@@ -1,0 +1,64 @@
+id: 7.1.r5/0
+type: file
+pred: 7.0.r4/10502
+count: 1
+text: 4 0 10489 18787 d1504d81b4282ee3ebcf3cdaf7f93238
+cpath: /trunk/COPYING
+copyfrom: 4 /COPYING
+
+PLAIN
+K 7
+COPYING
+V 13
+file 7.1.r5/0
+K 6
+README
+V 15
+file 6.0.r3/400
+K 12
+helloworld.c
+V 15
+file 2.0.r3/256
+K 8
+makefile
+V 14
+file 5.0.r2/59
+END
+ENDREP
+id: 1.0.r5/303
+type: dir
+pred: 1.0.r3/643
+count: 3
+text: 5 151 139 139 f64dae99765c4ad6dd4f923d5c122b03
+cpath: /trunk
+copyroot: 0 /
+
+PLAIN
+K 8
+branches
+V 14
+dir 3.0.r1/385
+K 4
+tags
+V 14
+dir 4.0.r1/451
+K 5
+trunk
+V 14
+dir 1.0.r5/303
+END
+ENDREP
+id: 0.0.r5/545
+type: dir
+pred: 0.0.r4/10769
+count: 5
+text: 5 436 96 96 2d909fa92b9b195db0fd14e3f7732c24
+cpath: /
+copyroot: 0 /
+
+7.0.r4/10502 delete false false /COPYING
+
+7._0.t4-1 add false false /trunk/COPYING
+4 /COPYING
+
+545 673

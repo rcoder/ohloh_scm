@@ -1,0 +1,118 @@
+#!/usr/bin/env ruby
+require File.dirname(__FILE__) + '/../lib/scm'
+
+# This is a simple command line tool which parses CVS and Subversion logs.
+# It is not used by the main Ohloh system.
+#
+# I use it primarily to help debug Ohloh behavior. It's a convenient way
+# to turn an enormously long CVS log into something readable.
+module Scm::Parsers
+	class CommandLine
+		attr_accessor :paths, :writer
+
+		def initialize(args=[])
+			args = args.clone # Because shift is destructive
+			set_option(args.shift) while args.first =~ /^-/
+			self.paths = args
+		end
+
+		def help
+			puts <<HELP
+Usage: ohlog [option] [paths]
+
+Ohloh source control log parser
+   http://www.ohloh.net/
+
+[option] can be one of the following:
+
+  --cvs             Parse a CVS rlog
+  --svn             Parse a Subversion log
+  --svn-xml         Parse a Subversion XML log
+
+  -h, --human       Output result as a human-readable log (default)
+  -x, --xml         Output result as an XML log
+
+  -?, --help        Display this message
+
+[paths] must be one or more source control log filenames.
+   If no path is given, input will be read from STDIN.
+
+Examples:
+
+   cvsnt -d :pserver:anonymous:@cvs-mirror.mozilla.org:/cvsroot rlog mozilla/browser | ohlog --cvs
+
+   svn log --xml --verbose -r2:3 http://svn.collab.net/repos/svn/trunk | ohlog --svn-xml
+
+HELP
+		end
+
+		def cvs
+			parse CvsParser
+		end
+
+		def svn
+			parse SvnParser
+		end
+
+		def svn_xml
+			parse SvnXmlParser
+		end
+
+		def parse(parser)
+			self.writer ||= HumanWriter.new(STDOUT)
+
+			if self.paths.any?
+				self.paths.each do |path|
+					parser.parse File.new(path,'r'), :writer => self.writer
+				end
+			else
+				parser.parse STDIN, :writer => self.writer
+			end
+		end
+
+		def subcommand=(s)
+			if @subcommand
+				STDERR.puts "Error: Multiple commands specified."
+				exit 1
+			else
+				@subcommand=s
+			end
+		end
+
+		def subcommand
+			@subcommand
+		end
+
+		def set_option(option)
+			case option
+			when '--cvs'
+				self.subcommand = :cvs
+			when '--svn'
+				self.subcommand = :svn
+			when '--svn-xml'
+				self.subcommand = :svn_xml
+			when '-h', '--human'
+				self.writer = HumanWriter.new(STDOUT)
+			when '-x', '--xml'
+				self.writer = XmlWriter.new(STDOUT)
+			when '-?', '--help'
+				self.subcommand = :help
+			else
+				STDERR.puts "Type 'ohlog -?' for usage."
+				exit 1
+			end
+		end
+
+		def run!
+			self.subcommand ||= :summary
+			if self.respond_to?(self.subcommand)
+				self.send(self.subcommand)
+			else
+				STDERR.puts "Type 'ohlog -?' for usage."
+				exit 1
+			end
+		end
+	end
+
+	CommandLine.new(ARGV).run!
+end

@@ -1,0 +1,59 @@
+require File.dirname(__FILE__) + '/../test_helper'
+
+module Scm::Adapters
+	class SvnMiscTest < Scm::Test
+
+		def test_export
+			with_svn_repository('svn') do |svn|
+				Scm::ScratchDir.new do |dir|
+					svn.export(dir)
+					assert_equal ['.','..','branches','tags','trunk'], Dir.entries(dir).sort
+				end
+			end
+		end
+
+		def test_path
+			assert !SvnAdapter.new(:url => "http://svn.collab.net/repos/svn/trunk").path
+			assert !SvnAdapter.new(:url => "svn://svn.collab.net/repos/svn/trunk").path
+			assert_equal "/foo/bar", SvnAdapter.new(:url => "file:///foo/bar").path
+			assert_equal "foo/bar", SvnAdapter.new(:url => "file://foo/bar").path
+			assert_equal "/foo/bar", SvnAdapter.new(:url => "svn+ssh://server/foo/bar").path
+		end
+
+		def test_hostname
+			assert !SvnAdapter.new(:url => "http://svn.collab.net/repos/svn/trunk").hostname
+			assert !SvnAdapter.new(:url => "svn://svn.collab.net/repos/svn/trunk").hostname
+			assert !SvnAdapter.new(:url => "file:///foo/bar").hostname
+			assert_equal "server", SvnAdapter.new(:url => "svn+ssh://server/foo/bar").hostname
+		end
+
+		def test_info
+			with_svn_repository('svn') do |svn|
+				assert_equal svn.url, svn.root
+				assert_equal "6a9cefd4-a008-4d2a-a89b-d77e99cd6eb1", svn.uuid
+				assert_equal 5, svn.max_revision
+				assert_equal 'directory', svn.node_kind
+
+				assert_equal 'file', svn.node_kind('trunk/helloworld.c',1)
+			end
+		end
+
+		def test_ls
+			with_svn_repository('svn') do |svn|
+				assert_equal ['branches/', 'tags/', 'trunk/'], svn.ls
+				assert_equal ['COPYING','README','helloworld.c','makefile'], svn.ls('trunk')
+				assert_equal ['helloworld.c'], svn.ls('trunk', 1)
+
+				assert_equal ['trunk/helloworld.c'], svn.recurse_files(nil, 1)
+				assert_equal ['helloworld.c'], svn.recurse_files('/trunk', 1)
+			end
+		end
+
+		def test_is_directory
+			with_svn_repository('svn') do |svn|
+				assert svn.is_directory?('trunk')
+				assert !svn.is_directory?('trunk/helloworld.c')
+			end
+		end
+	end
+end

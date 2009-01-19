@@ -1,0 +1,5 @@
+# The "triggers" file lists libraries which handle the events for each
+# module.
+#
+# In addition to the lines here, the default_trigger library is loaded, if available.
+#

@@ -1,0 +1,34 @@
+
+RCS file: /Users/robin/cvs_repo//simple/new_file.rb,v
+head: 1.2
+branch:
+locks: strict
+access list:
+symbolic names:
+	another_branch: 1.2.0.2
+	my_branch: 1.1.0.2
+keyword substitution: kv
+total revisions: 5;	selected revisions: 5
+description:
+----------------------------
+revision 1.2
+date: 2006/06/29 18:14:47;  author: robin;  state: Exp;  lines: +1 -0;  kopt: kv;  commitid: c3944a41896430e;  mergepoint: 1.1.2.1;  filename: new_file.rb;
+merged new_file.rb from branch onto the HEAD
+----------------------------
+revision 1.1
+date: 2006/06/29 18:05:27;  author: robin;  state: dead;  kopt: kv;  commitid: bd144a41667e765;  filename: new_file.rb;
+branches:  1.1.2;
+file new_file.rb was initially added on branch my_branch.
+----------------------------
+revision 1.1.2.3
+date: 2006/06/29 18:40:38;  author: robin;  state: dead;  lines: +0 -0;  kopt: kv;  commitid: d4e44a41ea6477e;  filename: new_file.rb;
+removed new_file.rb from the branch only
+----------------------------
+revision 1.1.2.2
+date: 2006/06/29 18:17:49;  author: robin;  state: Exp;  lines: +1 -0;  kopt: kv;  commitid: c7744a4194cefc8;  filename: new_file.rb;
+modifed new_file.rb on the branch only
+----------------------------
+revision 1.1.2.1
+date: 2006/06/29 18:05:27;  author: robin;  state: Exp;  lines: +1 -0;  kopt: kv;  commitid: bd144a41667e765;  filename: new_file.rb;
+added new_file.rb on the branch
+=============================================================================
