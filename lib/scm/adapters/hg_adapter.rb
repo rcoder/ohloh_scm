@@ -7,3 +7,5 @@ module Scm::Adapters
 end
 
 require 'lib/scm/adapters/hg/validation'
+require 'lib/scm/adapters/hg/cat_file'
+require 'lib/scm/adapters/hg/misc'

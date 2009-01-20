@@ -12,14 +12,16 @@ module Scm::Parsers
 		end
 
 		def write_commit(commit)
+			@buffer << "--------------- #{'-' * 40}\n"
 			@buffer << "token:          #{commit.token.to_s}\n"
-			@buffer << "committer name: #{commit.committer_name}\n"
-			@buffer << "committer date: #{commit.committer_date}\n"
 
-			if commit.author_name
-				@buffer << "author name:    #{commit.author_name}\n"
-				@buffer << "author date:    #{commit.author_date}\n"
-			end
+			@buffer << "committer name: #{commit.committer_name}\n" if commit.committer_name
+			@buffer << "committer mail: <#{commit.committer_email}>\n" if commit.committer_email
+			@buffer << "committer date: #{commit.committer_date}\n" if commit.committer_date
+
+			@buffer << "author name:    #{commit.author_name}\n" if commit.author_name
+			@buffer << "author mail:    <#{commit.author_email}>\n" if commit.author_email
+			@buffer << "author date:    #{commit.author_date}\n" if commit.author_date
 
 			if commit.diffs && commit.diffs.any?
 				commit.diffs.each do |diff|
@@ -34,8 +36,11 @@ module Scm::Parsers
 			end
 
 			if commit.message
-				@buffer << "\n#{commit.message}\n"
+				@buffer << "\n#{commit.message}"
+				@buffer << "\n" unless commit.message[-1..-1] == "\n"
 			end
+
+			@buffer << "\n"
 		end
 
 		def write_postamble

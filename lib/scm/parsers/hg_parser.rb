@@ -18,9 +18,9 @@ module Scm::Parsers
 						e = Scm::Commit.new
 						e.diffs = []
 						e.token = $1
-					when /^user:\s+(.+) <(.+)>/
+					when /^user:\s+(.+?)(\s+<(.+)>)?$/
 						e.committer_name = $1
-						e.committer_email = $2
+						e.committer_email = $3
 					when /^date:\s+(.+)/
 						e.committer_date = Time.local(*ParseDate.parsedate($1)).utc
 					when /^files:\s+(.+)/

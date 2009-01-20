@@ -42,6 +42,25 @@ SAMPLE
 			assert_equal 0, commits[1].diffs.size
 		end
 
+		def test_log_parser_default_partial_user_name
+sample_log = <<SAMPLE
+changeset:   259:45c293b71341
+user:        robin@ohloh.net
+date:        Sat Jun 04 23:37:11 2005 -0800
+summary:     fix addremove
+
+SAMPLE
+
+			commits = HgParser.parse(sample_log)
+
+			assert commits
+			assert_equal 1, commits.size
+
+			assert_equal '45c293b71341', commits[0].token
+			assert_equal 'robin@ohloh.net', commits[0].committer_name
+			assert !commits[0].committer_email
+		end
+
 		def test_log_parser_verbose
 sample_log = <<SAMPLE
 changeset:   1:b14fa4692f94

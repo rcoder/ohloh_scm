@@ -81,4 +81,15 @@ class Scm::Test < Test::Unit::TestCase
 			raise RuntimeError.new("Repository archive #{File.join(REPO_DIR, name)} not found.")
 		end
 	end
+
+	def with_hg_repository(name)
+		if Dir.entries(REPO_DIR).include?(name)
+			Scm::ScratchDir.new do |dir|
+				`cp -R #{File.join(REPO_DIR, name)} #{dir}`
+				yield Scm::Adapters::HgAdapter.new(:url => File.join(dir, name)).normalize
+			end
+		else
+			raise RuntimeError.new("Repository archive #{File.join(REPO_DIR, name)} not found.")
+		end
+	end
 end
