@@ -67,9 +67,11 @@ module Scm::Adapters
 		# the directory contains.
 		def deepen_commit(commit)
 			deep_commit = commit.clone
-			deep_commit.diffs = commit.diffs.collect do |diff|
-				deepen_diff(diff, commit.token)
-			end.flatten.uniq.sort { |a,b| a.action <=> b.action }.sort { |a,b| a.path <=> b.path }
+			if commit.diffs
+				deep_commit.diffs = commit.diffs.collect do |diff|
+					deepen_diff(diff, commit.token)
+				end.flatten.uniq.sort { |a,b| a.action <=> b.action }.sort { |a,b| a.path <=> b.path }
+			end
 
 			remove_dupes(deep_commit)
 		end
@@ -82,8 +84,10 @@ module Scm::Adapters
 			# and once from the regular log entry.
 			#
 			# So look for diffs of the form ["M", "path"] which are matched by ["A", "path"] and remove them.
-			commit.diffs.delete_if do |d|
-				d.action == 'M' && commit.diffs.select { |x| x.action == 'A' and x.path == d.path }.any?
+			if commit.diffs
+				commit.diffs.delete_if do |d|
+					d.action == 'M' && commit.diffs.select { |x| x.action == 'A' and x.path == d.path }.any?
+				end
 			end
 			commit
 		end
