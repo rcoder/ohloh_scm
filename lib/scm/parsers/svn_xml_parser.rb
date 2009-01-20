@@ -17,6 +17,7 @@ module Scm::Parsers
 			case name
 			when 'logentry'
 				@commit = Scm::Commit.new
+				@commit.diffs = []
 				@commit.token = attrs['revision'].to_i
 			when 'path'
 				@diff = Scm::Diff.new(:action => attrs['action'])
@@ -33,7 +34,6 @@ module Scm::Parsers
 				@commit.committer_date = Time.utc(*ParseDate.parsedate(@text))
 			when 'path'
 				@diff.path = @text
-				@commit.diffs ||= []
 				@commit.diffs << @diff
 			when 'msg'
 				@commit.message = @text
