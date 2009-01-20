@@ -12,41 +12,30 @@ module Scm::Parsers
 		end
 
 		def write_commit(commit)
-			@buffer << "-" * 72 + "\n"
-
-			@buffer << commit.token.to_s
-			@buffer << ' | Committer: '
-			@buffer << commit.committer_name.to_s.ljust(24)
-			@buffer << ' | '
-			@buffer << commit.committer_date.to_s
-			@buffer << "\n"
+			@buffer << "token:          #{commit.token.to_s}\n"
+			@buffer << "committer name: #{commit.committer_name}\n"
+			@buffer << "committer date: #{commit.committer_date}\n"
 
 			if commit.author_name
-				@buffer << ' ' * commit.token.to_s.length
-				@buffer << ' | Author:    '
-				@buffer << commit.author_name.to_s.ljust(24)
-				@buffer << ' | '
-				@buffer << commit.author_date.to_s
-				@buffer << "\n"
+				@buffer << "author name:    #{commit.author_name}\n"
+				@buffer << "author date:    #{commit.author_date}\n"
 			end
 
 			if commit.diffs && commit.diffs.any?
-				commit.diffs.each { |diff| write_diff(diff) }
+				commit.diffs.each do |diff|
+					@buffer << "                #{diff.action} #{diff.path}\n"
+				end
 			end
 
 			if commit.directories && commit.directories.any?
 				commit.directories.each do |d|
-					@buffer << "\t#{d}\n"
+					@buffer << "                #{d}\n"
 				end
 			end
 
 			if commit.message
 				@buffer << "\n#{commit.message}\n"
 			end
-		end
-
-		def write_diff(diff)
-			@buffer << "\t#{diff.action} #{diff.path}\n"
 		end
 
 		def write_postamble

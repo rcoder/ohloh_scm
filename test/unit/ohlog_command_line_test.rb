@@ -24,6 +24,9 @@ module Scm::Parsers
 			assert_buffers_equal File.read(DATA_DIR + '/simple.ohlog'), result
 		end
 
+		def test_hg_from_file
+		end
+
 		def test_help
 			result = `#{File.dirname(__FILE__) + '/../../bin/ohlog'} -?`
 			assert_equal 0, $?
