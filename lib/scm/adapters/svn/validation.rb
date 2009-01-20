@@ -12,6 +12,7 @@ module Scm::Adapters
 			super
 			@url = path_to_file_url(@url)
 			@url = force_https_if_sourceforge(@url)
+			@branch_name = @branch_name[0..-2] if @branch_name && @branch_name[-1..-1] == '/'
 			self
 		end
 
@@ -44,6 +45,7 @@ module Scm::Adapters
 		# The current branch_name is overwritten.
 		def recalc_branch_name
 			@branch_name = @url ? @url[root.length..-1] : @branch_name
+			@branch_name = @branch_name[0..-2] if @branch_name[-1..-1] == '/'
 		end
 
 		def guess_forge

@@ -94,4 +94,8 @@ module Scm::Adapters
 				SvnAdapter.new(:url => 'http://pianosa.googlecode.com/svn/trunk').normalize.url
 		end
 	end
+
+	def test_strip_trailing_whack_from_branch_name
+		assert_equal '/trunk', SvnAdapter.new(:branch_name => "/trunk/").normalize.branch_name
+	end
 end
