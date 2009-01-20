@@ -84,6 +84,15 @@ module Scm::Adapters
 			assert_equal '/foo', SvnAdapter.new(:branch_name => '/trunk/hamcrest-c++').strip_path_branch('/trunk/hamcrest-c++/foo')
 		end
 
+		def test_remove_dupes
+			svn = SvnAdapter.new
+			c = Scm::Commit.new(:diffs => [ Scm::Diff.new(:action => "A", :path => "foo"),
+																			Scm::Diff.new(:action => "M", :path => "foo") ])
+
+			svn.remove_dupes(c)
+			assert_equal 1, c.diffs.size
+			assert_equal 'A', c.diffs.first.action
+		end
 
 		def test_deep_commits
 			with_svn_repository('deep_svn') do |svn|
@@ -226,7 +235,6 @@ module Scm::Adapters
 			assert_equal '6ff87c4664981e4397625791c8ea3bbb5f2279a3', commits[4].diffs[1].sha1
 			assert_equal '0000000000000000000000000000000000000000', commits[4].diffs[1].parent_sha1
 		end
-
 
 	end
 end

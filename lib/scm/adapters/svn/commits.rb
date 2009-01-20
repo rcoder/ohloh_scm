@@ -70,7 +70,22 @@ module Scm::Adapters
 			deep_commit.diffs = commit.diffs.collect do |diff|
 				deepen_diff(diff, commit.token)
 			end.flatten.uniq.sort { |a,b| a.action <=> b.action }.sort { |a,b| a.path <=> b.path }
-			deep_commit
+
+			remove_dupes(deep_commit)
+		end
+
+		def remove_dupes(commit)
+			# Strange case correction.
+			#
+			# Subversion may report that a directory is added, and then also that a file within that directory is modified.
+			# Because we expand directories, the result is that the file may be listed twice -- once as part of our expansion,
+			# and once from the regular log entry.
+			#
+			# So look for diffs of the form ["M", "path"] which are matched by ["A", "path"] and remove them.
+			commit.diffs.delete_if do |d|
+				d.action == 'M' && commit.diffs.select { |x| x.action == 'A' and x.path == d.path }.any?
+			end
+			commit
 		end
 
 		# If the diff points to a file, simply returns the diff.
