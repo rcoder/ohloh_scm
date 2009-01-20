@@ -199,8 +199,10 @@ module Scm::Adapters
 
 		# Populates the SHA1 values for each diff in a commit.
 		def populate_sha1s!(commit)
-			commit.diffs.each do |diff|
-				populate_sha1!(diff, commit.token)
+			if commit.diffs
+				commit.diffs.each do |diff|
+					populate_sha1!(diff, commit.token)
+				end
 			end
 			commit
 		end

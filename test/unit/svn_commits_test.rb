@@ -94,6 +94,15 @@ module Scm::Adapters
 			assert_equal 'A', c.diffs.first.action
 		end
 
+		# Had so many bugs around this case that a test was required
+		def test_deepen_commit_with_nil_diffs
+			with_svn_repository('svn') do |svn|
+				c = svn.commits.first # Doesn't matter which
+				c.diffs = nil
+				svn.populate_sha1s!(svn.deepen_commit(c)) # If we don't crash we pass the test.
+			end
+		end
+
 		def test_deep_commits
 			with_svn_repository('deep_svn') do |svn|
 
