@@ -157,9 +157,8 @@ module Scm::Adapters
 					File.open(log_filename, 'w') { |f| f.puts '<?xml version="1.0"?>' }
 				end
 				File.open(log_filename, 'r') { |io| yield io }
-			rescue
+			ensure
 				File.delete(log_filename) if FileTest.exist?(log_filename)
-				raise
 			end
 		end
 

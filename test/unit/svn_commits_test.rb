@@ -16,6 +16,7 @@ module Scm::Adapters
 				assert_equal [1,2,3,4,5], svn.commits.collect { |c| c.token }
 				assert_equal [3,4,5], svn.commits(2).collect { |c| c.token }
 				assert_equal [], svn.commits(1000)
+				assert !FileTest.exist?(svn.log_filename)
 			end
 		end
 
@@ -189,16 +190,17 @@ module Scm::Adapters
 			with_svn_repository('svn') do |svn|
 				svn.each_commit do |e|
 					commits << e
-					assert e.token
-					assert e.committer_name
-					assert e.committer_date
+					assert e.token.to_s =~ /\d+/
+					assert e.committer_name.length > 0
+					assert e.committer_date.is_a?(Time)
 					assert e.message
-					assert e.diffs
+					assert e.diffs.any?
 					e.diffs.each do |d|
 						assert d.action.length == 1
 						assert d.path.length > 0
 					end
 				end
+				assert !FileTest.exist?(svn.log_filename) # Make sure we cleaned up after ourselves
 			end
 
 			assert_equal [1, 2, 3, 4, 5], commits.collect { |c| c.token }
