@@ -41,7 +41,7 @@ module Scm::Adapters
 		def each_commit(since=0)
 			open_log_file(since) do |io|
 				Scm::Parsers::HgStyledParser.parse(io) do |commit|
-					yield commit if block_given? && commit.token != since
+					yield populate_commit_sha1s!(commit) if block_given? && commit.token != since
 				end
 			end
 		end

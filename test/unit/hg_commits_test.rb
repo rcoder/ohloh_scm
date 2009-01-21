@@ -43,9 +43,12 @@ module Scm::Adapters
 					assert c.committer_date.is_a?(Time)
 					assert c.message.length > 0
 					assert c.diffs.any?
+					# Check that the diffs are populated
 					c.diffs.each do |d|
 						assert d.action =~ /^[MAD]$/
 						assert d.path.length > 0
+						assert d.sha1.length == 40
+						assert d.parent_sha1.length == 40
 					end
 					commits << c
 				end
@@ -56,6 +59,15 @@ module Scm::Adapters
 											'b14fa4692f949940bd1e28da6fb4617de2615484',
 											'468336c6671cbc58237a259d1b7326866afc2817',
 											'75532c1e1f1de55c2271f6fd29d98efbe35397c4'], commits.collect { |c| c.token }
+
+				# Spot check that the diff sha1 and parent_sha1 are being computed correctly
+				before_diff = commits[0].diffs.select { |d| d.path == 'helloworld.c' }.first
+				assert_equal '4c734ad53b272c9b3d719f214372ac497ff6c068', before_diff.sha1
+				assert_equal '0000000000000000000000000000000000000000', before_diff.parent_sha1
+
+				after_diff = commits[2].diffs.select { |d| d.path == 'helloworld.c' }.first
+				assert_equal 'f6adcae4447809b651c787c078d255b2b4e963c5', after_diff.sha1
+				assert_equal before_diff.sha1, after_diff.parent_sha1
 			end
 		end
 	end

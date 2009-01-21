@@ -14,6 +14,8 @@ main()
 }
 EXPECTED
 				assert_equal expected, svn.cat_file(Scm::Commit.new(:token => "1"), Scm::Diff.new(:path => "trunk/helloworld.c"))
+
+				assert_equal nil, svn.cat_file(Scm::Commit.new(:token => "1"), Scm::Diff.new(:path => "file not found"))
 			end
 
 		end

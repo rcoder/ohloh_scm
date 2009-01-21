@@ -4,7 +4,7 @@ module Scm::Adapters
 			cat(commit.token, diff.path)
 		end
 
-		def cat_parent_file(commit, diff)
+		def cat_file_parent(commit, diff)
 			cat(parent_commit(commit).token, diff.path)
 		end
 

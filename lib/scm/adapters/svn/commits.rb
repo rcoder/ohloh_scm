@@ -59,7 +59,7 @@ module Scm::Adapters
 		#
 		def each_commit(since=nil)
 			commit_tokens(since).each do |rev|
-				yield populate_sha1s!(deepen_commit(strip_commit_branch(verbose_commit(rev))))
+				yield populate_commit_sha1s!(deepen_commit(strip_commit_branch(verbose_commit(rev))))
 			end
 		end
 
@@ -189,72 +189,6 @@ module Scm::Adapters
 				files << s if s.length > 0 and s !~ /CVSROOT\// and s[-1..-1] != '/'
 			end
 			files.sort
-		end
-
-		#---------------------------------------------------------------------
-		# SHA1 Computation
-		# Generates SHA1 hashes for file contents, matching Git's method.
-		#---------------------------------------------------------------------
-
-		# Populates the SHA1 values for each diff in a commit.
-		def populate_sha1s!(commit)
-			if commit.diffs
-				commit.diffs.each do |diff|
-					populate_sha1!(diff, commit.token)
-				end
-			end
-			commit
-		end
-
-		# Populates the SHA1 values for a single diff.
-		def populate_sha1!(diff, rev)
-			diff.sha1 =
-				case diff.action
-				when 'D'
-					NULL_SHA1
-				else
-					get_sha1(diff.path, rev)
-				end
-
-			diff.parent_sha1 =
-				case diff.action
-				when 'A'
-					NULL_SHA1
-				else
-					# It is possible for Subversion to report deletion or modification of a file
-					# which didn't previously exist. This happens, for instance, when a directory
-					# is copied and some contents of that directory are deleted during
-					# the same commit. We don't care about these deletions and don't need to report them.
-					# The parent_sha1 computation might fail, so use the 'try' version.
-					try_get_sha1(diff.path, rev-1)
-				end
-
-			diff
-		end
-
-
-		# Use in cases where we're not sure that the file actually exists.
-		# Returns NULL_SHA1 if the file is not found.
-		def try_get_sha1(path=nil, revision='HEAD')
-			begin
-				get_sha1(path, revision)
-			rescue
-				if $!.message =~ /svn: (File not found|.* is not a directory in filesystem)/
-					NULL_SHA1
-				else
-					raise
-				end
-			end
-		end
-
-		# Use in cases where the file should actually exist.
-		# Raises an exception if the file is not found.
-		def get_sha1(path=nil, revision='HEAD')
-			generate_sha1(cat(path, revision))
-		end
-
-		def generate_sha1(contents)
-			contents.to_s == '' ? NULL_SHA1 : SHA1.sha1("blob #{contents.length}\0#{contents}").to_s
 		end
 	end
 end

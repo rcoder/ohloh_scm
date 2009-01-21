@@ -22,3 +22,4 @@ end
 
 require 'lib/scm/adapters/abstract/system'
 require 'lib/scm/adapters/abstract/validation'
+require 'lib/scm/adapters/abstract/sha1'

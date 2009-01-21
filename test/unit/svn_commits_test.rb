@@ -23,8 +23,9 @@ module Scm::Adapters
 		# Confirms that the sha1 matches those created by git exactly
 		def test_sha1
 			with_svn_repository('svn') do |svn|
-				assert_equal '0000000000000000000000000000000000000000', svn.try_get_sha1('/trunk/file_not_found')
-				assert_equal 'f6adcae4447809b651c787c078d255b2b4e963c5', svn.try_get_sha1('/trunk/helloworld.c')
+				assert_equal '0000000000000000000000000000000000000000', svn.compute_sha1(nil)
+				assert_equal '0000000000000000000000000000000000000000', svn.compute_sha1('')
+				assert_equal '30d74d258442c7c65512eafab474568dd706c430', svn.compute_sha1('test')
 			end
 		end
 
@@ -33,7 +34,7 @@ module Scm::Adapters
 			with_svn_repository('svn') do |svn|
 				c = Scm::Commit.new(:token => 3)
 				c.diffs = [Scm::Diff.new(:path => "/trunk/helloworld.c", :action => "M")]
-				svn.populate_sha1s!(c)
+				svn.populate_commit_sha1s!(c)
 				assert_equal 'f6adcae4447809b651c787c078d255b2b4e963c5', c.diffs.first.sha1
 				assert_equal '4c734ad53b272c9b3d719f214372ac497ff6c068', c.diffs.first.parent_sha1
 			end
@@ -110,7 +111,7 @@ module Scm::Adapters
 			with_svn_repository('svn') do |svn|
 				c = svn.commits.first # Doesn't matter which
 				c.diffs = nil
-				svn.populate_sha1s!(svn.deepen_commit(c)) # If we don't crash we pass the test.
+				svn.populate_commit_sha1s!(svn.deepen_commit(c)) # If we don't crash we pass the test.
 			end
 		end
 

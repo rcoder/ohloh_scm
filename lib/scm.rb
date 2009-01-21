@@ -5,8 +5,6 @@ require 'rbconfig'
 
 $: << File.join(File.dirname(__FILE__),"..")
 
-NULL_SHA1 = '0000000000000000000000000000000000000000' unless defined?(NULL_SHA1)
-
 require 'lib/scm/systemu'
 require 'lib/scm/scratch_dir'
 require 'lib/scm/commit'

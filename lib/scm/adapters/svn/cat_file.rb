@@ -9,7 +9,11 @@ module Scm::Adapters
 		end
 
 		def cat(path=nil, revision='HEAD')
-			run "svn cat -r #{revision} '#{SvnAdapter.uri_encode(File.join(self.root, self.branch_name.to_s, path.to_s))}@#{revision}'"
+			begin
+				run "svn cat -r #{revision} '#{SvnAdapter.uri_encode(File.join(self.root, self.branch_name.to_s, path.to_s))}@#{revision}'"
+			rescue
+				raise unless $!.message =~ /svn: (File not found|.* is not a directory in filesystem)/
+			end
 		end
 	end
 end
