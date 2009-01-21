@@ -108,7 +108,7 @@ SAMPLE
 				assert FileTest.exist?(HgStyledParser.style_path)
 				log = hg.run("cd #{hg.url} && hg log --style #{Scm::Parsers::HgStyledParser.style_path}")
 				commits = Scm::Parsers::HgStyledParser.parse(log)
-				assert_styled_commits(commits, true)
+				assert_styled_commits(commits, false)
 
 				assert FileTest.exist?(HgStyledParser.verbose_style_path)
 				log = hg.run("cd #{hg.url} && hg log --style #{Scm::Parsers::HgStyledParser.verbose_style_path}")
@@ -118,6 +118,7 @@ SAMPLE
 		end
 
 		protected
+
 		def assert_styled_commits(commits, with_diffs=false)
 			assert_equal 4, commits.size
 
