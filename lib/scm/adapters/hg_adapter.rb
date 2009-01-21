@@ -8,4 +8,5 @@ end
 
 require 'lib/scm/adapters/hg/validation'
 require 'lib/scm/adapters/hg/cat_file'
+require 'lib/scm/adapters/hg/commits'
 require 'lib/scm/adapters/hg/misc'

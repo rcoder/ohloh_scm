@@ -24,6 +24,8 @@ require 'lib/scm/parsers/cvs_parser'
 require 'lib/scm/parsers/svn_parser'
 require 'lib/scm/parsers/svn_xml_parser'
 require 'lib/scm/parsers/hg_parser'
+require 'lib/scm/parsers/hg_styled_parser'
+
 require 'lib/scm/parsers/array_writer'
 require 'lib/scm/parsers/xml_writer'
 require 'lib/scm/parsers/human_writer'

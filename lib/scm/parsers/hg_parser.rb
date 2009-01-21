@@ -1,6 +1,9 @@
 require 'parsedate'
 
 module Scm::Parsers
+	# This parser can process the default hg logs, with or without the --verbose flag.
+	# It is handy for debugging but is not detailed enough for Ohloh analysis.
+	# See the HgStyledParser.
 	class HgParser < Parser
 		def self.scm
 			'hg'

@@ -102,5 +102,51 @@ SAMPLE
 			assert_equal 1, commits[1].diffs.size
 			assert_equal 'helloworld.c', commits[1].diffs[0].path
 		end
+
+		def test_styled_parser
+			with_hg_repository('hg') do |hg|
+				assert FileTest.exist?(HgStyledParser.style_path)
+				log = hg.run("cd #{hg.url} && hg log --style #{Scm::Parsers::HgStyledParser.style_path}")
+				commits = Scm::Parsers::HgStyledParser.parse(log)
+				assert_styled_commits(commits, true)
+
+				assert FileTest.exist?(HgStyledParser.verbose_style_path)
+				log = hg.run("cd #{hg.url} && hg log --style #{Scm::Parsers::HgStyledParser.verbose_style_path}")
+				commits = Scm::Parsers::HgStyledParser.parse(log)
+				assert_styled_commits(commits, true)
+			end
+		end
+
+		protected
+		def assert_styled_commits(commits, with_diffs=false)
+			assert_equal 4, commits.size
+
+			assert_equal '75532c1e1f1de55c2271f6fd29d98efbe35397c4', commits[0].token
+			assert_equal 'Robin Luckey', commits[0].committer_name
+			assert_equal 'robin@ohloh.net', commits[0].committer_email
+			assert Time.utc(2009,1,20,19,34,53) - commits[0].committer_date < 1 # Don't care about milliseconds
+			assert_equal "deleted helloworld.c\n", commits[0].message
+
+			if with_diffs
+				assert_equal 1, commits[0].diffs.size
+				assert_equal 'D', commits[0].diffs[0].action
+				assert_equal 'helloworld.c', commits[0].diffs[0].path
+			else
+				assert_equal [], commits[0].diffs
+			end
+
+			assert_equal '468336c6671cbc58237a259d1b7326866afc2817', commits[1].token
+			assert Time.utc(2009, 1,20,19,34,04) - commits[1].committer_date < 1
+
+			if with_diffs
+				assert_equal 2, commits[1].diffs.size
+				assert_equal 'M', commits[1].diffs[0].action
+				assert_equal 'helloworld.c', commits[1].diffs[0].path
+				assert_equal 'A', commits[1].diffs[1].action
+				assert_equal 'README', commits[1].diffs[1].path
+			else
+				assert_equal [], commits[0].diffs
+			end
+		end
 	end
 end
