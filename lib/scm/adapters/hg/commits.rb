@@ -46,6 +46,11 @@ module Scm::Adapters
 			end
 		end
 
+		# Not used by Ohloh proper, but handy for debugging and testing
+		def log(since=0)
+			run "cd '#{url}' && hg log -v -r #{since}:tip"
+		end
+
 		# Returns a file handle to the log.
 		# In our standard, the log should include everything AFTER +since+. However, hg doesn't work that way;
 		# it returns everything after and INCLUDING +since+. Therefore, consumers of this file should check for
