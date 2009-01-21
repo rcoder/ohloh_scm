@@ -86,7 +86,7 @@ module Scm::Adapters
 			# So look for diffs of the form ["M", "path"] which are matched by ["A", "path"] and remove them.
 			if commit.diffs
 				commit.diffs.delete_if do |d|
-					d.action == 'M' && commit.diffs.select { |x| x.action == 'A' and x.path == d.path }.any?
+					d.action =~ /[MR]/ && commit.diffs.select { |x| x.action == 'A' and x.path == d.path }.any?
 				end
 			end
 			commit
