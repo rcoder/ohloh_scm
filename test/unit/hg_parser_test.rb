@@ -61,6 +61,37 @@ SAMPLE
 			assert !commits[0].committer_email
 		end
 
+		# Sometimes the log does not include a summary
+		def test_log_parser_default_no_summary
+sample_log = <<SAMPLE
+changeset:   1:b14fa4692f94
+user:        Jason Allen <jason@ohloh.net>
+date:        Tue Jan 20 11:33:17 2009 -0800
+
+
+changeset:   0:01101d8ef3ce
+user:        Robin Luckey <robin@ohloh.net>
+date:        Tue Jan 20 11:32:54 2009 -0800
+
+SAMPLE
+			commits = HgParser.parse(sample_log)
+
+			assert commits
+			assert_equal 2, commits.size
+
+			assert_equal 'b14fa4692f94', commits[0].token
+			assert_equal 'Jason Allen', commits[0].committer_name
+			assert_equal 'jason@ohloh.net', commits[0].committer_email
+			assert_equal Time.utc(2009,1,20,19,33,17), commits[0].committer_date
+			assert_equal 0, commits[0].diffs.size
+
+			assert_equal '01101d8ef3ce', commits[1].token
+			assert_equal 'Robin Luckey', commits[1].committer_name
+			assert_equal 'robin@ohloh.net', commits[1].committer_email
+			assert_equal Time.utc(2009,1,20,19,32,54), commits[1].committer_date
+			assert_equal 0, commits[1].diffs.size
+		end
+
 		def test_log_parser_verbose
 sample_log = <<SAMPLE
 changeset:   1:b14fa4692f94

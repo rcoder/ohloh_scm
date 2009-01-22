@@ -18,6 +18,7 @@ module Scm::Parsers
 				if state == :data
 					case l
 					when /^changeset:\s+\d+:([0-9a-f]+)/
+						yield e if e && block_given?
 						e = Scm::Commit.new
 						e.diffs = []
 						e.token = $1
@@ -32,8 +33,6 @@ module Scm::Parsers
 						end
 					when /^summary:\s+(.+)/
 						e.message = $1
-						yield e if block_given?
-						e = nil
 					when /^description:/
 						next_state = :long_comment
 					end
@@ -59,6 +58,8 @@ module Scm::Parsers
 				end
 				state = next_state
 			end
+			yield e if e && block_given?
 		end
+
 	end
 end

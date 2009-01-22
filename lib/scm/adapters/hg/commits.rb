@@ -3,12 +3,12 @@ module Scm::Adapters
 
 		# Return the number of commits in the repository following +since+.
 		def commit_count(since=0)
-			commit_tokens(since).size
+			commit_tokens(since || 0).size
 		end
 
 		# Return the list of commit tokens following +since+.
 		def commit_tokens(since=0)
-			tokens = run("cd '#{self.url}' && hg log -r #{since}:tip --template='{node}\\n'").split("\n")
+			tokens = run("cd '#{self.url}' && hg log -r #{since || 0}:tip --template='{node}\\n'").split("\n")
 
 			# Hg returns everything after *and including* since.
 			# We do not want to include it.
@@ -24,7 +24,7 @@ module Scm::Adapters
 		# If you need all commits including diffs, you should use the each_commit() iterator, which only holds one commit
 		# in memory at a time.
 		def commits(since=0)
-			log = run("cd '#{self.url}' && hg log -v -r #{since}:tip --style #{Scm::Parsers::HgStyledParser.style_path}")
+			log = run("cd '#{self.url}' && hg log -v -r #{since || 0}:tip --style #{Scm::Parsers::HgStyledParser.style_path}")
 			a = Scm::Parsers::HgStyledParser.parse(log)
 
 			if a.any? && a.first.token == since
