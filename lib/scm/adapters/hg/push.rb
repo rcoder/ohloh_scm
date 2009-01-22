@@ -24,16 +24,28 @@ module Scm::Adapters
 
 		def local?
 			return true if hostname == Socket.gethostname
-			return false if url =~ /:/
-			true
+			return true if url =~ /^file:\/\//
+			return true if url !~ /:/
+			false
 		end
 
 		def hostname
-			url =~ /^([^:^\/]+):(.+)/ ? $1 : nil
+			$1 if url =~ /^ssh:\/\/([^\/]+)/
 		end
 
 		def path
-			url =~ /^([^:^\/]+):(.+)/ ? $2 : nil
+			case url
+			when /^file:\/\/(.+)$/
+				$1
+			when /^ssh:\/\/[^\/]+(\/.+)$/
+				$1
+			when /^[^:]*$/
+				url
+			end
+		end
+
+		def hg_path
+			path && File.join(path, '.hg')
 		end
 	end
 end
