@@ -222,40 +222,26 @@ module Scm::Adapters
 			assert_equal 1, commits[0].diffs.size
 			assert_equal 'A', commits[0].diffs[0].action
 			assert_equal '/trunk/helloworld.c', commits[0].diffs[0].path
-			assert_equal '4c734ad53b272c9b3d719f214372ac497ff6c068', commits[0].diffs[0].sha1
-			assert_equal '0000000000000000000000000000000000000000', commits[0].diffs[0].parent_sha1
 
 			assert_equal 1, commits[1].diffs.size
 			assert_equal 'A', commits[1].diffs[0].action
 			assert_equal '/trunk/makefile', commits[1].diffs[0].path
-			assert_equal 'af2dfd5070b01a19b672861e595de98c101c49cc', commits[1].diffs[0].sha1
-			assert_equal '0000000000000000000000000000000000000000', commits[1].diffs[0].parent_sha1
 
 			assert_equal 2, commits[2].diffs.size
 			assert_equal 'A', commits[2].diffs[0].action
 			assert_equal '/trunk/README', commits[2].diffs[0].path
-			assert_equal 'f0547ce063095e66be74618bc410989df226d2d2', commits[2].diffs[0].sha1
-			assert_equal '0000000000000000000000000000000000000000', commits[2].diffs[0].parent_sha1
 			assert_equal 'M', commits[2].diffs[1].action
 			assert_equal '/trunk/helloworld.c', commits[2].diffs[1].path
-			assert_equal 'f6adcae4447809b651c787c078d255b2b4e963c5', commits[2].diffs[1].sha1
-			assert_equal '4c734ad53b272c9b3d719f214372ac497ff6c068', commits[2].diffs[1].parent_sha1
 
 			assert_equal 1, commits[3].diffs.size
 			assert_equal 'A', commits[3].diffs[0].action
 			assert_equal '/COPYING', commits[3].diffs[0].path
-			assert_equal '6ff87c4664981e4397625791c8ea3bbb5f2279a3', commits[3].diffs[0].sha1
-			assert_equal '0000000000000000000000000000000000000000', commits[3].diffs[0].parent_sha1
 
 			assert_equal 2, commits[4].diffs.size
 			assert_equal 'D', commits[4].diffs[0].action
 			assert_equal '/COPYING', commits[4].diffs[0].path
-			assert_equal '0000000000000000000000000000000000000000', commits[4].diffs[0].sha1
-			assert_equal '6ff87c4664981e4397625791c8ea3bbb5f2279a3', commits[4].diffs[0].parent_sha1
 			assert_equal 'A', commits[4].diffs[1].action
 			assert_equal '/trunk/COPYING', commits[4].diffs[1].path
-			assert_equal '6ff87c4664981e4397625791c8ea3bbb5f2279a3', commits[4].diffs[1].sha1
-			assert_equal '0000000000000000000000000000000000000000', commits[4].diffs[1].parent_sha1
 		end
 
 	end
