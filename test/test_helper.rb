@@ -47,49 +47,32 @@ class Scm::Test < Test::Unit::TestCase
 		assert_equal expected_lines, actual_lines
 	end
 
-	# Expands a tarballed git repository and yields a GitAdapter that points to it.
-	def with_git_repository(name)
-		archive = name + '.tgz'
-		if Dir.entries(REPO_DIR).include?(archive)
-			Scm::ScratchDir.new do |dir|
-				`tar xzf #{File.join(REPO_DIR, archive)} --directory #{dir}`
-				yield Scm::Adapters::GitAdapter.new(:url => File.join(dir, name)).normalize
+	def with_repository(type, name, block)
+		Scm::ScratchDir.new do |dir|
+			if Dir.entries(REPO_DIR).include?(name)
+				`cp -R #{File.join(REPO_DIR, name)} #{dir}`
+			elsif Dir.entries(REPO_DIR).include?(name + '.tgz')
+				`tar xzf #{File.join(REPO_DIR, name + '.tgz')} --directory #{dir}`
+			else
+				raise RuntimeError.new("Repository archive #{File.join(REPO_DIR, name)} not found.")
 			end
-		else
-			raise RuntimeError.new("Repository archive #{File.join(REPO_DIR, archive)} not found.")
+			block.call(type.new(:url => File.join(dir, name)).normalize)
 		end
 	end
 
-	def with_svn_repository(name)
-		if Dir.entries(REPO_DIR).include?(name)
-			Scm::ScratchDir.new do |dir|
-				`cp -R #{File.join(REPO_DIR, name)} #{dir}`
-				yield Scm::Adapters::SvnAdapter.new(:url => File.join(dir, name)).normalize
-			end
-		else
-			raise RuntimeError.new("Repository archive #{File.join(REPO_DIR, name)} not found.")
-		end
+	def with_svn_repository(name, &block)
+		with_repository(Scm::Adapters::SvnAdapter, name, block)
 	end
 
-	def with_cvs_repository(name)
-		if Dir.entries(REPO_DIR).include?(name)
-			Scm::ScratchDir.new do |dir|
-				`cp -R #{File.join(REPO_DIR, name)} #{dir}`
-				yield Scm::Adapters::CvsAdapter.new(:url => File.join(dir, name)).normalize
-			end
-		else
-			raise RuntimeError.new("Repository archive #{File.join(REPO_DIR, name)} not found.")
-		end
+	def with_cvs_repository(name, &block)
+		with_repository(Scm::Adapters::CvsAdapter, name, block)
 	end
 
-	def with_hg_repository(name)
-		if Dir.entries(REPO_DIR).include?(name)
-			Scm::ScratchDir.new do |dir|
-				`cp -R #{File.join(REPO_DIR, name)} #{dir}`
-				yield Scm::Adapters::HgAdapter.new(:url => File.join(dir, name)).normalize
-			end
-		else
-			raise RuntimeError.new("Repository archive #{File.join(REPO_DIR, name)} not found.")
-		end
+	def with_git_repository(name, &block)
+		with_repository(Scm::Adapters::GitAdapter, name, block)
+	end
+
+	def with_hg_repository(name, &block)
+		with_repository(Scm::Adapters::HgAdapter, name, block)
 	end
 end
