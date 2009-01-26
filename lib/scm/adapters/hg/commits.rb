@@ -61,7 +61,7 @@ module Scm::Adapters
 					# As a time optimization, just create an empty file rather than fetch a log we know will be empty.
 					File.open(log_filename, 'w') { }
 				else
-					run "cd '#{url}' && hg log --verbose -r #{since}:tip --style #{Scm::Parsers::HgStyledParser.verbose_style_path} > #{log_filename}"
+					run "cd '#{url}' && hg log --verbose -r #{since || 0}:tip --style #{Scm::Parsers::HgStyledParser.verbose_style_path} > #{log_filename}"
 				end
 				File.open(log_filename, 'r') { |io| yield io }
 			ensure
