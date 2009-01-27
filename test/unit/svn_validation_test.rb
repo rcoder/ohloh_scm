@@ -114,6 +114,11 @@ module Scm::Adapters
 				assert_equal '', svn_based_at_root.recalc_branch_name
 				assert_equal '', svn_based_at_root.branch_name
 
+				svn_trunk = SvnAdapter.new(:url => svn.root + '/trunk')
+				assert !svn_trunk.branch_name
+				assert_equal '/trunk', svn_trunk.recalc_branch_name
+				assert_equal '/trunk', svn_trunk.branch_name
+
 				svn_trunk_with_whack = SvnAdapter.new(:url => svn.root + '/trunk/')
 				assert !svn_trunk_with_whack.branch_name
 				assert_equal '/trunk', svn_trunk_with_whack.recalc_branch_name
