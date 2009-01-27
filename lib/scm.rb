@@ -15,6 +15,7 @@ require 'lib/scm/adapters/cvs_adapter'
 require 'lib/scm/adapters/svn_adapter'
 require 'lib/scm/adapters/git_adapter'
 require 'lib/scm/adapters/hg_adapter'
+require 'lib/scm/adapters/factory'
 
 require 'lib/scm/parsers/parser'
 require 'lib/scm/parsers/branch_number'
