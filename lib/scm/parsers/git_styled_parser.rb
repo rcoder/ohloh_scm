@@ -7,7 +7,7 @@ module Scm::Parsers
 		end
 
 		def self.whatchanged
-			"git whatchanged --root --abbrev=40 --max-count=1 --pretty=#{format}"
+			"git whatchanged --root -m --abbrev=40 --max-count=1 --pretty=#{format}"
 		end
 
 		def self.format
