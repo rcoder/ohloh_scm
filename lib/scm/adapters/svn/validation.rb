@@ -47,6 +47,7 @@ module Scm::Adapters
 		def recalc_branch_name
 			@branch_name = @url ? @url[root.length..-1] : @branch_name
 			@branch_name = @branch_name[0..-2] if @branch_name[-1..-1] == '/'
+			@branch_name
 		end
 
 		def guess_forge

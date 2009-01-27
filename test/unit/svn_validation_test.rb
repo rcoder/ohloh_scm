@@ -102,6 +102,24 @@ module Scm::Adapters
 			end
 			assert save_svn.validate_server_connection.any? # Repo is gone, should get an error
 		end
+
+		def test_recalc_branch_name
+			with_svn_repository('svn') do |svn|
+				svn_based_at_root = SvnAdapter.new(:url => svn.root)
+				assert !svn_based_at_root.branch_name
+				assert_equal '', svn_based_at_root.recalc_branch_name
+				assert_equal '', svn_based_at_root.branch_name
+
+				svn_based_at_root_with_whack = SvnAdapter.new(:url => svn.root, :branch_name => '/')
+				assert_equal '', svn_based_at_root.recalc_branch_name
+				assert_equal '', svn_based_at_root.branch_name
+
+				svn_trunk_with_whack = SvnAdapter.new(:url => svn.root + '/trunk/')
+				assert !svn_trunk_with_whack.branch_name
+				assert_equal '/trunk', svn_trunk_with_whack.recalc_branch_name
+				assert_equal '/trunk', svn_trunk_with_whack.branch_name
+			end
+		end
 	end
 
 	def test_strip_trailing_whack_from_branch_name
