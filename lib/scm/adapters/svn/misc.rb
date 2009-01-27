@@ -49,9 +49,6 @@ module Scm::Adapters
 		end
 
 		def exist?
-			# If it's a local directory, first just check that the dir exists
-			return false if url =~ /^file:\/\/(.+)/ && !FileTest.exist?(File.join($1, 'db'))
-
 			begin
 				!!(head_token)
 			rescue
