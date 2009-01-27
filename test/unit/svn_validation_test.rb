@@ -93,6 +93,15 @@ module Scm::Adapters
 			assert_equal 'http://pianosa.googlecode.com/svn/trunk',
 				SvnAdapter.new(:url => 'http://pianosa.googlecode.com/svn/trunk').normalize.url
 		end
+
+		def test_validate_server_connection
+			save_svn = nil
+			with_svn_repository('svn') do |svn|
+				assert !svn.validate_server_connection # No errors
+				save_svn = svn
+			end
+			assert save_svn.validate_server_connection.any? # Repo is gone, should get an error
+		end
 	end
 
 	def test_strip_trailing_whack_from_branch_name
