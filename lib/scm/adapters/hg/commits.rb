@@ -34,6 +34,12 @@ module Scm::Adapters
 			end
 		end
 
+		# Returns a single commit, including its diffs
+		def verbose_commit(token)
+			log = run("cd '#{self.url}' && hg log -v -r #{token} --style #{Scm::Parsers::HgStyledParser.verbose_style_path}")
+			Scm::Parsers::HgStyledParser.parse(log).first
+		end
+
 		# Yields each commit after +since+, including its diffs.
 		# The log is stored in a temporary file.
 		# This is designed to prevent excessive RAM usage when we encounter a massive repository.
@@ -57,7 +63,7 @@ module Scm::Adapters
 		# and reject the duplicate commit.
 		def open_log_file(since=0)
 			begin
-				if since == tip_token # There are no new commits
+				if since == head_token # There are no new commits
 					# As a time optimization, just create an empty file rather than fetch a log we know will be empty.
 					File.open(log_filename, 'w') { }
 				else

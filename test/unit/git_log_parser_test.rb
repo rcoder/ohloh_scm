@@ -1,15 +1,15 @@
 require File.dirname(__FILE__) + '/../test_helper'
 require 'date'
 
-module Scm::Adapters
-	class GitLogParserTest < Scm::Test
+module Scm::Parsers
+	class GitStyledParserTest < Scm::Test
 
 		def test_basic
 			commits = []
 
 			helloworld = File.new(File.dirname(__FILE__) + '/../data/helloworld.log').read
 
-			Git::LogParser.parse( helloworld ) do |commit|
+			GitStyledParser.parse( helloworld ) do |commit|
 				commits << commit
 			end
 
@@ -80,7 +80,7 @@ __END_COMMENT__
 		LOG
 
 		commits = []
-		Git::LogParser.parse( log ) do |commit|
+		GitStyledParser.parse( log ) do |commit|
 			commits << commit
 		end
 		assert_equal "Cin\303\251 Library/Cin\303\251 Library.nsi", commits[0].diffs[0].path
@@ -120,7 +120,7 @@ __END_COMMENT__
 		LOG
 
 		commits = []
-		Git::LogParser.parse( log ) do |commit|
+		GitStyledParser.parse( log ) do |commit|
 			commits << commit
 		end
 
@@ -160,7 +160,7 @@ __END_COMMENT__
 		LOG
 
 		commits = []
-		Git::LogParser.parse( log ) do |commit|
+		GitStyledParser.parse( log ) do |commit|
 			commits << commit
 		end
 
@@ -199,7 +199,7 @@ __END_COMMENT__
 			LOG
 
 			commits = []
-			Git::LogParser.parse( log ) do |commit|
+			GitStyledParser.parse( log ) do |commit|
 				commits << commit
 			end
 

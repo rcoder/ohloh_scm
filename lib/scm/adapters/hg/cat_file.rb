@@ -5,7 +5,8 @@ module Scm::Adapters
 		end
 
 		def cat_file_parent(commit, diff)
-			cat(parent_commit(commit).token, diff.path)
+			p = parents(commit)
+			cat(p.first.token, diff.path) if p.first
 		end
 
 		def cat(revision, path)

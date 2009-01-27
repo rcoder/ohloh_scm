@@ -31,7 +31,6 @@ module Scm::Adapters
 			with_svn_repository('svn') do |svn|
 				assert_equal svn.url, svn.root
 				assert_equal "6a9cefd4-a008-4d2a-a89b-d77e99cd6eb1", svn.uuid
-				assert_equal 5, svn.max_revision
 				assert_equal 'directory', svn.node_kind
 
 				assert_equal 'file', svn.node_kind('trunk/helloworld.c',1)

@@ -1,9 +1,22 @@
-module Scm::Adapters::Git
-	class LogParser
+module Scm::Parsers
+	# This parser processes Git whatchanged generated using a custom style.
+	# This custom style provides additional information required by Ohloh.
+	class GitStyledParser < Parser
+		def self.scm
+			'git'
+		end
 
-		NO_AUTHOR='(no author)'
+		def self.whatchanged
+			"git whatchanged --root --abbrev=40 --max-count=1 --pretty=#{format}"
+		end
 
-		def self.parse io
+		def self.format
+		  "format:'__BEGIN_COMMIT__%nCommit: %H%nAuthor: %an%nAuthorEmail: %ae%nDate: %aD%n__BEGIN_COMMENT__%n%s%n%b%n__END_COMMENT__'"
+		end
+
+		ANONYMOUS = "(no author)" unless defined?(ANONYMOUS)
+
+		def self.internal_parse(io, opts)
 			e = nil
 			state = :key_values
 
@@ -25,7 +38,7 @@ module Scm::Adapters::Git
 						e = Scm::Commit.new
 						e.diffs = []
 						e.token = sha1
-						e.author_name = NO_AUTHOR
+						e.author_name = ANONYMOUS
 					elsif line =~ /^Author: (.+)$/
 						e.author_name = $1
 					elsif line =~ /^Date: (.*)$/
@@ -36,7 +49,7 @@ module Scm::Adapters::Git
 						e.author_email = $1
 						# In the rare case that the Git repository does not contain any names (see OpenEmbedded for example)
 						# we use the email instead.
-						e.author_name = $1 if e.author_name.to_s.empty? || e.author_name == NO_AUTHOR
+						e.author_name = $1 if e.author_name.to_s.empty? || e.author_name == ANONYMOUS
 					end
 
 				elsif state == :message

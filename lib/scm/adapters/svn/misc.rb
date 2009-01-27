@@ -53,7 +53,7 @@ module Scm::Adapters
 			return false if url =~ /^file:\/\/(.+)/ && !FileTest.exist?(File.join($1, 'db'))
 
 			begin
-				!!(max_revision)
+				!!(head_token)
 			rescue
 				logger.debug { $! }
 				false
@@ -75,10 +75,6 @@ module Scm::Adapters
 
 		def uuid
 			$1 if self.info =~ /^Repository UUID: (.+)$/
-		end
-
-		def max_revision
-			self.info =~ /^Revision: (\d+)$/ ? $1.to_i : nil
 		end
 
 		# Returns an array of file and directory names.

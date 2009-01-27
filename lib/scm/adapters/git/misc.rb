@@ -6,16 +6,11 @@ module Scm::Adapters
 
 		def exist?
 			begin
-				!!(head)
+				!!(head_token)
 			rescue
 				logger.debug { $! }
 				false
 			end
-		end
-
-		def head
-			run("git ls-remote --heads '#{url}' #{branch_name}") =~ /^(^[a-z0-9]{40})\s+\S+$/
-			$1
 		end
 
 		def export(dest_dir, commit_id = 'HEAD')

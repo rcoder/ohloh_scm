@@ -146,7 +146,7 @@ module Scm::Adapters
 
 		def open_log_file(since=0)
 			begin
-				if (since.to_i + 1) <= max_revision
+				if (since.to_i + 1) <= head_token
 					run "svn log --xml --stop-on-copy -r #{since.to_i + 1}:HEAD '#{SvnAdapter.uri_encode(self.url)}' #{opt_auth} > #{log_filename}"
 				else
 					# As a time optimization, just create an empty file rather than fetch a log we know will be empty.

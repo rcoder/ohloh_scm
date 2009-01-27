@@ -12,10 +12,8 @@ module Scm::Adapters
 			end
 		end
 
-		def test_head
+		def test_branches
 			with_git_repository('git') do |git|
-				assert git.exist?
-				assert_equal '1df547800dcd168e589bb9b26b4039bff3a7f7e4', git.head
 				assert_equal ['master'], git.branches
 				assert git.has_branch?('master')
 			end
