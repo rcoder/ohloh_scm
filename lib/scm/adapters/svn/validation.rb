@@ -29,14 +29,15 @@ module Scm::Adapters
 		def validate_server_connection
 			return unless valid?
 			begin
-				if max_revision.nil?
+				if head_token.nil?
 					@errors << [:failed, "The server did not respond to a 'svn info' command. Is the URL correct?"]
-				elsif !self.url.starts_with?(root)
+				elsif self.url[0..root.length-1] != root
 					@errors << [:failed, "The URL did not match the Subversion root #{root}. Is the URL correct?"]
 				elsif ls.nil?
 					@errors << [:failed, "The server did not respond to a 'svn ls' command. Is the URL correct?"]
 				end
 			rescue
+				logger.error { $!.inspect }
 				@errors << [:failed, "An error occured connecting to the server. Check the URL, username, and password."]
 			end
 		end
