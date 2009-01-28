@@ -9,6 +9,7 @@ module Scm::Adapters
 		end
 
 		def cat(sha1)
+			return '' if sha1 == NULL_SHA1
 			run "cd '#{url}' && git cat-file -p #{sha1}"
 		end
 	end

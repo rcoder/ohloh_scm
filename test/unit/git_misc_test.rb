@@ -19,5 +19,11 @@ module Scm::Adapters
 			end
 		end
 
+		def test_ls_tree
+			with_git_repository('git') do |git|
+				assert_equal ['.gitignore','COPYING','README','helloworld.c','makefile','ohloh_token'], git.ls_tree(git.head_token).sort
+			end
+		end
+
 	end
 end

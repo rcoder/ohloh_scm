@@ -17,6 +17,10 @@ module Scm::Adapters
 			run "cd #{url} && git archive #{commit_id} | tar -C #{ dest_dir } -x"
 		end
 
+		def ls_tree(token='HEAD')
+			run("cd #{url} && git ls-tree -r #{token} | cut -f 2 -d '\t'").split("\n")
+		end
+
 		# Moves us the correct branch and checks out the most recent files.
 		#
 		# Anything not tracked by Git is deleted.

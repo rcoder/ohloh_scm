@@ -12,6 +12,12 @@ module Scm::Adapters
 			end
 		end
 
+		def test_ls_tree
+			with_svn_repository('svn') do |svn|
+				assert_equal ['branches/','tags/','trunk/','trunk/helloworld.c','trunk/makefile'], svn.ls_tree(2).sort
+			end
+		end
+
 		def test_path
 			assert !SvnAdapter.new(:url => "http://svn.collab.net/repos/svn/trunk").path
 			assert !SvnAdapter.new(:url => "svn://svn.collab.net/repos/svn/trunk").path

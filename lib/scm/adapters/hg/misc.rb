@@ -8,5 +8,9 @@ module Scm::Adapters
 				false
 			end
 		end
+
+		def ls_tree(token)
+			run("cd #{path} && hg manifest -r #{token}").split("\n")
+		end
 	end
 end

@@ -120,6 +120,10 @@ module Scm::Adapters
 			run "svn export --force -r #{commit_id} '#{SvnAdapter.uri_encode(File.join(root, branch_name.to_s))}' '#{dest_dir}'"
 		end
 
+		def ls_tree(token)
+			run("svn ls -R -r #{token} '#{SvnAdapter.uri_encode(File.join(root, branch_name.to_s))}@#{token}'").split("\n")
+		end
+
 		def opt_auth
 			opt_password = ""
 			opt_password = "--username='#{self.username}' --password='#{self.password}'" if self.username && self.username != ''
