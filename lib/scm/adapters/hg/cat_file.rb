@@ -10,10 +10,17 @@ module Scm::Adapters
 		end
 
 		def cat(revision, path)
-			out, err = run_with_err("cd '#{url}' && hg cat -r #{revision} '#{path}'")
+			out, err = run_with_err("cd '#{url}' && hg cat -r #{revision} #{escape(path)}")
 			return nil if err =~ /No such file in rev/
 			raise RuntimeError.new(err) unless err.to_s == ''
 			out
+		end
+
+		# Escape bash-significant characters in the filename
+		# Example:
+		#     "Foo Bar & Baz" => "Foo\ Bar\ \&\ Baz"
+		def escape(path)
+			path.gsub(/[ '"&]/) { |c| '\\' + c }
 		end
 	end
 end

@@ -27,5 +27,21 @@ EXPECTED
 			end
 		end
 
+		# Ensure that we escape bash-significant characters like ' and & when they appear in the filename
+		def test_funny_file_name_chars
+			Scm::ScratchDir.new do |dir|
+				# Make a file with a problematic filename
+				funny_name = 'file_name_&\'"'
+				File.open(File.join(dir, funny_name), 'w') { |f| f.write "contents" }
+
+				# Add it to an hg repository
+				`cd #{dir} && hg init && hg add * && hg commit -m test`
+
+				# Confirm that we can read the file back
+				hg = HgAdapter.new(:url => dir).normalize
+				assert_equal "contents", hg.cat_file(hg.head, Scm::Diff.new(:path => funny_name))
+			end
+		end
+
 	end
 end
