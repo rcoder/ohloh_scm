@@ -1,5 +1,3 @@
-require 'parsedate'
-
 module Scm::Parsers
 	class SvnParser < Parser
 		def self.scm
@@ -18,7 +16,7 @@ module Scm::Parsers
 						e = Scm::Commit.new
 						e.token = $1.to_i
 						e.committer_name = $2
-						e.committer_date = Time.local(*ParseDate.parsedate($3)).utc
+						e.committer_date = Time.parse($3).utc
 					elsif l == "Changed paths:"
 						next_state = :diffs
 					elsif l.empty?
