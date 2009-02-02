@@ -1,5 +1,3 @@
-require 'parsedate'
-
 module Scm::Parsers
 	# This parser can process the default hg logs, with or without the --verbose flag.
 	# It is handy for debugging but is not detailed enough for Ohloh analysis.
@@ -26,7 +24,7 @@ module Scm::Parsers
 						e.committer_name = $1
 						e.committer_email = $3
 					when /^date:\s+(.+)/
-						e.committer_date = Time.local(*ParseDate.parsedate($1)).utc
+						e.committer_date = Time.parse($1).utc
 					when /^files:\s+(.+)/
 						($1 || '').split(' ').each do |file|
 							e.diffs << Scm::Diff.new(:action => '?', :path => file)
