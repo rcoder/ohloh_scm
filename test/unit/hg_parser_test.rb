@@ -11,13 +11,13 @@ module Scm::Parsers
 sample_log = <<SAMPLE
 changeset:   1:b14fa4692f94
 user:        Jason Allen <jason@ohloh.net>
-date:        Tue Jan 20 11:33:17 2009 -0800
+date:        Tue, Jan 20 2009 11:33:17 -0800
 summary:     added makefile
 
 
 changeset:   0:01101d8ef3ce
 user:        Robin Luckey <robin@ohloh.net>
-date:        Tue Jan 20 11:32:54 2009 -0800
+date:        Tue, Jan 20 2009 11:32:54 -0800
 summary:     Initial Checkin
 
 SAMPLE
@@ -46,7 +46,7 @@ SAMPLE
 sample_log = <<SAMPLE
 changeset:   259:45c293b71341
 user:        robin@ohloh.net
-date:        Sat Jun 04 23:37:11 2005 -0800
+date:        Sat, Jun 04 2005 23:37:11 -0800
 summary:     fix addremove
 
 SAMPLE
@@ -66,12 +66,12 @@ SAMPLE
 sample_log = <<SAMPLE
 changeset:   1:b14fa4692f94
 user:        Jason Allen <jason@ohloh.net>
-date:        Tue Jan 20 11:33:17 2009 -0800
+date:        Tue, Jan 20 2009 11:33:17 -0800
 
 
 changeset:   0:01101d8ef3ce
 user:        Robin Luckey <robin@ohloh.net>
-date:        Tue Jan 20 11:32:54 2009 -0800
+date:        Tue, Jan 20 2009 11:32:54 -0800
 
 SAMPLE
 			commits = HgParser.parse(sample_log)
@@ -96,7 +96,7 @@ SAMPLE
 sample_log = <<SAMPLE
 changeset:   1:b14fa4692f94
 user:        Jason Allen <jason@ohloh.net>
-date:        Tue Jan 20 11:33:17 2009 -0800
+date:        Tue, Jan 20 2009 11:33:17 -0800
 files:       makefile
 description:
 added makefile
@@ -104,7 +104,7 @@ added makefile
 
 changeset:   0:01101d8ef3ce
 user:        Robin Luckey <robin@ohloh.net>
-date:        Tue Jan 20 11:32:54 2009 -0800
+date:        Tue, Jan 20 2009 11:32:54 -0800
 files:       helloworld.c
 description:
 Initial Checkin
