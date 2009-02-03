@@ -47,6 +47,7 @@ module Scm::Parsers
 
 	class SvnXmlParser < Parser
 		def self.internal_parse(buffer, opts)
+			buffer = '<?xml?>' if buffer.is_a?(StringIO) and buffer.length < 2
 			begin
 				REXML::Document.parse_stream(buffer, SubversionListener.new(Proc.new { |c| yield c if block_given? }))
 			rescue EOFError
