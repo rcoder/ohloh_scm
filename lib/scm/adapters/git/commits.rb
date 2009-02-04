@@ -7,8 +7,8 @@ module Scm::Adapters
 		end
 
 		# Returns the SHA1 hash for every commit in the repository following the commit with SHA1 'since'.
-		def commit_tokens(since=nil)
-			run(rev_list_command(since)).split("\n")
+		def commit_tokens(since=nil, up_to=branch_name)
+			run(rev_list_command(since, up_to)).split("\n")
 		end
 
 		# Yields each commit following the commit with SHA1 'since'.
@@ -47,16 +47,9 @@ module Scm::Adapters
 			end
 		end
 
-
-		def rev_list_command(since=nil)
-			rev_list_options = "--root --reverse --topo-order"
-
-			if since
-				"cd '#{self.url}' && git rev-list #{rev_list_options} #{since}..HEAD #{self.branch_name}"
-			else
-				"cd '#{self.url}' && git rev-list #{rev_list_options} #{self.branch_name}"
-			end
+		def rev_list_command(since=nil, up_to=branch_name)
+			range = since ? "#{since}..#{up_to}" : up_to
+			"cd '#{url}' && git rev-list --topo-order --reverse #{range}"
 		end
-
 	end
 end
