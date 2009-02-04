@@ -17,5 +17,15 @@ module Scm::Adapters
 		def parents(commit)
 			parent_tokens(commit).collect { |token| verbose_commit(token) }
 		end
+
+		# This method returns the list of commits you must fetch if you are
+		# current as of old_head, and wish to be current up to new_head.
+		def walk(old_head=nil, new_head=head_token)
+			if old_head
+				run("cd #{url} && git rev-list --reverse #{old_head.to_s}..#{new_head.to_s}").split("\n")
+			else
+				run("cd #{url} && git rev-list --reverse #{new_head.to_s}").split("\n")
+			end
+		end
 	end
 end
