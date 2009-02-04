@@ -49,7 +49,7 @@ module Scm::Adapters
 
 
 		def rev_list_command(since=nil)
-			rev_list_options = "--root --reverse --no-merges --topo-order"
+			rev_list_options = "--root --reverse --topo-order"
 
 			if since
 				"cd '#{self.url}' && git rev-list #{rev_list_options} #{since}..HEAD #{self.branch_name}"

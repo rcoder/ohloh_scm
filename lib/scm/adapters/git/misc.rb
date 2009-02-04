@@ -60,5 +60,9 @@ module Scm::Adapters
 				run "cd '#{self.url}' && git branch -f #{name} origin/#{name}"
 			end
 		end
+
+		def is_merge_commit?(commit)
+			parent_tokens(commit).size > 1
+		end
 	end
 end

@@ -25,5 +25,11 @@ module Scm::Adapters
 			end
 		end
 
+		def test_is_merge_commit
+			with_git_repository('git_walk') do |git|
+				assert git.is_merge_commit?(Scm::Commit.new(:token => 'f264fb40c340a415b305ac1f0b8f12502aa2788f'))
+				assert !git.is_merge_commit?(Scm::Commit.new(:token => 'd067161caae2eeedbd74976aeff5c4d8f1ccc946'))
+			end
+		end
 	end
 end
