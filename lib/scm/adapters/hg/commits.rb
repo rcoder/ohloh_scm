@@ -7,12 +7,15 @@ module Scm::Adapters
 		end
 
 		# Return the list of commit tokens following +since+.
-		def commit_tokens(since=0)
-			tokens = run("cd '#{self.url}' && hg log -r #{since || 0}:tip --template='{node}\\n'").split("\n")
+		def commit_tokens(since=0, up_to='tip')
+			# We reverse the final result in Ruby, rather than passing the --reverse flag to hg.
+			# That's because the -f (follow) flag doesn't behave the same in both directions.
+			# Basically, we're trying very hard to make this act just like Git. The hg_rev_list_test checks this.
+			tokens = run("cd '#{self.url}' && hg log -f -r #{up_to || 'tip'}:#{since || 0} --template='{node}\\n'").split("\n").reverse
 
 			# Hg returns everything after *and including* since.
-			# We do not want to include it.
-			if tokens.any? && tokens.first == since	
+			# We want to exclude it.
+			if tokens.any? && tokens.first == since
 				tokens[1..-1]
 			else
 				tokens
@@ -24,8 +27,8 @@ module Scm::Adapters
 		# If you need all commits including diffs, you should use the each_commit() iterator, which only holds one commit
 		# in memory at a time.
 		def commits(since=0)
-			log = run("cd '#{self.url}' && hg log -v -r #{since || 0}:tip --style #{Scm::Parsers::HgStyledParser.style_path}")
-			a = Scm::Parsers::HgStyledParser.parse(log)
+			log = run("cd '#{self.url}' && hg log -f -v -r tip:#{since || 0} --style #{Scm::Parsers::HgStyledParser.style_path}")
+			a = Scm::Parsers::HgStyledParser.parse(log).reverse
 
 			if a.any? && a.first.token == since
 				a[1..-1]
@@ -54,7 +57,7 @@ module Scm::Adapters
 
 		# Not used by Ohloh proper, but handy for debugging and testing
 		def log(since=0)
-			run "cd '#{url}' && hg log -v -r #{since}:tip"
+			run "cd '#{url}' && hg log -f -v -r tip:#{since}"
 		end
 
 		# Returns a file handle to the log.
