@@ -47,7 +47,7 @@ class Scm::Test < Test::Unit::TestCase
 		assert_equal expected_lines, actual_lines
 	end
 
-	def with_repository(type, name, block)
+	def with_repository(type, name)
 		Scm::ScratchDir.new do |dir|
 			if Dir.entries(REPO_DIR).include?(name)
 				`cp -R #{File.join(REPO_DIR, name)} #{dir}`
@@ -56,27 +56,30 @@ class Scm::Test < Test::Unit::TestCase
 			else
 				raise RuntimeError.new("Repository archive #{File.join(REPO_DIR, name)} not found.")
 			end
-			block.call(type.new(:url => File.join(dir, name)).normalize)
+			yield type.new(:url => File.join(dir, name)).normalize
 		end
 	end
 
-	def with_svn_repository(name, &block)
-		with_repository(Scm::Adapters::SvnAdapter, name, block)
+	def with_svn_repository(name, branch_name='')
+		with_repository(Scm::Adapters::SvnAdapter, name) do |svn|
+			svn.branch_name = branch_name
+			yield svn
+		end
 	end
 
-	def with_cvs_repository(name, &block)
-		with_repository(Scm::Adapters::CvsAdapter, name, block)
+	def with_cvs_repository(name)
+		with_repository(Scm::Adapters::CvsAdapter, name) { |cvs| yield cvs }
 	end
 
-	def with_git_repository(name, &block)
-		with_repository(Scm::Adapters::GitAdapter, name, block)
+	def with_git_repository(name)
+		with_repository(Scm::Adapters::GitAdapter, name) { |git| yield git }
 	end
 
-	def with_hg_repository(name, &block)
-		with_repository(Scm::Adapters::HgAdapter, name, block)
+	def with_hg_repository(name)
+		with_repository(Scm::Adapters::HgAdapter, name) { |hg| yield hg }
 	end
 
-	def with_bzr_repository(name, &block)
-		with_repository(Scm::Adapters::BzrAdapter, name, block)
+	def with_bzr_repository(name)
+		with_repository(Scm::Adapters::BzrAdapter, name) { |bzr| yield bzr }
 	end
 end

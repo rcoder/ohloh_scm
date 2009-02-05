@@ -244,5 +244,22 @@ module Scm::Adapters
 			assert_equal '/trunk/COPYING', commits[4].diffs[1].path
 		end
 
+		def test_final_revision
+			with_svn_repository('svn') do |svn|
+				assert_equal 5, svn.commit_count
+				assert_equal [1,2,3,4,5], svn.commit_tokens
+
+				svn.final_revision = 3
+				assert_equal 3, svn.commit_count
+				assert_equal [1,2,3], svn.commit_tokens
+
+				assert_equal 1, svn.commit_count(2)
+				assert_equal [3], svn.commit_tokens(2)
+
+				assert_equal 0, svn.commit_count(4)
+				assert_equal [], svn.commit_tokens(4)
+			end
+		end
+
 	end
 end

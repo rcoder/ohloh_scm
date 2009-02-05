@@ -3,6 +3,11 @@ require 'rexml/document'
 module Scm::Adapters
 	class SvnAdapter < AbstractAdapter
 
+		# The last revision to be analyzed in this repository. Everything after this revision is ignored.
+		# The repository is considered to be retired after this point, and under no circumstances should
+		# this adapter ever return information regarding commits after this point.
+		attr_accessor :final_revision
+
 		# In all commit- and log-related methods, 'since' refers to the revision number of the last known commit,
 		# and the methods return the commits *following* this commit.
 		#
@@ -14,12 +19,14 @@ module Scm::Adapters
 
 		# Returns the count of commits following revision number 'since'.
 		def commit_count(since=0)
-			run("svn log -q -r #{since.to_i + 1}:HEAD --stop-on-copy '#{SvnAdapter.uri_encode(File.join(root, branch_name.to_s))}' | grep -E -e '^r[0-9]+ ' | wc -l").strip.to_i
+			return 0 if final_revision && since > final_revision
+			run("svn log -q -r #{since.to_i + 1}:#{final_revision || 'HEAD'} --stop-on-copy '#{SvnAdapter.uri_encode(File.join(root, branch_name.to_s))}' | grep -E -e '^r[0-9]+ ' | wc -l").strip.to_i
 		end
 
 		# Returns an array of revision numbers for all commits following revision number 'since'.
 		def commit_tokens(since=0)
-			cmd = "svn log -q -r #{since.to_i + 1}:HEAD --stop-on-copy '#{SvnAdapter.uri_encode(File.join(root, branch_name.to_s))}' | grep -E -e '^r[0-9]+ ' | cut -f 1 -d '|' | cut -c 2-"
+			return [] if final_revision && since > final_revision
+			cmd = "svn log -q -r #{since.to_i + 1}:#{final_revision || 'HEAD'} --stop-on-copy '#{SvnAdapter.uri_encode(File.join(root, branch_name.to_s))}' | grep -E -e '^r[0-9]+ ' | cut -f 1 -d '|' | cut -c 2-"
 			run(cmd).split.collect { |r| r.to_i }
 		end
 
@@ -141,13 +148,13 @@ module Scm::Adapters
 		#---------------------------------------------------------------------
 
 		def log(since=0)
-			run "svn log --xml --stop-on-copy -r #{since.to_i + 1}:HEAD '#{SvnAdapter.uri_encode(self.url)}' #{opt_auth}"
+			run "svn log --xml --stop-on-copy -r #{since.to_i + 1}:#{final_revision || 'HEAD'} '#{SvnAdapter.uri_encode(File.join(self.root, self.branch_name.to_s))}' #{opt_auth}"
 		end
 
 		def open_log_file(since=0)
 			begin
 				if (since.to_i + 1) <= head_token
-					run "svn log --xml --stop-on-copy -r #{since.to_i + 1}:HEAD '#{SvnAdapter.uri_encode(self.url)}' #{opt_auth} > #{log_filename}"
+					run "svn log --xml --stop-on-copy -r #{since.to_i + 1}:#{final_revision || 'HEAD'} '#{SvnAdapter.uri_encode(File.join(self.root, self.branch_name))}' #{opt_auth} > #{log_filename}"
 				else
 					# As a time optimization, just create an empty file rather than fetch a log we know will be empty.
 					File.open(log_filename, 'w') { |f| f.puts '<?xml version="1.0"?>' }
@@ -171,7 +178,7 @@ module Scm::Adapters
 		# Directories named 'CVSROOT' are always ignored and the files they contain are never returned.
 		# An empty array means that the call succeeded, but the remote directory is empty.
 		# A nil result means that the call failed and the remote server could not be queried.
-		def recurse_files(path=nil, revision='HEAD')
+		def recurse_files(path=nil, revision=final_revision || 'HEAD')
 			begin
 				stdout = run "svn ls -r #{revision} --recursive #{opt_auth} '#{SvnAdapter.uri_encode(File.join(root, branch_name.to_s, path.to_s))}@#{revision}'"
 			rescue
