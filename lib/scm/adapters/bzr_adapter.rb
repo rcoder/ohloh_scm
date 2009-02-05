@@ -7,3 +7,5 @@ module Scm::Adapters
 end
 
 require 'lib/scm/adapters/bzr/validation'
+require 'lib/scm/adapters/bzr/commits'
+require 'lib/scm/adapters/bzr/head'
