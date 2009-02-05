@@ -1,7 +1,7 @@
 require File.dirname(__FILE__) + '/../test_helper'
 
 module Scm::Adapters
-	# Repository graph.git has the following structure:
+	# Repository git_walk has the following structure:
 	#
 	#      G -> H -> I -> J -> development
 	#     /      \    \
