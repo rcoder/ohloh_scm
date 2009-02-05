@@ -20,7 +20,9 @@ module Scm::Parsers
 				@commit.diffs = []
 				@commit.token = attrs['revision'].to_i
 			when 'path'
-				@diff = Scm::Diff.new(:action => attrs['action'])
+				@diff = Scm::Diff.new(:action => attrs['action'],
+															:from_path => attrs['copyfrom-path'],
+															:from_revision => attrs['copyfrom-rev'].to_i)
 			end
 		end
 

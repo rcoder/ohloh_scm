@@ -133,5 +133,23 @@ metze
 COMMENT
 			assert_equal comment, revs[0].message
 		end
+
+		def test_svn_copy
+			log = <<-LOG
+------------------------------------------------------------------------
+r8 | robin | 2009-02-05 05:40:46 -0800 (Thu, 05 Feb 2009) | 1 line
+Changed paths:
+   A /trunk (from /branches/development:7)
+
+the branch becomes the new trunk
+			LOG
+
+			commits = SvnParser.parse(log)
+			assert_equal 1, commits.size
+			assert_equal 1, commits.first.diffs.size
+			assert_equal "/trunk", commits.first.diffs.first.path
+			assert_equal "/branches/development", commits.first.diffs.first.from_path
+			assert_equal 7, commits.first.diffs.first.from_revision
+		end
 	end
 end

@@ -27,6 +27,10 @@ module Scm
 		# These must be computed using the same method as Git.
 		attr_accessor :parent_sha1, :sha1
 
+		# For Subversion only, a path may be reported as copied from another location.
+		# These attributes store the path and revision number of the source of the copy.
+		attr_accessor :from_path, :from_revision
+
 		def initialize(params={})
 			params.each { |k,v| send(k.to_s + '=', v) if respond_to?(k.to_s + '=') }
 		end
