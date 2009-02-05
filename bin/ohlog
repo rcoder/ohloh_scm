@@ -29,6 +29,7 @@ Ohloh source control log parser
   --svn             Parse a Subversion log
   --svn-xml         Parse a Subversion XML log
   --hg              Parse a Mercurial log
+  --bzr             Parse a Bazaar log
 
   -h, --human       Output result as a human-readable log (default)
   -x, --xml         Output result as an XML log
@@ -45,6 +46,8 @@ Examples:
    svn log --xml --verbose -r2:3 http://svn.collab.net/repos/svn/trunk | ohlog --svn-xml
 
    hg log -v | ohloh --hg
+
+   bzr log -v | ohlog --bzr
 
 HELP
 		end
@@ -63,6 +66,10 @@ HELP
 
 		def hg
 			parse HgParser
+		end
+
+		def bzr
+			parse BzrParser
 		end
 
 		def parse(parser)
@@ -100,6 +107,8 @@ HELP
 				self.subcommand = :svn_xml
 			when '--hg'
 				self.subcommand = :hg
+			when '--bzr'
+				self.subcommand = :bzr
 			when '-h', '--human'
 				self.writer = HumanWriter.new(STDOUT)
 			when '-x', '--xml'
