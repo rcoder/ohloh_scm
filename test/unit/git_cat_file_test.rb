@@ -1,7 +1,7 @@
 require File.dirname(__FILE__) + '/../test_helper'
 
 module Scm::Adapters
-	class GitMiscTest < Scm::Test
+	class GitCatFileTest < Scm::Test
 
 		def test_cat_file
 			with_git_repository('git') do |git|
