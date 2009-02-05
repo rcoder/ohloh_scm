@@ -5,3 +5,5 @@ module Scm::Adapters
 		end
 	end
 end
+
+require 'lib/scm/adapters/bzr/validation'

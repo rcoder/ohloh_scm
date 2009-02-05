@@ -12,6 +12,15 @@ module Scm::Adapters
 			end
 		end
 
+		def test_factory_bzr
+			Scm::ScratchDir.new do |path|
+				`cd #{path} && bzr init`
+				bzr = Factory.from_path(path)
+				assert bzr.is_a?(BzrAdapter)
+				assert_equal bzr.url, path
+			end
+		end
+
 		def test_factory_git
 			Scm::ScratchDir.new do |path|
 				`cd #{path} && git init`
