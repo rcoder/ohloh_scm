@@ -63,6 +63,8 @@ class Scm::Test < Test::Unit::TestCase
 	def with_svn_repository(name, branch_name='')
 		with_repository(Scm::Adapters::SvnAdapter, name) do |svn|
 			svn.branch_name = branch_name
+			svn.url = File.join(svn.root, svn.branch_name)
+			svn.url = svn.url[0..-2] if svn.url[-1..-1] == '/' # Strip trailing /
 			yield svn
 		end
 	end

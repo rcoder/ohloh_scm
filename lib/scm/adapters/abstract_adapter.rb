@@ -3,11 +3,7 @@ module Scm::Adapters
 		attr_accessor :url, :branch_name, :username, :password, :errors, :public_urls_only
 
 		def initialize(params={})
-			@url = params[:url]
-			@branch_name = params[:branch_name]
-			@username = params[:username]
-			@password = params[:password]
-			@public_urls_only = params[:public_urls_only]
+			params.each { |k,v| send(k.to_s + '=', v) if respond_to?(k.to_s + '=') }
 		end
 
 		# Handy for test overrides

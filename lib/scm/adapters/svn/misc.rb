@@ -57,9 +57,9 @@ module Scm::Adapters
 			end
 		end
 
-		def info(path=nil, revision='HEAD')
+		def info(path=nil, revision=final_token || 'HEAD')
 			if path || (revision != 'HEAD')
-				run "svn info -r #{revision} #{opt_auth} '#{SvnAdapter.uri_encode(File.join(self.root, self.branch_name.to_s, path.to_s))}@#{revision}'"
+				run "svn info -r #{revision} #{opt_auth} '#{SvnAdapter.uri_encode(File.join(self.url, path.to_s))}@#{revision}'"
 			else
 				# Cache the default info query for performance
 				@info ||= run "svn info -r #{revision} #{opt_auth} '#{SvnAdapter.uri_encode(self.url)}@#{revision}'"
@@ -79,7 +79,7 @@ module Scm::Adapters
 		# Directories named 'CVSROOT' are always ignored and never returned.
 		# An empty array means that the call succeeded, but the remote directory is empty.
 		# A nil result means that the call failed and the remote server could not be queried.
-		def ls(path=nil, revision='HEAD')
+		def ls(path=nil, revision=final_token || 'HEAD')
 			begin
 				stdout = run "svn ls -r #{revision} #{opt_auth} '#{SvnAdapter.uri_encode(File.join(url, path.to_s))}@#{revision}'"
 			rescue
@@ -94,11 +94,11 @@ module Scm::Adapters
 			files.sort
 		end
 
-		def node_kind(path=nil, revision='HEAD')
+		def node_kind(path=nil, revision=final_token || 'HEAD')
 			$1 if self.info(path, revision) =~ /^Node Kind: (.+)$/
 		end
 
-		def is_directory?(path=nil, revision='HEAD')
+		def is_directory?(path=nil, revision=final_token || 'HEAD')
 			begin
 				return node_kind(path, revision) == 'directory'
 			rescue
@@ -115,7 +115,7 @@ module Scm::Adapters
 			run "svn checkout -r #{rev.token} '#{SvnAdapter.uri_encode(self.url)}@#{rev.token}' '#{dest_dir}' --ignore-externals #{opt_auth}"
 		end
 
-		def export(dest_dir, commit_id = 'HEAD')
+		def export(dest_dir, commit_id = final_token || 'HEAD')
 			FileUtils.mkdir_p(File.dirname(dest_dir)) unless FileTest.exist?(File.dirname(dest_dir))
 			run "svn export --force -r #{commit_id} '#{SvnAdapter.uri_encode(File.join(root, branch_name.to_s))}' '#{dest_dir}'"
 		end

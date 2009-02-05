@@ -3,11 +3,6 @@ require 'rexml/document'
 module Scm::Adapters
 	class SvnAdapter < AbstractAdapter
 
-		# The last revision to be analyzed in this repository. Everything after this revision is ignored.
-		# The repository is considered to be retired after this point, and under no circumstances should
-		# this adapter ever return information regarding commits after this point.
-		attr_accessor :final_revision
-
 		# In all commit- and log-related methods, 'since' refers to the revision number of the last known commit,
 		# and the methods return the commits *following* this commit.
 		#
@@ -17,39 +12,57 @@ module Scm::Adapters
 		#
 		# This is convenient for Ohloh -- Ohloh passes the last commit it is aware of, and these methods return any new commits.
 
-		# Returns the count of commits following revision number 'since'.
+		# The last revision to be analyzed in this repository. Everything after this revision is ignored.
+		# The repository is considered to be retired after this point, and under no circumstances should
+		# this adapter ever return information regarding commits after this point.
+		attr_accessor :final_token
+
+		#------------------------------------------------------------------
+		# Commit accessors are now redirected to recursive "chained" versions
+		#------------------------------------------------------------------
+
 		def commit_count(since=0)
-			return 0 if final_revision && since > final_revision
-			run("svn log -q -r #{since.to_i + 1}:#{final_revision || 'HEAD'} --stop-on-copy '#{SvnAdapter.uri_encode(File.join(root, branch_name.to_s))}' | grep -E -e '^r[0-9]+ ' | wc -l").strip.to_i
+			chained_commit_count(since)
+		end
+
+		def commit_tokens(since=0)
+			chained_commit_tokens(since)
+		end
+
+		def commits(since=0)
+			chained_commits(since)
+		end
+
+		def each_commit(since=0)
+			chained_each_commit(since) { |commit| yield commit }
+		end
+
+		#------------------------------------------------------------------
+		# Base versions of the commit accessors.
+		#
+		# These are the original, simple commit accessors that are
+		# unaware of branch "chaining".
+		#------------------------------------------------------------------
+
+		# Returns the count of commits following revision number 'since'.
+		def base_commit_count(since=0)
+			return 0 if final_token && since >= final_token
+			run("svn log -q -r #{since.to_i + 1}:#{final_token || 'HEAD'} --stop-on-copy '#{SvnAdapter.uri_encode(File.join(root, branch_name.to_s))}@#{final_token || 'HEAD'}' | grep -E -e '^r[0-9]+ ' | wc -l").strip.to_i
 		end
 
 		# Returns an array of revision numbers for all commits following revision number 'since'.
-		def commit_tokens(since=0)
-			return [] if final_revision && since > final_revision
-			cmd = "svn log -q -r #{since.to_i + 1}:#{final_revision || 'HEAD'} --stop-on-copy '#{SvnAdapter.uri_encode(File.join(root, branch_name.to_s))}' | grep -E -e '^r[0-9]+ ' | cut -f 1 -d '|' | cut -c 2-"
+		def base_commit_tokens(since=0)
+			return [] if final_token && since >= final_token
+			cmd = "svn log -q -r #{since.to_i + 1}:#{final_token || 'HEAD'} --stop-on-copy '#{SvnAdapter.uri_encode(File.join(root, branch_name.to_s))}@#{final_token || 'HEAD'}' | grep -E -e '^r[0-9]+ ' | cut -f 1 -d '|' | cut -c 2-"
 			run(cmd).split.collect { |r| r.to_i }
 		end
 
 		# Returns an array of commits following revision number 'since'. These commit objects do not include diffs.
-		def commits(since=0)
+		def base_commits(since=0)
 			c = []
 			open_log_file(since) do |io|
 				c = Scm::Parsers::SvnXmlParser.parse(io)
 			end
-
-			# We may be using a log saved on disk from a previous fetch.
-			# If so, exclude the portion of the log up to 'since'.
-			c.each_index do |i|
-				if c[i].token.to_i == since.to_i
-					if i == commits.size-1
-						# We're up to date
-						return []
-					else
-						return c[i+1..-1]
-					end
-				end
-			end
-			c
 		end
 
 		# Yields each commit following revision number 'since'. These commit object are populated with diffs.
@@ -60,8 +73,8 @@ module Scm::Adapters
 		# directories, the complexity (and time) of this method comes in expanding directories with a recursion
 		# through every file in the directory.
 		#
-		def each_commit(since=nil)
-			commit_tokens(since).each do |rev|
+		def base_each_commit(since=nil)
+			base_commit_tokens(since).each do |rev|
 				yield deepen_commit(strip_commit_branch(verbose_commit(rev)))
 			end
 		end
@@ -73,7 +86,7 @@ module Scm::Adapters
 			if commit.diffs
 				deep_commit.diffs = commit.diffs.collect do |diff|
 					deepen_diff(diff, commit.token)
-				end.flatten.uniq.sort { |a,b| a.action <=> b.action }.sort { |a,b| a.path <=> b.path }
+				end.compact.flatten.uniq.sort { |a,b| a.action <=> b.action }.sort { |a,b| a.path <=> b.path }
 			end
 
 			remove_dupes(deep_commit)
@@ -86,10 +99,10 @@ module Scm::Adapters
 			# Because we expand directories, the result is that the file may be listed twice -- once as part of our expansion,
 			# and once from the regular log entry.
 			#
-			# So look for diffs of the form ["M", "path"] which are matched by ["A", "path"] and remove them.
+			# So look for diffs of the form ["M", "path"] which are matched by ["A", "path"], and keep only the "A" diff.
 			if commit.diffs
 				commit.diffs.delete_if do |d|
-					d.action =~ /[MR]/ && commit.diffs.select { |x| x.action == 'A' and x.path == d.path }.any?
+					d && d.action =~ /[MR]/ && commit.diffs.select { |x| x.action == 'A' and x.path == d.path }.any?
 				end
 			end
 			commit
@@ -100,11 +113,19 @@ module Scm::Adapters
 		def deepen_diff(diff, rev)
 			# Note that if the directory was deleted, we have to look at the previous revision to see what it held.
 			recurse_rev = (diff.action == 'D') ? rev-1 : rev
-			if (diff.action == 'D' or diff.action == 'A') && is_directory?(diff.path, recurse_rev)
+
+			if diff.action == 'A' && diff.path == '' && rev == first_token && parent_svn
+				# A very special case. This is the first commit, and the entire tree is being
+				# copied from somewhere else. In this case, there isn't actually any change, just
+				# a change of branch_name. Return no diffs at all.
+				nil
+			elsif (diff.action == 'D' or diff.action == 'A') && is_directory?(diff.path, recurse_rev)
+				# Deleting or adding a directory. Expand it out to show every file.
 				recurse_files(diff.path, recurse_rev).collect do |f|
 					Scm::Diff.new(:action => diff.action, :path => File.join(diff.path, f))
 				end
 			else
+				# An ordinary file action. Just return the diff.
 				diff
 			end
 		end
@@ -148,16 +169,17 @@ module Scm::Adapters
 		#---------------------------------------------------------------------
 
 		def log(since=0)
-			run "svn log --xml --stop-on-copy -r #{since.to_i + 1}:#{final_revision || 'HEAD'} '#{SvnAdapter.uri_encode(File.join(self.root, self.branch_name.to_s))}' #{opt_auth}"
+			run "svn log --xml --stop-on-copy -r #{since.to_i + 1}:#{final_token || 'HEAD'} '#{SvnAdapter.uri_encode(File.join(self.root, self.branch_name.to_s))}' #{opt_auth}"
 		end
 
 		def open_log_file(since=0)
+			since ||= 0
 			begin
-				if (since.to_i + 1) <= head_token
-					run "svn log --xml --stop-on-copy -r #{since.to_i + 1}:#{final_revision || 'HEAD'} '#{SvnAdapter.uri_encode(File.join(self.root, self.branch_name))}' #{opt_auth} > #{log_filename}"
-				else
+				if (final_token && since >= final_token) || since >= head_token
 					# As a time optimization, just create an empty file rather than fetch a log we know will be empty.
 					File.open(log_filename, 'w') { |f| f.puts '<?xml version="1.0"?>' }
+				else
+					run "svn log --xml --stop-on-copy -r #{since.to_i + 1}:#{final_token || 'HEAD'} '#{SvnAdapter.uri_encode(File.join(self.root, self.branch_name))}' #{opt_auth} > #{log_filename}"
 				end
 				File.open(log_filename, 'r') { |io| yield io }
 			ensure
@@ -169,8 +191,9 @@ module Scm::Adapters
 		  File.join('/tmp', (self.url).gsub(/\W/,'') + '.log')
 		end
 
+		# Returns one commit with the exact revision number provided
 		def single_revision_xml(revision)
-			run "svn log --verbose --xml --stop-on-copy -r #{revision} --limit 1 #{opt_auth} '#{SvnAdapter.uri_encode(self.url)}@#{revision}'"
+			run "svn log --verbose --xml --stop-on-copy -r #{revision} --limit 1 #{opt_auth} '#{SvnAdapter.uri_encode(File.join(self.root, self.branch_name))}@#{revision}'"
 		end
 
 		# Recurses the entire repository and returns an array of file names.
@@ -178,7 +201,7 @@ module Scm::Adapters
 		# Directories named 'CVSROOT' are always ignored and the files they contain are never returned.
 		# An empty array means that the call succeeded, but the remote directory is empty.
 		# A nil result means that the call failed and the remote server could not be queried.
-		def recurse_files(path=nil, revision=final_revision || 'HEAD')
+		def recurse_files(path=nil, revision=final_token || 'HEAD')
 			begin
 				stdout = run "svn ls -r #{revision} --recursive #{opt_auth} '#{SvnAdapter.uri_encode(File.join(root, branch_name.to_s, path.to_s))}@#{revision}'"
 			rescue

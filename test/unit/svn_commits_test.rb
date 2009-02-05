@@ -121,19 +121,40 @@ module Scm::Adapters
 				# The full repository contains 4 revisions...
 				assert_equal 4, svn.commit_count
 
-				# ...however, the current trunk contains only revisions 3 and 4.
-				# That's because the branch was moved to replace the trunk at revision 3.
+				# ..however, looking only at the history of /trunk@4 shows 3 revisions.
+				# 
+				# That's because /trunk@3 was created by copying /branches/b@1
 				#
-				# Even though there was a different trunk directory present in
-				# revisions 1 and 2, it is not visible to Ohloh.
+				# I hope the following diagram helps to explain:
+				#
+				# r1              | r2             |        r3           |   r4
+				# ----------------|----------------|---------------------|---------------
+				#                 |                |                     |
+				# /trunk(x) ------|-> deleted(x)   |    /--> /trunk(*) --|--> /trunk(*)
+				#                 |                |   /                 |
+				# /branches/b(*)--|----------------|--/                  |
+				#                 |                |                     |
+				#
+				# (*) activity we track
+				# (x) activity we ignore
 
 				trunk = SvnAdapter.new(:url => File.join(svn.url,'trunk'), :branch_name => '/trunk').normalize
-				assert_equal 2, trunk.commit_count
-				assert_equal [3,4], trunk.commit_tokens
+				assert_equal 3, trunk.commit_count
+				assert_equal [1,3,4], trunk.commit_tokens
 
+				commits = []
+				trunk.each_commit { |c| commits << c }
 
-				deep_commits = []
-				trunk.each_commit { |c| deep_commits << c }
+				# The first commit we should see is /branches/b@1.
+				# It should contain two files.
+
+				assert_equal 1, commits.first.token
+				assert_equal 2, commits.first.diffs.size # Two files seen
+
+				assert_equal 'A', commits.first.diffs[0].action
+				assert_equal '/subdir/bar.rb', commits.first.diffs[0].path
+				assert_equal 'A', commits.first.diffs[1].action
+				assert_equal '/subdir/foo.rb', commits.first.diffs[1].path
 
 				# When the branch is moved to replace the trunk in revision 3,
 				# the Subversion log shows
@@ -141,46 +162,34 @@ module Scm::Adapters
 				#   D /branches/b
 				#   A /trunk (from /branches/b:2)
 				#
-				# However, there are files in those directories. Make sure the commits
-				# that we generate include all of those files not shown by the log.
-				#
-				# Also, our commits do not include diffs for the actual directories;
-				# only the files within those directories.
-				#
-				# Also, since we are only tracking the /trunk and not /branches/b, then
-				# there should not be anything referring to activity in /branches/b.
+				# The branch_name changes at this point, but none of the file contents
+				# actually change. So there are no diffs to report at this point.
+				assert_equal 3, commits[1].token
+				assert_equal 0, commits[1].diffs.size
 
-				assert_equal 3, deep_commits.first.token # Make sure this is the right revision
-				assert_equal 2, deep_commits.first.diffs.size # Two files seen
-
-				assert_equal 'A', deep_commits.first.diffs[0].action
-				assert_equal '/subdir/bar.rb', deep_commits.first.diffs[0].path
-				assert_equal 'A', deep_commits.first.diffs[1].action
-				assert_equal '/subdir/foo.rb', deep_commits.first.diffs[1].path
-
-				# In Revision 4, a directory is renamed. This shows in the Subversion log as
+				# In Revision 4, a subdirectory is renamed. This shows in the Subversion log as
 				#
 				#   A /trunk/newdir (from /trunk/subdir:3)
 				#   D /trunk/subdir
 				#
-				# Again, there are files in this directory, so make sure our commit includes
+				# There are files in this directory, so make sure our commit includes
 				# both delete and add events for all of the files in this directory, but does
 				# not actually refer to the directories themselves.
 
-				assert_equal 4, deep_commits.last.token # Make sure we're checking the right revision
+				assert_equal 4, commits.last.token
 
 				# There should be 2 files removed and two files added
-				assert_equal 4, deep_commits.last.diffs.size
+				assert_equal 4, commits.last.diffs.size
 
-				assert_equal 'A', deep_commits.last.diffs[0].action
-				assert_equal '/newdir/bar.rb', deep_commits.last.diffs[0].path
-				assert_equal 'A', deep_commits.last.diffs[1].action
-				assert_equal '/newdir/foo.rb', deep_commits.last.diffs[1].path
+				assert_equal 'A', commits.last.diffs[0].action
+				assert_equal '/newdir/bar.rb', commits.last.diffs[0].path
+				assert_equal 'A', commits.last.diffs[1].action
+				assert_equal '/newdir/foo.rb', commits.last.diffs[1].path
 
-				assert_equal 'D', deep_commits.last.diffs[2].action
-				assert_equal '/subdir/bar.rb', deep_commits.last.diffs[2].path
-				assert_equal 'D', deep_commits.last.diffs[3].action
-				assert_equal '/subdir/foo.rb', deep_commits.last.diffs[3].path
+				assert_equal 'D', commits.last.diffs[2].action
+				assert_equal '/subdir/bar.rb', commits.last.diffs[2].path
+				assert_equal 'D', commits.last.diffs[3].action
+				assert_equal '/subdir/foo.rb', commits.last.diffs[3].path
 			end
 		end
 
@@ -242,23 +251,6 @@ module Scm::Adapters
 			assert_equal '/COPYING', commits[4].diffs[0].path
 			assert_equal 'A', commits[4].diffs[1].action
 			assert_equal '/trunk/COPYING', commits[4].diffs[1].path
-		end
-
-		def test_final_revision
-			with_svn_repository('svn') do |svn|
-				assert_equal 5, svn.commit_count
-				assert_equal [1,2,3,4,5], svn.commit_tokens
-
-				svn.final_revision = 3
-				assert_equal 3, svn.commit_count
-				assert_equal [1,2,3], svn.commit_tokens
-
-				assert_equal 1, svn.commit_count(2)
-				assert_equal [3], svn.commit_tokens(2)
-
-				assert_equal 0, svn.commit_count(4)
-				assert_equal [], svn.commit_tokens(4)
-			end
 		end
 
 	end
