@@ -9,3 +9,4 @@ end
 require 'lib/scm/adapters/bzr/validation'
 require 'lib/scm/adapters/bzr/commits'
 require 'lib/scm/adapters/bzr/head'
+require 'lib/scm/adapters/bzr/cat_file'
