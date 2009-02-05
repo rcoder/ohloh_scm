@@ -75,4 +75,8 @@ class Scm::Test < Test::Unit::TestCase
 	def with_hg_repository(name, &block)
 		with_repository(Scm::Adapters::HgAdapter, name, block)
 	end
+
+	def with_bzr_repository(name, &block)
+		with_repository(Scm::Adapters::BzrAdapter, name, block)
+	end
 end
