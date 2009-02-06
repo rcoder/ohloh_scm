@@ -2,13 +2,21 @@ module Scm::Adapters
 	class BzrAdapter < AbstractAdapter
 
 		# Return the number of commits in the repository following +since+.
-		def commit_count(since=0)
-			commit_tokens(since || 0).size
+		def commit_count(since=nil)
+			commit_tokens(since).size
 		end
 
 		# Return the list of commit tokens following +since+.
-		def commit_tokens(since=0)
-			tokens = run("#{rev_list_command(since)} --log-format=line | cut -d':' -f1").split("\n")
+		def commit_tokens(since=nil)
+			tokens = run("cd '#{url}' && bzr log --long --forward --show-id -r #{to_rev_param(since)}.. | grep ^revision-id | cut -c 14-").split("\n")
+
+			# Bzr returns everything after *and including* since.
+			# We want to exclude it.
+			if tokens.any? && tokens.first == since
+				tokens[1..-1]
+			else
+				tokens
+			end
 		end
 
 		# Returns a list of shallow commits (i.e., the diffs are not populated).
@@ -16,9 +24,15 @@ module Scm::Adapters
 		# we encounter massive repositories.  If you need all commits
 		# including diffs, you should use the each_commit() iterator,
 		# which only holds one commit in memory at a time.
-		def commits(since=0)
+		def commits(since=nil)
 			log = run("#{rev_list_command(since)} | cat")
 			a = Scm::Parsers::BzrParser.parse(log)
+
+			if a.any? && a.first.token == since
+				a[1..-1]
+			else
+				a
+			end
 		end
 
 		# Returns a single commit, including its diffs
@@ -41,7 +55,7 @@ module Scm::Adapters
 		end
 
 		# Not used by Ohloh proper, but handy for debugging and testing
-		def log(since=0)
+		def log(since=nil)
 			run "#{rev_list_command(since)} -v"
 		end
 
@@ -70,7 +84,22 @@ module Scm::Adapters
 		end
 
 		def rev_list_command(since=nil)
-			"cd '#{self.url}' && bzr log --forward -r #{since ? since+1 : 1}.."
+			"cd '#{self.url}' && bzr log --long --show-id --forward -r #{to_rev_param(since)}.."
+		end
+
+		# If you want to pass a revision-id as a bzr log parameter, you
+		# must prefix it with "revid:". This takes care of that.
+		def to_rev_param(r=nil)
+			case r
+			when nil
+				1
+			when Fixnum
+				r.to_s
+			when /^\d+$/
+				r
+			else
+				"revid:#{r.to_s}"
+			end
 		end
 	end
 end
