@@ -30,14 +30,14 @@ module Scm::Adapters
 		end
 
 		def hostname
-			$1 if url =~ /^ssh:\/\/([^\/]+)/
+			$1 if url =~ /^bzr\+ssh:\/\/([^\/]+)/
 		end
 
 		def path
 			case url
 			when /^file:\/\/(.+)$/
 				$1
-			when /^ssh:\/\/[^\/]+(\/.+)$/
+			when /^bzr\+ssh:\/\/[^\/]+(\/.+)$/
 				$1
 			when /^[^:]*$/
 				url

@@ -7,17 +7,17 @@ module Scm::Adapters
 			assert !BzrAdapter.new.hostname
 			assert !BzrAdapter.new(:url => "http://www.ohloh.net/test").hostname
 			assert !BzrAdapter.new(:url => "/Users/test/foo").hostname
-			assert_equal "foo", BzrAdapter.new(:url => 'ssh://foo/bar').hostname
+			assert_equal "foo", BzrAdapter.new(:url => 'bzr+ssh://foo/bar').hostname
 		end
 
 		def test_local
 			assert !BzrAdapter.new(:url => "foo:/bar").local? # Assuming your machine is not named "foo" :-)
 			assert !BzrAdapter.new(:url => "http://www.ohloh.net/foo").local?
-			assert !BzrAdapter.new(:url => "ssh://host/Users/test/src").local?
+			assert !BzrAdapter.new(:url => "bzr+ssh://host/Users/test/src").local?
 			assert BzrAdapter.new(:url => "src").local?
 			assert BzrAdapter.new(:url => "/Users/test/src").local?
 			assert BzrAdapter.new(:url => "file:///Users/test/src").local?
-			assert BzrAdapter.new(:url => "ssh://#{Socket.gethostname}/Users/test/src").local?
+			assert BzrAdapter.new(:url => "bzr+ssh://#{Socket.gethostname}/Users/test/src").local?
 		end
 
 		def test_path
@@ -25,7 +25,7 @@ module Scm::Adapters
 			assert_equal nil, BzrAdapter.new(:url => "http://ohloh.net/foo").path
 			assert_equal nil, BzrAdapter.new(:url => "https://ohloh.net/foo").path
 			assert_equal "/Users/test/foo", BzrAdapter.new(:url => "file:///Users/test/foo").path
-			assert_equal "/Users/test/foo", BzrAdapter.new(:url => "ssh://localhost/Users/test/foo").path
+			assert_equal "/Users/test/foo", BzrAdapter.new(:url => "bzr+ssh://localhost/Users/test/foo").path
 			assert_equal "/Users/test/foo", BzrAdapter.new(:url => "/Users/test/foo").path
 		end
 

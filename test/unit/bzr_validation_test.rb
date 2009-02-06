@@ -29,8 +29,8 @@ module Scm::Adapters
 		def test_rejected_public_urls
 			[ "file:///home/test/bzr",
 				"/home/test/bzr",
-				"ssh://test@localhost/home/test/bzr",
-				"ssh://localhost/home/test/bzr"
+				"bzr+ssh://test@localhost/home/test/bzr",
+				"bzr+ssh://localhost/home/test/bzr"
 			].each do |url|
 				bzr = BzrAdapter.new(:url => url, :public_urls_only => true)
 				assert bzr.validate_url
