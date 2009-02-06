@@ -27,5 +27,9 @@ module Scm::Adapters
 				"revid:#{r.to_s}"
 			end
 		end
+
+		def is_merge_commit?(commit)
+			parent_tokens(commit).size > 1
+		end
 	end
 end
