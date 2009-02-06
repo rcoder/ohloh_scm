@@ -13,3 +13,5 @@ require 'lib/scm/adapters/svn/push'
 require 'lib/scm/adapters/svn/pull'
 require 'lib/scm/adapters/svn/head'
 require 'lib/scm/adapters/svn/misc'
+require 'lib/scm/adapters/svn/patch'
+
