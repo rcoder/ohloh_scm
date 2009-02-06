@@ -63,6 +63,23 @@ module Scm::Adapters
 			end
 		end
 
+		# This bzr repository contains the following tree structure
+		#    /foo/
+		#    /foo/helloworld.c
+		#    /bar/
+		# Ohloh doesn't care about directories, so only /foo/helloworld.c should be reported.
+		def test_each_commit_excludes_directories
+			with_bzr_repository('bzr_with_subdirectories') do |bzr|
+				commits = []
+				bzr.each_commit do |c|
+					commits << c
+				end
+				assert_equal 1, commits.size
+				assert_equal 1, commits.first.diffs.size
+				assert_equal 'foo/helloworld.c', commits.first.diffs.first.path
+			end
+		end
+
 		protected
 
 		def revision_ids

@@ -49,9 +49,16 @@ module Scm::Adapters
 		def each_commit(since=0)
 			open_log_file(since) do |io|
 				Scm::Parsers::BzrParser.parse(io) do |commit|
-					yield commit if block_given? && commit.token != since
+					yield remove_directories(commit) if block_given? && commit.token != since
 				end
 			end
+		end
+
+		# Ohloh tracks only files, not directories. This function removes directories
+		# from the commit diffs.
+		def remove_directories(commit)
+			commit.diffs.delete_if { |d| d.path[-1..-1] == '/' }
+			commit
 		end
 
 		# Not used by Ohloh proper, but handy for debugging and testing
