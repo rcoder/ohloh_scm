@@ -1,7 +1,7 @@
 module Scm::Adapters
 	class BzrAdapter < AbstractAdapter
 		def head_token
-			run("bzr revno -q #{url}").strip
+			run("bzr log --limit 1 --show-id #{url} 2> /dev/null | grep ^revision-id | cut -f2 -d' '").strip
 		end
 
 		def head
@@ -9,7 +9,7 @@ module Scm::Adapters
 		end
 
 		def parent_tokens(commit)
-			run("cd '#{url}' && bzr log -c $((#{commit.token} - 1)) --log-format=line | cut -f1 -d':'").split("\n")
+			run("cd '#{url}' && bzr log --long --show-id -c #{to_rev_param(commit.token)} | grep ^parent | cut -f2 -d' '").split("\n")
 		end
 
 		def parents(commit)

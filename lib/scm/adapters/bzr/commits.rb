@@ -37,7 +37,7 @@ module Scm::Adapters
 
 		# Returns a single commit, including its diffs
 		def verbose_commit(token)
-			log = run("cd '#{self.url}' && bzr log -v -c #{token}")
+			log = run("cd '#{self.url}' && bzr log --long --show-id -v -c #{to_rev_param(token)}")
 			Scm::Parsers::BzrParser.parse(log).first
 		end
 
@@ -85,21 +85,6 @@ module Scm::Adapters
 
 		def rev_list_command(since=nil)
 			"cd '#{self.url}' && bzr log --long --show-id --forward -r #{to_rev_param(since)}.."
-		end
-
-		# If you want to pass a revision-id as a bzr log parameter, you
-		# must prefix it with "revid:". This takes care of that.
-		def to_rev_param(r=nil)
-			case r
-			when nil
-				1
-			when Fixnum
-				r.to_s
-			when /^\d+$/
-				r
-			else
-				"revid:#{r.to_s}"
-			end
 		end
 	end
 end

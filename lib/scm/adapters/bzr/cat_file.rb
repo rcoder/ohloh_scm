@@ -10,7 +10,7 @@ module Scm::Adapters
 		end
 
 		def cat(revision, path)
-			out, err = run_with_err("cd '#{url}' && bzr cat -r #{revision} #{escape(path)}")
+			out, err = run_with_err("cd '#{url}' && bzr cat -r #{to_rev_param(revision)} #{escape(path)}")
 			return nil if err =~ / is not present in revision /
 			raise RuntimeError.new(err) unless err.to_s == ''
 			out
