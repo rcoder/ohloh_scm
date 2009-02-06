@@ -8,7 +8,7 @@ module Scm::Adapters
 
 		# Return the list of commit tokens following +since+.
 		def commit_tokens(since=nil)
-			tokens = run("cd '#{url}' && bzr log --long --forward --show-id -r #{to_rev_param(since)}.. | grep ^revision-id | cut -c 14-").split("\n")
+			tokens = run("#{rev_list_command(since)} | grep -E -e '^( *)revision-id: ' | cut -f2 -d':' | cut -c 2-").split("\n")
 
 			# Bzr returns everything after *and including* since.
 			# We want to exclude it.

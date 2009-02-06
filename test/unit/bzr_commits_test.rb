@@ -12,6 +12,13 @@ module Scm::Adapters
 			end
 		end
 
+		def test_commit_count_with_branches
+			with_bzr_repository('bzr_with_branch') do |bzr|
+				# Only 3 commits are on main line... make sure we catch the branch commit as well
+				assert_equal 4, bzr.commit_count
+			end
+		end
+
 		def test_commit_tokens
 			with_bzr_repository('bzr') do |bzr|
 				assert_equal revision_ids, bzr.commit_tokens
