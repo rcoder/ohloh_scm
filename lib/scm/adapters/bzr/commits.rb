@@ -37,7 +37,7 @@ module Scm::Adapters
 
 		# Returns a single commit, including its diffs
 		def verbose_commit(token)
-			log = run("cd '#{self.url}' && bzr log --long --show-id -v -c #{to_rev_param(token)}")
+			log = run("cd '#{self.url}' && bzr log --long --show-id -v --limit 1 -c #{to_rev_param(token)}")
 			Scm::Parsers::BzrParser.parse(log).first
 		end
 

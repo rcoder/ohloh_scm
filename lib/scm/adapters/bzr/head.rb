@@ -9,7 +9,7 @@ module Scm::Adapters
 		end
 
 		def parent_tokens(commit)
-			run("cd '#{url}' && bzr log --long --show-id -c #{to_rev_param(commit.token)} | grep ^parent | cut -f2 -d' '").split("\n")
+			run("cd '#{url}' && bzr log --long --show-id --limit 1 -c #{to_rev_param(commit.token)} | grep ^parent | cut -f2 -d' '").split("\n")
 		end
 
 		def parents(commit)
