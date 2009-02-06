@@ -9,45 +9,47 @@ module Scm::Parsers
 			e = nil
 			state = :data
 			action = ''
+			indent = '' # Track the level of indentation as we descend into branches
 			show_id = false # true if this log includes revision and file ids
 
 			buffer.each_line do |l|
 				next_state = state
 
 				case l
-				when /^-+$/
+				when /^( *)-+$/
 					# a new commit begins
+					indent = $1
 					yield e if e && block_given?
 					e = Scm::Commit.new
 					e.diffs = []
 					next_state = :data
-				when /^revno:\s+(\d+)$/
+				when /^#{indent}revno:\s+(\d+)$/
 					e.token = $1
 					next_state = :data
-				when /^revision-id:\s+(\S+)$/
+				when /^#{indent}revision-id:\s+(\S+)$/
 					e.token = $1
 					show_id = true
 					next_state = :data
-				when /^committer:\s+(.+?)(\s+<(.+)>)?$/
+				when /^#{indent}committer:\s+(.+?)(\s+<(.+)>)?$/
 					e.committer_name = $1
 					e.committer_email = $3
 					next_state = :data
-				when /^timestamp:\s+(.+)/
+				when /^#{indent}timestamp:\s+(.+)/
 					e.committer_date = Time.parse($1)
 					next_state = :data
-				when /^added:$/
+				when /^#{indent}added:$/
 					next_state = :collect_files
 					action = 'A'
-				when /^modified:$/
+				when /^#{indent}modified:$/
 					next_state = :collect_files
 					action = 'M'
-				when /^removed:$/
+				when /^#{indent}removed:$/
 					next_state = :collect_files
 					action = 'D'
-				when /^message:$/
+				when /^#{indent}message:$/
 					next_state = :collect_message
 					e.message ||= ''
-				when /^  (.*)$/
+				when /^#{indent}  (.*)$/
 					case state
 					when :collect_files
 						path = $1
