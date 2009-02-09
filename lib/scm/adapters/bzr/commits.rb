@@ -46,10 +46,10 @@ module Scm::Adapters
 		# This is designed to prevent excessive RAM usage when we
 		# encounter a massive repository.  Only a single commit is ever
 		# held in memory at once.
-		def each_commit(since=0)
+		def each_commit(since=nil)
 			open_log_file(since) do |io|
 				Scm::Parsers::BzrParser.parse(io) do |commit|
-					yield remove_directories(commit) if block_given? && commit.token != since
+					yield remove_dupes(remove_directories(commit)) if block_given? && commit.token != since
 				end
 			end
 		end
@@ -61,6 +61,23 @@ module Scm::Adapters
 			commit
 		end
 
+		# Bazaar may report that a file was both removed and added in the same commit.
+		# We're going to consider this to be simply a modification of the file.
+		# So we'll remove the 'D' action, and replace the 'A' with an 'M' action.
+		def remove_dupes(commit)
+			if commit.diffs
+				dupes = commit.diffs.collect do |d|
+					d if d.action == 'D' && commit.diffs.select { |x| x.action == 'A' and x.path == d.path }.any?
+				end.compact
+				dupes.each do |dupe|
+					commit.diffs.delete_if { |del| del.action == 'D' and del.path == dupe.path }
+					commit.diffs.each { |add| add.action = 'M' if add.path == dupe.path }
+				end
+			end
+			commit
+		end
+
+
 		# Not used by Ohloh proper, but handy for debugging and testing
 		def log(since=nil)
 			run "#{rev_list_command(since)} -v"
@@ -71,14 +88,14 @@ module Scm::Adapters
 		# +since+. However, bzr doesn't work that way; it returns
 		# everything after and INCLUDING +since+. Therefore, consumers
 		# of this file should check for and reject the duplicate commit.
-		def open_log_file(since=0)
+		def open_log_file(since=nil)
 			begin
 				if since == head_token # There are no new commits
 					# As a time optimization, just create an empty
 					# file rather than fetch a log we know will be empty.
 					File.open(log_filename, 'w') { }
 				else
-					run "#{rev_list_command} -v > #{log_filename}"
+					run "#{rev_list_command(since)} -v > #{log_filename}"
 				end
 				File.open(log_filename, 'r') { |io| yield io }
 			ensure
