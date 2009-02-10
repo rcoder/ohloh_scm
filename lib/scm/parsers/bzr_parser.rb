@@ -88,7 +88,13 @@ module Scm::Parsers
 					Scm::Diff.new(:action => 'A', :path => after )]
 			else
 				[Scm::Diff.new(:action => action, :path => line)]
+			end.each do |d|
+				d.path = strip_trailing_asterisk(d.path)
 			end
+		end
+
+		def self.strip_trailing_asterisk(path)
+			path[-1..-1] == '*' ? path[0..-2] : path
 		end
 
 		# Bazaar may report that a file was both deleted, added, and/or modified all

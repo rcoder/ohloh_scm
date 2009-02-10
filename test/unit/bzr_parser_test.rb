@@ -345,5 +345,28 @@ modified:
 			assert_equal 'M', diffs.last.action
 			assert_equal 'helloworld.c', diffs.last.path
 		end
+
+		def test_strip_trailing_asterisk_from_executables
+			log = <<-SAMPLE
+------------------------------------------------------------
+revno: 1
+committer: info <info@ohloh.net>
+timestamp: Wed 2005-09-14 21:27:20 +1000
+message:
+  added an executable, also renamed an executable
+added:
+  script*
+renamed:
+  helloworld* => goodbyeworld*
+			SAMPLE
+
+			diffs = BzrParser.parse(log).first.diffs
+			diffs.sort! { |a,b| a.path <=> b.path }
+
+			assert_equal 'goodbyeworld', diffs[0].path
+			assert_equal 'helloworld', diffs[1].path
+			assert_equal 'script', diffs[2].path
+
+		end
 	end
 end
