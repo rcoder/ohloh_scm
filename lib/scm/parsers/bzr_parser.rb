@@ -16,7 +16,14 @@ module Scm::Parsers
 				next_state = state
 
 				case l
-				when /^( *)-+$/
+				# A commit message can contain lines of only dashes, which makes parsing difficult.
+				#
+				# This delimiter detector filters most casual cases of using dash lines in commits.
+				# We check that the dashed line is exactly 60 chars long, and is prepended by 4*n spaces.
+				#
+				# Unless the commit message itself includes leading spaces, the commit message will
+				# begin in column 4*n+2, and thus will not match our pattern.
+				when /^((    )*)-{60,60}$/
 					# a new commit begins
 					indent = $1
 					if e && block_given?

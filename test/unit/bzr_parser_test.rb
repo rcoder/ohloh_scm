@@ -366,7 +366,44 @@ renamed:
 			assert_equal 'goodbyeworld', diffs[0].path
 			assert_equal 'helloworld', diffs[1].path
 			assert_equal 'script', diffs[2].path
+		end
 
+		def test_comment_that_contains_dashes
+			log = <<-SAMPLE
+------------------------------------------------------------
+revno: 2
+committer: info <info@ohloh.net>
+timestamp: Wed 2005-09-14 21:27:20 +1000
+message:
+  This is a tricky commit message to confirm fix
+  to Ticket 5. We're including a line of dashes in
+  the message that resembles a log delimiter.
+  
+  ------------------------------------------------------------
+  
+	Happy parsing!
+added:
+  goodbyeworld.c
+------------------------------------------------------------
+revno: 1
+committer: info <info@ohloh.net>
+timestamp: Wed 2005-09-14 21:27:20 +1000
+message:
+  Initial Revision
+added:
+  helloworld.c
+			SAMPLE
+
+			commits = BzrParser.parse(log)
+
+			assert_equal 2, commits.size
+			assert_equal '2', commits.first.token
+			assert_equal 1, commits.first.diffs.size
+			assert_equal "goodbyeworld.c", commits.first.diffs.first.path
+
+			assert_equal '1', commits.last.token
+			assert_equal 1, commits.last.diffs.size
+			assert_equal "helloworld.c", commits.last.diffs.first.path
 		end
 	end
 end
