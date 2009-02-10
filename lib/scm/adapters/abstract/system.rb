@@ -27,11 +27,11 @@ module Scm::Adapters
 		end
 
 		# As above, but does not raise an exception when an error occurs.
-		# Returns two values, stdout and stderr.
+		# Returns three values: stdout, stderr, and process exit code
 		def self.run_with_err(cmd)
 			logger.debug { cmd }
 			status, out, err = systemu(cmd)
-			[out, err]
+			[out, err, status]
 		end
 
 		def run_with_err(cmd)
