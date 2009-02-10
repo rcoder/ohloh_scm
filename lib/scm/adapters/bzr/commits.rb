@@ -49,7 +49,7 @@ module Scm::Adapters
 		def each_commit(since=nil)
 			open_log_file(since) do |io|
 				Scm::Parsers::BzrParser.parse(io) do |commit|
-					yield remove_dupes(remove_directories(commit)) if block_given? && commit.token != since
+					yield remove_directories(commit) if block_given? && commit.token != since
 				end
 			end
 		end
@@ -58,22 +58,6 @@ module Scm::Adapters
 		# from the commit diffs.
 		def remove_directories(commit)
 			commit.diffs.delete_if { |d| d.path[-1..-1] == '/' }
-			commit
-		end
-
-		# Bazaar may report that a file was both removed and added in the same commit.
-		# We're going to consider this to be simply a modification of the file.
-		# So we'll remove the 'D' action, and replace the 'A' with an 'M' action.
-		def remove_dupes(commit)
-			if commit.diffs
-				dupes = commit.diffs.collect do |d|
-					d if d.action == 'D' && commit.diffs.select { |x| x.action == 'A' and x.path == d.path }.any?
-				end.compact
-				dupes.each do |dupe|
-					commit.diffs.delete_if { |del| del.action == 'D' and del.path == dupe.path }
-					commit.diffs.each { |add| add.action = 'M' if add.path == dupe.path }
-				end
-			end
 			commit
 		end
 

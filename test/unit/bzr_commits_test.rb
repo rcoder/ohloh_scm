@@ -63,15 +63,6 @@ module Scm::Adapters
 			end
 		end
 
-		def test_remove_dupes_add_remove
-			bzr = BzrAdapter.new
-			c = Scm::Commit.new(:diffs => [ Scm::Diff.new(:action => "A", :path => "foo"),
-																			Scm::Diff.new(:action => "D", :path => "foo") ])
-			bzr.remove_dupes(c)
-			assert_equal 1, c.diffs.size
-			assert_equal 'M', c.diffs.first.action
-		end
-
 		# This bzr repository contains the following tree structure
 		#    /foo/
 		#    /foo/helloworld.c
