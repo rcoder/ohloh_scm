@@ -45,6 +45,9 @@ module Scm::Adapters
 
 		# If this adapter's branch was created by copying or renaming another branch,
 		# then return a new adapter that points to that prior branch.
+		#
+		# Only commits following +since+ are considered, so if the copy or rename
+		# occured on or before +since+, then no parent will be found or returned.
 		def parent_svn(since=0)
 			parent = nil
 			c = first_commit(since)
@@ -75,12 +78,12 @@ module Scm::Adapters
 
 		# Returns an array of revision numbers for all commits following revision number 'since'.
 		def chained_commit_tokens(since=0)
-			(parent_svn ? parent_svn.chained_commit_tokens(since) : []) + base_commit_tokens(since)
+			(parent_svn(since) ? parent_svn.chained_commit_tokens(since) : []) + base_commit_tokens(since)
 		end
 
 		# Returns an array of commits following revision number 'since'.
 		def chained_commits(since=0)
-			(parent_svn ? parent_svn.chained_commits(since) : []) + base_commits(since)
+			(parent_svn(since) ? parent_svn.chained_commits(since) : []) + base_commits(since)
 		end
 
 		# Yield verbose commits following revision number 'since', one at a time.
@@ -91,19 +94,25 @@ module Scm::Adapters
 			end
 		end
 
+		def chained_verbose_commit(since=0)
+			parent_svn(since) ? parent_svn.chained_verbose_commit(since) : base_verbose_commit(since)
+		end
+
 		# Helper methods for parent_svn
 
 		def first_token(since=0)
-			first_commit(since).token
+			c = first_commit(since)
+			c && c.token
 		end
 
 		def first_commit(since=0)
 			Scm::Parsers::SvnXmlParser.parse(next_revision_xml(since)).first
 		end
-	
+
 		# Returns the first commit with a revision number greater than the provided revision number
-		def next_revision_xml(since)
-			run "svn log --verbose --xml --stop-on-copy -r #{since+1}:#{final_token || 'HEAD'} --limit 1 #{opt_auth} '#{SvnAdapter.uri_encode(File.join(self.root, self.branch_name))}@#{final_token || 'HEAD'}'"
+		def next_revision_xml(since=0)
+			return "<?xml?>" if since.to_i >= head_token
+			run "svn log --verbose --xml --stop-on-copy -r #{since.to_i+1}:#{final_token || 'HEAD'} --limit 1 #{opt_auth} '#{SvnAdapter.uri_encode(File.join(self.root, self.branch_name))}@#{final_token || 'HEAD'}'"
 		end
 	end
 end

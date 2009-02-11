@@ -37,6 +37,10 @@ module Scm::Adapters
 			chained_each_commit(since) { |commit| yield commit }
 		end
 
+		def verbose_commit(since=0)
+			chained_verbose_commit(since)
+		end
+
 		#------------------------------------------------------------------
 		# Base versions of the commit accessors.
 		#
@@ -46,12 +50,14 @@ module Scm::Adapters
 
 		# Returns the count of commits following revision number 'since'.
 		def base_commit_count(since=0)
+			since ||= 0
 			return 0 if final_token && since >= final_token
 			run("svn log -q -r #{since.to_i + 1}:#{final_token || 'HEAD'} --stop-on-copy '#{SvnAdapter.uri_encode(File.join(root, branch_name.to_s))}@#{final_token || 'HEAD'}' | grep -E -e '^r[0-9]+ ' | wc -l").strip.to_i
 		end
 
 		# Returns an array of revision numbers for all commits following revision number 'since'.
 		def base_commit_tokens(since=0)
+			since ||= 0
 			return [] if final_token && since >= final_token
 			cmd = "svn log -q -r #{since.to_i + 1}:#{final_token || 'HEAD'} --stop-on-copy '#{SvnAdapter.uri_encode(File.join(root, branch_name.to_s))}@#{final_token || 'HEAD'}' | grep -E -e '^r[0-9]+ ' | cut -f 1 -d '|' | cut -c 2-"
 			run(cmd).split.collect { |r| r.to_i }
@@ -75,7 +81,7 @@ module Scm::Adapters
 		#
 		def base_each_commit(since=nil)
 			base_commit_tokens(since).each do |rev|
-				yield deepen_commit(strip_commit_branch(verbose_commit(rev)))
+				yield base_verbose_commit(rev)
 			end
 		end
 
@@ -158,10 +164,8 @@ module Scm::Adapters
 			end
 		end
 
-		# A single commit, including any changed paths.
-		# Basically equivalent to the data you get back from the Subversion log when you pass the --verbose flag.
-		def verbose_commit(rev)
-			Scm::Parsers::SvnXmlParser.parse(single_revision_xml(rev)).first
+		def base_verbose_commit(rev)
+			deepen_commit(strip_commit_branch(Scm::Parsers::SvnXmlParser.parse(single_revision_xml(rev)).first))
 		end
 
 		#---------------------------------------------------------------------

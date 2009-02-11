@@ -253,5 +253,33 @@ module Scm::Adapters
 			assert_equal '/trunk/COPYING', commits[4].diffs[1].path
 		end
 
+		def test_verbose_commit_with_chaining
+			with_svn_repository('svn_with_branching','/trunk') do |svn|
+
+				assert svn.verbose_commit(9)
+				assert_equal 'modified helloworld.c', svn.verbose_commit(9).message
+				assert_equal ['/helloworld.c'], svn.verbose_commit(9).diffs.collect { |d| d.path }
+
+				assert svn.verbose_commit(8)
+				assert_equal [], svn.verbose_commit(8).diffs
+
+				# Reaching these commits requires chaining
+				assert svn.verbose_commit(5)
+				assert_equal 'add a new branch, with goodbyeworld.c', svn.verbose_commit(5).message
+				assert_equal ['/goodbyeworld.c'], svn.verbose_commit(5).diffs.collect { |d| d.path }
+
+				assert svn.verbose_commit(4)
+				assert_equal [], svn.verbose_commit(4).diffs
+
+				# Reaching these commits requires chaining twice
+				assert svn.verbose_commit(2)
+				assert_equal 'Added helloworld.c to trunk', svn.verbose_commit(2).message
+				assert_equal ['/helloworld.c'], svn.verbose_commit(2).diffs.collect { |d| d.path }
+
+				assert svn.verbose_commit(1)
+				assert_equal [], svn.verbose_commit(1).diffs
+			end
+		end
+
 	end
 end
