@@ -46,7 +46,7 @@ module Scm::Adapters
 		# This is designed to prevent excessive RAM usage when we
 		# encounter a massive repository.  Only a single commit is ever
 		# held in memory at once.
-		def each_commit(since=0)
+		def each_commit(since=nil)
 			open_log_file(since) do |io|
 				Scm::Parsers::BzrParser.parse(io) do |commit|
 					yield remove_directories(commit) if block_given? && commit.token != since
@@ -61,6 +61,7 @@ module Scm::Adapters
 			commit
 		end
 
+
 		# Not used by Ohloh proper, but handy for debugging and testing
 		def log(since=nil)
 			run "#{rev_list_command(since)} -v"
@@ -71,14 +72,14 @@ module Scm::Adapters
 		# +since+. However, bzr doesn't work that way; it returns
 		# everything after and INCLUDING +since+. Therefore, consumers
 		# of this file should check for and reject the duplicate commit.
-		def open_log_file(since=0)
+		def open_log_file(since=nil)
 			begin
 				if since == head_token # There are no new commits
 					# As a time optimization, just create an empty
 					# file rather than fetch a log we know will be empty.
 					File.open(log_filename, 'w') { }
 				else
-					run "#{rev_list_command} -v > #{log_filename}"
+					run "#{rev_list_command(since)} -v > #{log_filename}"
 				end
 				File.open(log_filename, 'r') { |io| yield io }
 			ensure

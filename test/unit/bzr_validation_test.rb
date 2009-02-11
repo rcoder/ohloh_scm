@@ -19,6 +19,7 @@ module Scm::Adapters
 			[ "http://www.selenic.com/repo/hello",
 				"http://www.selenic.com:80/repo/hello",
 				"https://www.selenic.com/repo/hello",
+				"bzr://www.selenic.com/repo/hello",
 			].each do |url|
 				bzr = BzrAdapter.new(:url => url, :public_urls_only => true)
 				assert !bzr.validate_url
@@ -46,6 +47,9 @@ module Scm::Adapters
 
 			bzr = BzrAdapter.new(:url => "/home/test/bzr")
 			assert_equal nil, bzr.guess_forge
+
+			bzr = BzrAdapter.new( :url => 'bzr://www.selenic.com/repo/hello')
+			assert_equal 'www.selenic.com', bzr.guess_forge
 
 			bzr = BzrAdapter.new( :url => 'http://www.selenic.com/repo/hello')
 			assert_equal 'www.selenic.com', bzr.guess_forge

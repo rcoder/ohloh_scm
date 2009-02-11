@@ -10,17 +10,15 @@ module Scm::Adapters
 		end
 
 		def cat(revision, path)
-			out, err = run_with_err("cd '#{url}' && bzr cat -r #{to_rev_param(revision)} #{escape(path)}")
+			out, err, status = run_with_err("cd '#{url}' && bzr cat --name-from-revision -r #{to_rev_param(revision)} '#{escape(path)}'")
 			return nil if err =~ / is not present in revision /
-			raise RuntimeError.new(err) unless err.to_s == ''
+			raise RuntimeError.new(err) unless status == 0
 			out
 		end
 
-		# Escape bash-significant characters in the filename
-		# Example:
-		#     "Foo Bar & Baz" => "Foo\ Bar\ \&\ Baz"
+		# Bzr doesn't like it when the filename includes a colon
 		def escape(path)
-			path.gsub(/[ '"&]/) { |c| '\\' + c }
+			path.gsub(/[:]/) { |c| '\\' + c }
 		end
 	end
 end

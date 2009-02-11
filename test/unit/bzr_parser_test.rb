@@ -264,5 +264,146 @@ SAMPLE
 			assert_equal 'hello_world.c', commits[3].diffs[0].path
 			assert_equal 'M', commits[3].diffs[0].action
 		end
+
+		def test_parse_diffs
+			assert_equal 'A', BzrParser.parse_diffs('A', "helloworld.c").first.action
+			assert_equal 'helloworld.c', BzrParser.parse_diffs('A', "helloworld.c").first.path
+		end
+
+		def test_parse_diffs_rename
+			diffs = BzrParser.parse_diffs(:rename, "helloworld.c => goodbyeworld.c")
+			assert_equal 2, diffs.size
+			assert_equal 'D', diffs.first.action
+			assert_equal 'helloworld.c', diffs.first.path
+			assert_equal 'A', diffs.last.action
+			assert_equal 'goodbyeworld.c', diffs.last.path
+		end
+
+		def test_rename
+			log = <<-SAMPLE
+------------------------------------------------------------
+revno: 2
+committer: info <info@ohloh.net>
+timestamp: Wed 2005-09-14 21:27:20 +1000
+message:
+  rename a file
+renamed:
+  helloworld.c => goodbyeworld.c
+			SAMPLE
+
+			commits = BzrParser.parse(log)
+
+			assert commits
+			assert_equal 1, commits.size
+			assert_equal 2, commits.first.diffs.size
+
+			assert_equal 'D', commits.first.diffs.first.action
+			assert_equal 'helloworld.c', commits.first.diffs.first.path
+
+			assert_equal 'A', commits.first.diffs.last.action
+			assert_equal 'goodbyeworld.c', commits.first.diffs.last.path
+		end
+
+		def test_remove_dupes_add_remove
+			diffs = BzrParser.remove_dupes([ Scm::Diff.new(:action => "A", :path => "foo"),
+																				Scm::Diff.new(:action => "D", :path => "foo") ])
+			assert_equal 1, diffs.size
+			assert_equal 'M', diffs.first.action
+			assert_equal 'foo', diffs.first.path
+		end
+
+		# A somewhat tricky case. A file is deleted, and another
+		# file is renamed to take its place. That file is then modified!
+		#
+		# This is what Ohloh expects to see:
+		#
+		#   D  goodbyeworld.c
+		#   M  helloworld.c
+		#
+		def test_complex_rename
+			log = <<-SAMPLE
+------------------------------------------------------------
+revno: 147.1.24
+committer: info <info@ohloh.net>
+timestamp: Wed 2005-09-14 21:27:20 +1000
+message:
+  rename a file to replace an existing one, then modify it!
+removed:
+  helloworld.c
+renamed:
+  goodbyeworld.c => helloworld.c
+modified:
+  helloworld.c
+			SAMPLE
+
+			diffs = BzrParser.parse(log).first.diffs
+			diffs.sort! { |a,b| a.path <=> b.path }
+
+			assert_equal 2, diffs.size
+			assert_equal 'D', diffs.first.action
+			assert_equal 'goodbyeworld.c', diffs.first.path
+			assert_equal 'M', diffs.last.action
+			assert_equal 'helloworld.c', diffs.last.path
+		end
+
+		def test_strip_trailing_asterisk_from_executables
+			log = <<-SAMPLE
+------------------------------------------------------------
+revno: 1
+committer: info <info@ohloh.net>
+timestamp: Wed 2005-09-14 21:27:20 +1000
+message:
+  added an executable, also renamed an executable
+added:
+  script*
+renamed:
+  helloworld* => goodbyeworld*
+			SAMPLE
+
+			diffs = BzrParser.parse(log).first.diffs
+			diffs.sort! { |a,b| a.path <=> b.path }
+
+			assert_equal 'goodbyeworld', diffs[0].path
+			assert_equal 'helloworld', diffs[1].path
+			assert_equal 'script', diffs[2].path
+		end
+
+		def test_comment_that_contains_dashes
+			log = <<-SAMPLE
+------------------------------------------------------------
+revno: 2
+committer: info <info@ohloh.net>
+timestamp: Wed 2005-09-14 21:27:20 +1000
+message:
+  This is a tricky commit message to confirm fix
+  to Ticket 5. We're including a line of dashes in
+  the message that resembles a log delimiter.
+  
+  ------------------------------------------------------------
+  
+	Happy parsing!
+added:
+  goodbyeworld.c
+------------------------------------------------------------
+revno: 1
+committer: info <info@ohloh.net>
+timestamp: Wed 2005-09-14 21:27:20 +1000
+message:
+  Initial Revision
+added:
+  helloworld.c
+			SAMPLE
+
+			commits = BzrParser.parse(log)
+
+			assert_equal 2, commits.size
+			assert_equal '2', commits.first.token
+			assert_equal 1, commits.first.diffs.size
+			assert_equal "goodbyeworld.c", commits.first.diffs.first.path
+
+			assert_equal '1', commits.last.token
+			assert_equal 1, commits.last.diffs.size
+			assert_equal "helloworld.c", commits.last.diffs.first.path
+		end
 	end
 end
