@@ -23,5 +23,13 @@ module Scm::Adapters
 				assert_equal [], cvs.commits('2006/06/29 18:52:23').collect { |c| c.token }
 			end
 		end
+
+		def test_commits_sets_scm
+			with_cvs_repository('cvs') do |cvs|
+				cvs.commits.each do |c|
+					assert_equal cvs, c.scm
+				end
+			end
+		end
 	end
 end

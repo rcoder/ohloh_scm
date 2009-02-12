@@ -83,14 +83,14 @@ module Scm::Adapters
 
 					logger.info { "Downloading revision #{r.token} (#{i+1} of #{commits.size})... " }
 					begin
-						source_scm.checkout(r, url)
+						r.scm.checkout(r, url)
 					rescue
 						logger.error { $!.inspect }
 						# If we fail to checkout, it's often because there is junk of some kind
 						# in our working directory.
 						logger.info { "Checkout failed. Cleaning and trying again..." }
 						clean_up_disk
-						source_scm.checkout(r, url)
+						r.scm.checkout(r, url)
 					end
 
 					logger.debug { "Committing revision #{r.token} (#{i+1} of #{commits.size})... " }

@@ -209,6 +209,7 @@ module Scm::Adapters
 						assert d.action.length == 1
 						assert d.path.length > 0
 					end
+					assert_equal svn, e.scm # Commit points back to its containing scm.
 				end
 				assert !FileTest.exist?(svn.log_filename) # Make sure we cleaned up after ourselves
 			end
@@ -256,28 +257,35 @@ module Scm::Adapters
 		def test_verbose_commit_with_chaining
 			with_svn_repository('svn_with_branching','/trunk') do |svn|
 
-				assert svn.verbose_commit(9)
-				assert_equal 'modified helloworld.c', svn.verbose_commit(9).message
-				assert_equal ['/helloworld.c'], svn.verbose_commit(9).diffs.collect { |d| d.path }
+				c = svn.verbose_commit(9)
+				assert_equal 'modified helloworld.c', c.message
+				assert_equal ['/helloworld.c'], c.diffs.collect { |d| d.path }
+				assert_equal '/trunk', c.scm.branch_name
 
-				assert svn.verbose_commit(8)
-				assert_equal [], svn.verbose_commit(8).diffs
+				c = svn.verbose_commit(8)
+				assert_equal [], c.diffs
+				assert_equal '/trunk', c.scm.branch_name
 
 				# Reaching these commits requires chaining
-				assert svn.verbose_commit(5)
-				assert_equal 'add a new branch, with goodbyeworld.c', svn.verbose_commit(5).message
-				assert_equal ['/goodbyeworld.c'], svn.verbose_commit(5).diffs.collect { |d| d.path }
-
-				assert svn.verbose_commit(4)
-				assert_equal [], svn.verbose_commit(4).diffs
+				c = svn.verbose_commit(5)
+				assert_equal 'add a new branch, with goodbyeworld.c', c.message
+				assert_equal ['/goodbyeworld.c'], c.diffs.collect { |d| d.path }
+				assert_equal '/branches/development', c.scm.branch_name
 
 				# Reaching these commits requires chaining twice
-				assert svn.verbose_commit(2)
-				assert_equal 'Added helloworld.c to trunk', svn.verbose_commit(2).message
-				assert_equal ['/helloworld.c'], svn.verbose_commit(2).diffs.collect { |d| d.path }
+				c = svn.verbose_commit(4)
+				assert_equal [], c.diffs
+				assert_equal '/trunk', c.scm.branch_name
 
-				assert svn.verbose_commit(1)
-				assert_equal [], svn.verbose_commit(1).diffs
+				# And now a fourth chain (to skip over /trunk deletion in rev 3)
+				c = svn.verbose_commit(2)
+				assert_equal 'Added helloworld.c to trunk', c.message
+				assert_equal ['/helloworld.c'], c.diffs.collect { |d| d.path }
+				assert_equal '/trunk', c.scm.branch_name
+
+				c = svn.verbose_commit(1)
+				assert_equal [], c.diffs
+				assert_equal '/trunk', c.scm.branch_name
 			end
 		end
 

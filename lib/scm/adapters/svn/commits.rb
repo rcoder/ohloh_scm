@@ -3,14 +3,16 @@ require 'rexml/document'
 module Scm::Adapters
 	class SvnAdapter < AbstractAdapter
 
-		# In all commit- and log-related methods, 'since' refers to the revision number of the last known commit,
-		# and the methods return the commits *following* this commit.
+		# In all commit- and log-related methods, 'since' refers to the revision
+		# number of the last known commit, and the methods return the commits
+		# *following* this commit.
 		#
 		# Examples:
 		#    commits(1) => [rev 2, rev 3, ..., HEAD]
 		#    commits(3) => [rev 4, rev 5, ..., HEAD]
 		#
-		# This is convenient for Ohloh -- Ohloh passes the last commit it is aware of, and these methods return any new commits.
+		# This is convenient for Ohloh -- Ohloh passes the last commit it is aware
+		# of, and these methods return any new commits.
 
 		# The last revision to be analyzed in this repository. Everything after this revision is ignored.
 		# The repository is considered to be retired after this point, and under no circumstances should
@@ -63,12 +65,14 @@ module Scm::Adapters
 			run(cmd).split.collect { |r| r.to_i }
 		end
 
-		# Returns an array of commits following revision number 'since'. These commit objects do not include diffs.
+		# Returns an array of commits following revision number 'since'.
+		# These commit objects do not include diffs.
 		def base_commits(since=0)
-			c = []
+			list = []
 			open_log_file(since) do |io|
-				c = Scm::Parsers::SvnXmlParser.parse(io)
+				list = Scm::Parsers::SvnXmlParser.parse(io)
 			end
+			list.each { |c| c.scm = self }
 		end
 
 		# Yields each commit following revision number 'since'. These commit object are populated with diffs.
@@ -165,7 +169,9 @@ module Scm::Adapters
 		end
 
 		def base_verbose_commit(rev)
-			deepen_commit(strip_commit_branch(Scm::Parsers::SvnXmlParser.parse(single_revision_xml(rev)).first))
+			c = Scm::Parsers::SvnXmlParser.parse(single_revision_xml(rev)).first
+			c.scm = self
+			deepen_commit(strip_commit_branch(c))
 		end
 
 		#---------------------------------------------------------------------

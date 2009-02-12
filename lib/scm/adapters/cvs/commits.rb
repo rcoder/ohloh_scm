@@ -5,6 +5,9 @@ module Scm::Adapters
 			open_log_file(since) do |io|
 				result = Scm::Parsers::CvsParser.parse(io, :branch_name => branch_name)
 			end
+			
+			# Git converter needs a backpointer to the scm for each commit
+			result.each { |c| c.scm = self } 
 
 			return result if result.size == 0 # Nothing found; we're done here.
 			return result if since.to_s == '' # We requested everything, so just return everything.

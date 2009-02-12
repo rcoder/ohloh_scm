@@ -34,6 +34,9 @@ module Scm
 		# the approximate timestamp of the change.
 		attr_accessor :token
 
+		# A pointer back to the adapter that contains this commit.
+		attr_accessor :scm
+
 		# Hack. To optimize CVS updates, we will store the names of all the
 		# directories that require updating during this commit. Ohloh itself never
 		# actually sees this.
