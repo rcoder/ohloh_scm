@@ -2,7 +2,6 @@ require 'open-uri'
 
 module Scm::Adapters
 	class SvnAdapter < AbstractAdapter
-
 		# Converts an URL of form file://local/path to simply /local/path.
 		def path
 			case url
@@ -58,12 +57,8 @@ module Scm::Adapters
 		end
 
 		def info(path=nil, revision=final_token || 'HEAD')
-			if path || (revision != 'HEAD')
-				run "svn info -r #{revision} #{opt_auth} '#{SvnAdapter.uri_encode(File.join(self.url, path.to_s))}@#{revision}'"
-			else
-				# Cache the default info query for performance
-				@info ||= run "svn info -r #{revision} #{opt_auth} '#{SvnAdapter.uri_encode(self.url)}@#{revision}'"
-			end
+			@info ||= {}
+			@info[[path, revision]] ||= run "svn info -r #{revision} #{opt_auth} '#{SvnAdapter.uri_encode(File.join(self.url, path.to_s))}@#{revision}'"
 		end
 
 		def root

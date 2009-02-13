@@ -49,19 +49,22 @@ module Scm::Adapters
 		# Only commits following +since+ are considered, so if the copy or rename
 		# occured on or before +since+, then no parent will be found or returned.
 		def parent_svn(since=0)
-			parent = nil
-			c = first_commit(since)
-			if c
-				c.diffs.each do |d|
-					if (b = new_branch_name(d))
-						parent = SvnAdapter.new(:url => File.join(root, b), :branch_name => b,
-													 :username => username, :password => password, 
-													 :final_token => d.from_revision).normalize
-						break
-					end
-				end
+			@parent_svn ||={}
+			@parent_svn[since] ||= begin
+			  parent = nil
+			  c = first_commit(since)
+			  if c
+				 c.diffs.each do |d|
+					 if (b = new_branch_name(d))
+						 parent = SvnAdapter.new(:url => File.join(root, b), :branch_name => b,
+																		 :username => username, :password => password, 
+																		 :final_token => d.from_revision).normalize
+						 break
+					 end
+				 end
+			  end
+			  parent
 			end
-			parent
 		end
 
 		#------------------------------------------------------------------
