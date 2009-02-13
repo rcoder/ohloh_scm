@@ -146,7 +146,7 @@ module Scm::Parsers
 
 			# Revision 6: /trunk/goodbyeworld.c is created, but we only see activity
 			# on /branches/development, so no commit reported.
-			
+
 			# Revision 7: /trunk is deleted, but again we don't see it.
 
 			# Revision 8: /branches/development is moved to become the new /trunk.
@@ -157,6 +157,36 @@ module Scm::Parsers
 			assert_equal 1, commits[5].diffs.size
 			assert_equal 'M', commits[5].diffs.first.action
 			assert_equal '/helloworld.c', commits[5].diffs.first.path
+		end
+
+		# Specifically tests this case:
+		# Suppose we're importing /myproject/trunk, and the log
+		# contains the following:
+		#
+		#   A /myproject (from /all/myproject:1)
+		#   D /all/myproject
+		#
+		# We need to make sure we detect the move here, even though
+		# "/myproject" is not an exact match for "/myproject/trunk".
+		def test_tree_move
+			with_svn_repository('svn_with_tree_move', '/myproject/trunk') do |svn|
+				assert_equal svn.url, svn.root + '/myproject/trunk'
+				assert_equal svn.branch_name, '/myproject/trunk'
+
+				p = svn.parent_svn
+				assert_equal p.url, svn.root + '/all/myproject/trunk'
+				assert_equal p.branch_name, '/all/myproject/trunk'
+				assert_equal p.final_token, 1
+
+				assert_equal [1, 2], svn.commit_tokens
+			end
+		end
+
+		def test_new_branch_name
+			svn = Scm::Adapters::SvnAdapter.new(:branch_name => "/trunk")
+
+			assert_equal "/branches/b", svn.new_branch_name(Scm::Diff.new(:action => 'A',
+					:path => "/trunk", :from_revision => 1, :from_path => "/branches/b"))
 		end
 
 	end

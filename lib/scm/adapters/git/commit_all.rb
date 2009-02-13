@@ -16,7 +16,7 @@ module Scm::Adapters
 
 			run "cd '#{self.url}' && git add ."
 			if anything_to_commit?
-				run " cd '#{self.url}' && git commit -a -F #{message_filename}"
+				run "cd '#{self.url}' && git commit -a -F #{message_filename}"
 			else
 				logger.info { "nothing to commit" }
 			end

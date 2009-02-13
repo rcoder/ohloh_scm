@@ -53,10 +53,10 @@ module Scm::Adapters
 			c = first_commit(since)
 			if c
 				c.diffs.each do |d|
-					if d.action == 'A' && d.path == branch_name && d.from_path && d.from_revision
-						parent = SvnAdapter.new(:url => File.join(root, d.from_path),
+					if (b = new_branch_name(d))
+						parent = SvnAdapter.new(:url => File.join(root, b), :branch_name => b,
 													 :username => username, :password => password, 
-													 :branch_name => d.from_path, :final_token => d.from_revision).normalize
+													 :final_token => d.from_revision).normalize
 						break
 					end
 				end
@@ -113,6 +113,15 @@ module Scm::Adapters
 		def next_revision_xml(since=0)
 			return "<?xml?>" if since.to_i >= head_token
 			run "svn log --verbose --xml --stop-on-copy -r #{since.to_i+1}:#{final_token || 'HEAD'} --limit 1 #{opt_auth} '#{SvnAdapter.uri_encode(File.join(self.root, self.branch_name))}@#{final_token || 'HEAD'}'"
+		end
+
+		# If the passed diff represents the wholesale movement of the entire
+		# code tree from one directory to another, this method returns the name
+		# of the previous directory.
+		def new_branch_name(d)
+			if d.action == 'A' && branch_name[0, d.path.size] == d.path && d.from_path && d.from_revision
+				d.from_path + branch_name[d.path.size..-1]
+			end
 		end
 	end
 end
