@@ -405,5 +405,33 @@ added:
 			assert_equal 1, commits.last.diffs.size
 			assert_equal "helloworld.c", commits.last.diffs.first.path
 		end
+
+		# In this example, directory "test/" is renamed to "/".
+		# This shows in the log as being renamed to an empty string.
+		def test_directory_renamed_to_root
+			log = <<-SAMPLE
+        ------------------------------------------------------------
+        revno: 220.90.1
+        revision-id: info@ohloh.net-20081002201109-j4z0r2c8nsgbm2vk
+        parent: info@ohloh.net-20081002200737-pjao1idjcrxpk4n4
+        committer: Ohloh <info@ohloh.net>
+        branch nick: subvertpy
+        timestamp: Thu 2008-10-02 22:11:09 +0200
+        message:
+          Promote the test directory to the root.
+        renamed:
+          test =>  test-20081002184530-hz9mrr3wqq4l8qdx-1
+			SAMPLE
+
+			commits = BzrParser.parse(log)
+
+			assert_equal 1, commits.size
+			assert_equal 'info@ohloh.net-20081002201109-j4z0r2c8nsgbm2vk', commits.first.token
+			assert_equal 2, commits.first.diffs.size
+			assert_equal "D", commits.first.diffs.first.action
+			assert_equal "test", commits.first.diffs.first.path
+			assert_equal "A", commits.first.diffs.last.action
+			assert_equal "", commits.first.diffs.last.path
+		end
 	end
 end
