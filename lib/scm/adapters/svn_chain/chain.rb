@@ -38,7 +38,8 @@ module Scm::Adapters
 		end
 
 		def first_commit(since=0)
-			Scm::Parsers::SvnXmlParser.parse(next_revision_xml(since)).first
+			@first_commit ||={} # Poor man's memoize
+			@first_commit[since] ||= Scm::Parsers::SvnXmlParser.parse(next_revision_xml(since)).first
 		end
 
 		# Returns the first commit with a revision number greater than the provided revision number
