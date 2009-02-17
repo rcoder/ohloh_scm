@@ -23,7 +23,7 @@ module Scm::Adapters
 		#    A /trunk (from /branches/beta:100)
 		#
 		# A single SvnAdapter pointed at today's /trunk will only see revisions 101
-		# to HEAD, because /trunk didn't even exist before revision 101.
+		# through HEAD, because /trunk didn't even exist before revision 101.
 		#
 		# To capture the prior history, we need to create *another* SvnAdapter
 		# which points at /branches/beta, and which considers revisions from 1 to 100.
@@ -35,10 +35,10 @@ module Scm::Adapters
 		#
 		# This behavior recurses ("chains") all the way back to revision 1.
 		#
-		# It only works if the *entire branch* changes names. We don't chain when
+		# It only works if the *entire branch* moves. We don't chain when
 		# subdirectories or individual files are copied.
 
-		# Returns the entire parent ancestry chain as a simple array.
+		# Returns the entire SvnAdapter ancestry chain as a simple array.
 		def chain
 			(parent_svn ? parent_svn.chain : []) << self
 		end
@@ -49,15 +49,16 @@ module Scm::Adapters
 		# Only commits following +since+ are considered, so if the copy or rename
 		# occured on or before +since+, then no parent will be found or returned.
 		def parent_svn(since=0)
-			@parent_svn ||={}
+			@parent_svn ||={} # Poor man's memoize
+
 			@parent_svn[since] ||= begin
 			  parent = nil
 			  c = first_commit(since)
 			  if c
 				 c.diffs.each do |d|
-					 if (b = new_branch_name(d))
+					 if (b = parent_branch_name(d))
 						 parent = SvnAdapter.new(:url => File.join(root, b), :branch_name => b,
-																		 :username => username, :password => password, 
+																		 :username => username, :password => password,
 																		 :final_token => d.from_revision).normalize
 						 break
 					 end
@@ -66,42 +67,6 @@ module Scm::Adapters
 			  parent
 			end
 		end
-
-		#------------------------------------------------------------------
-		# Recursive or "chained" versions of the commit accessors.
-		#
-		# These methods recurse through the chain of ancestors for this
-		# adapter, calling the base_* method in turn for each ancestor.
-		#------------------------------------------------------------------
-
-		# Returns the count of commits following revision number 'since'.
-		def chained_commit_count(since=0)
-			(parent_svn ? parent_svn.chained_commit_count(since) : 0) + base_commit_count(since)
-		end
-
-		# Returns an array of revision numbers for all commits following revision number 'since'.
-		def chained_commit_tokens(since=0)
-			(parent_svn(since) ? parent_svn.chained_commit_tokens(since) : []) + base_commit_tokens(since)
-		end
-
-		# Returns an array of commits following revision number 'since'.
-		def chained_commits(since=0)
-			(parent_svn(since) ? parent_svn.chained_commits(since) : []) + base_commits(since)
-		end
-
-		# Yield verbose commits following revision number 'since', one at a time.
-		def chained_each_commit(since=0, &block)
-			parent_svn.chained_each_commit(since, &block) if parent_svn
-			base_each_commit(since) do |commit|
-				block.call commit
-			end
-		end
-
-		def chained_verbose_commit(since=0)
-			parent_svn(since) ? parent_svn.chained_verbose_commit(since) : base_verbose_commit(since)
-		end
-
-		# Helper methods for parent_svn
 
 		def first_token(since=0)
 			c = first_commit(since)
@@ -121,7 +86,7 @@ module Scm::Adapters
 		# If the passed diff represents the wholesale movement of the entire
 		# code tree from one directory to another, this method returns the name
 		# of the previous directory.
-		def new_branch_name(d)
+		def parent_branch_name(d)
 			if d.action == 'A' && branch_name[0, d.path.size] == d.path && d.from_path && d.from_revision
 				d.from_path + branch_name[d.path.size..-1]
 			end

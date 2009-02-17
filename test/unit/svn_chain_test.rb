@@ -55,47 +55,47 @@ module Scm::Parsers
 
 		def test_chained_commit_tokens
 			with_svn_repository('svn_with_branching', '/trunk') do |svn|
-				assert_equal [1,2,4,5,8,9], svn.chained_commit_tokens
-				assert_equal [2,4,5,8,9], svn.chained_commit_tokens(1)
-				assert_equal [4,5,8,9], svn.chained_commit_tokens(2)
-				assert_equal [4,5,8,9], svn.chained_commit_tokens(3)
-				assert_equal [5,8,9], svn.chained_commit_tokens(4)
-				assert_equal [8,9], svn.chained_commit_tokens(5)
-				assert_equal [8,9], svn.chained_commit_tokens(6)
-				assert_equal [8,9], svn.chained_commit_tokens(7)
-				assert_equal [9], svn.chained_commit_tokens(8)
-				assert_equal [], svn.chained_commit_tokens(9)
-				assert_equal [], svn.chained_commit_tokens(10)
+				assert_equal [1,2,4,5,8,9], svn.commit_tokens
+				assert_equal [2,4,5,8,9], svn.commit_tokens(1)
+				assert_equal [4,5,8,9], svn.commit_tokens(2)
+				assert_equal [4,5,8,9], svn.commit_tokens(3)
+				assert_equal [5,8,9], svn.commit_tokens(4)
+				assert_equal [8,9], svn.commit_tokens(5)
+				assert_equal [8,9], svn.commit_tokens(6)
+				assert_equal [8,9], svn.commit_tokens(7)
+				assert_equal [9], svn.commit_tokens(8)
+				assert_equal [], svn.commit_tokens(9)
+				assert_equal [], svn.commit_tokens(10)
 			end
 		end
 
 		def test_chained_commit_count
 			with_svn_repository('svn_with_branching', '/trunk') do |svn|
-				assert_equal 6, svn.chained_commit_count
-				assert_equal 5, svn.chained_commit_count(1)
-				assert_equal 4, svn.chained_commit_count(2)
-				assert_equal 4, svn.chained_commit_count(3)
-				assert_equal 3, svn.chained_commit_count(4)
-				assert_equal 2, svn.chained_commit_count(5)
-				assert_equal 2, svn.chained_commit_count(6)
-				assert_equal 2, svn.chained_commit_count(7)
-				assert_equal 1, svn.chained_commit_count(8)
-				assert_equal 0, svn.chained_commit_count(9)
+				assert_equal 6, svn.commit_count
+				assert_equal 5, svn.commit_count(1)
+				assert_equal 4, svn.commit_count(2)
+				assert_equal 4, svn.commit_count(3)
+				assert_equal 3, svn.commit_count(4)
+				assert_equal 2, svn.commit_count(5)
+				assert_equal 2, svn.commit_count(6)
+				assert_equal 2, svn.commit_count(7)
+				assert_equal 1, svn.commit_count(8)
+				assert_equal 0, svn.commit_count(9)
 			end
 		end
 
 		def test_chained_commits
 			with_svn_repository('svn_with_branching', '/trunk') do |svn|
-				assert_equal [1,2,4,5,8,9], svn.chained_commits.collect { |c| c.token }
-				assert_equal [2,4,5,8,9], svn.chained_commits(1).collect { |c| c.token }
-				assert_equal [4,5,8,9], svn.chained_commits(2).collect { |c| c.token }
-				assert_equal [4,5,8,9], svn.chained_commits(3).collect { |c| c.token }
-				assert_equal [5,8,9], svn.chained_commits(4).collect { |c| c.token }
-				assert_equal [8,9], svn.chained_commits(5).collect { |c| c.token }
-				assert_equal [8,9], svn.chained_commits(6).collect { |c| c.token }
-				assert_equal [8,9], svn.chained_commits(7).collect { |c| c.token }
-				assert_equal [9], svn.chained_commits(8).collect { |c| c.token }
-				assert_equal [], svn.chained_commits(9).collect { |c| c.token }
+				assert_equal [1,2,4,5,8,9], svn.commits.collect { |c| c.token }
+				assert_equal [2,4,5,8,9], svn.commits(1).collect { |c| c.token }
+				assert_equal [4,5,8,9], svn.commits(2).collect { |c| c.token }
+				assert_equal [4,5,8,9], svn.commits(3).collect { |c| c.token }
+				assert_equal [5,8,9], svn.commits(4).collect { |c| c.token }
+				assert_equal [8,9], svn.commits(5).collect { |c| c.token }
+				assert_equal [8,9], svn.commits(6).collect { |c| c.token }
+				assert_equal [8,9], svn.commits(7).collect { |c| c.token }
+				assert_equal [9], svn.commits(8).collect { |c| c.token }
+				assert_equal [], svn.commits(9).collect { |c| c.token }
 			end
 		end
 
@@ -107,13 +107,7 @@ module Scm::Parsers
 		def test_chained_each_commit
 			commits = []
 			with_svn_repository('svn_with_branching', '/trunk') do |svn|
-				svn.chained_each_commit do |c|
-					commits << c
-					# puts "r#{c.token} #{c.message}"
-					c.diffs.each do |d|
-						# puts "\t#{d.action} #{d.path}"
-					end
-				end
+				svn.each_commit { |c| commits << c }
 			end
 
 			assert_equal [1,2,4,5,8,9], commits.collect { |c| c.token }
@@ -182,10 +176,10 @@ module Scm::Parsers
 			end
 		end
 
-		def test_new_branch_name
+		def test_parent_branch_name
 			svn = Scm::Adapters::SvnAdapter.new(:branch_name => "/trunk")
 
-			assert_equal "/branches/b", svn.new_branch_name(Scm::Diff.new(:action => 'A',
+			assert_equal "/branches/b", svn.parent_branch_name(Scm::Diff.new(:action => 'A',
 					:path => "/trunk", :from_revision => 1, :from_path => "/branches/b"))
 		end
 

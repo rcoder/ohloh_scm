@@ -20,27 +20,37 @@ module Scm::Adapters
 		attr_accessor :final_token
 
 		#------------------------------------------------------------------
-		# Commit accessors are now redirected to recursive "chained" versions
+		# Recursive or "chained" versions of the commit accessors.
+		#
+		# These methods recurse through the chain of ancestors for this
+		# adapter, calling the base_* method in turn for each ancestor.
 		#------------------------------------------------------------------
 
+		# Returns the count of commits following revision number 'since'.
 		def commit_count(since=0)
-			chained_commit_count(since)
+			(parent_svn ? parent_svn.commit_count(since) : 0) + base_commit_count(since)
 		end
 
+		# Returns an array of revision numbers for all commits following revision number 'since'.
 		def commit_tokens(since=0)
-			chained_commit_tokens(since)
+			(parent_svn(since) ? parent_svn.commit_tokens(since) : []) + base_commit_tokens(since)
 		end
 
+		# Returns an array of commits following revision number 'since'.
 		def commits(since=0)
-			chained_commits(since)
+			(parent_svn(since) ? parent_svn.commits(since) : []) + base_commits(since)
 		end
 
-		def each_commit(since=0)
-			chained_each_commit(since) { |commit| yield commit }
+		# Yield verbose commits following revision number 'since', one at a time.
+		def each_commit(since=0, &block)
+			parent_svn.each_commit(since, &block) if parent_svn
+			base_each_commit(since) do |commit|
+				block.call commit
+			end
 		end
 
 		def verbose_commit(since=0)
-			chained_verbose_commit(since)
+			parent_svn(since) ? parent_svn.verbose_commit(since) : base_verbose_commit(since)
 		end
 
 		#------------------------------------------------------------------
