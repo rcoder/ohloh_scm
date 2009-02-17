@@ -38,7 +38,7 @@ module Scm::Adapters
 		# These commit objects do not include diffs.
 		def commits(since=0)
 			list = []
-			open_log_file(since) do |io|
+			open_log_file(since.to_i) do |io|
 				list = Scm::Parsers::SvnXmlParser.parse(io)
 			end
 			list.each { |c| c.scm = self }
