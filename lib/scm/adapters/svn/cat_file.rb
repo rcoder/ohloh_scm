@@ -9,10 +9,6 @@ module Scm::Adapters
 		end
 
 		def cat(path, revision)
-			parent_svn(revision) ? parent_svn.cat(path, revision) : base_cat(path, revision)
-		end
-
-		def base_cat(path, revision)
 			begin
 				run "svn cat -r #{revision} '#{SvnAdapter.uri_encode(File.join(self.root, self.branch_name.to_s, path.to_s))}@#{revision}'"
 			rescue

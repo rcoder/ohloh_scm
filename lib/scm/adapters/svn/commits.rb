@@ -19,56 +19,15 @@ module Scm::Adapters
 		# this adapter ever return information regarding commits after this point.
 		attr_accessor :final_token
 
-		#------------------------------------------------------------------
-		# Recursive or "chained" versions of the commit accessors.
-		#
-		# These methods recurse through the chain of ancestors for this
-		# adapter, calling the base_* method in turn for each ancestor.
-		#------------------------------------------------------------------
-
 		# Returns the count of commits following revision number 'since'.
 		def commit_count(since=0)
-			(parent_svn ? parent_svn.commit_count(since) : 0) + base_commit_count(since)
-		end
-
-		# Returns an array of revision numbers for all commits following revision number 'since'.
-		def commit_tokens(since=0)
-			(parent_svn(since) ? parent_svn.commit_tokens(since) : []) + base_commit_tokens(since)
-		end
-
-		# Returns an array of commits following revision number 'since'.
-		def commits(since=0)
-			(parent_svn(since) ? parent_svn.commits(since) : []) + base_commits(since)
-		end
-
-		# Yield verbose commits following revision number 'since', one at a time.
-		def each_commit(since=0, &block)
-			parent_svn.each_commit(since, &block) if parent_svn
-			base_each_commit(since) do |commit|
-				block.call commit
-			end
-		end
-
-		def verbose_commit(since=0)
-			parent_svn(since) ? parent_svn.verbose_commit(since) : base_verbose_commit(since)
-		end
-
-		#------------------------------------------------------------------
-		# Base versions of the commit accessors.
-		#
-		# These are the original, simple commit accessors that are
-		# unaware of branch "chaining".
-		#------------------------------------------------------------------
-
-		# Returns the count of commits following revision number 'since'.
-		def base_commit_count(since=0)
 			since ||= 0
 			return 0 if final_token && since >= final_token
 			run("svn log -q -r #{since.to_i + 1}:#{final_token || 'HEAD'} --stop-on-copy '#{SvnAdapter.uri_encode(File.join(root, branch_name.to_s))}@#{final_token || 'HEAD'}' | grep -E -e '^r[0-9]+ ' | wc -l").strip.to_i
 		end
 
 		# Returns an array of revision numbers for all commits following revision number 'since'.
-		def base_commit_tokens(since=0)
+		def commit_tokens(since=0)
 			since ||= 0
 			return [] if final_token && since >= final_token
 			cmd = "svn log -q -r #{since.to_i + 1}:#{final_token || 'HEAD'} --stop-on-copy '#{SvnAdapter.uri_encode(File.join(root, branch_name.to_s))}@#{final_token || 'HEAD'}' | grep -E -e '^r[0-9]+ ' | cut -f 1 -d '|' | cut -c 2-"
@@ -77,7 +36,7 @@ module Scm::Adapters
 
 		# Returns an array of commits following revision number 'since'.
 		# These commit objects do not include diffs.
-		def base_commits(since=0)
+		def commits(since=0)
 			list = []
 			open_log_file(since) do |io|
 				list = Scm::Parsers::SvnXmlParser.parse(io)
@@ -93,9 +52,9 @@ module Scm::Adapters
 		# directories, the complexity (and time) of this method comes in expanding directories with a recursion
 		# through every file in the directory.
 		#
-		def base_each_commit(since=nil)
-			base_commit_tokens(since).each do |rev|
-				yield base_verbose_commit(rev)
+		def each_commit(since=nil)
+			commit_tokens(since).each do |rev|
+				yield verbose_commit(rev)
 			end
 		end
 
@@ -134,12 +93,7 @@ module Scm::Adapters
 			# Note that if the directory was deleted, we have to look at the previous revision to see what it held.
 			recurse_rev = (diff.action == 'D') ? rev-1 : rev
 
-			if diff.action == 'A' && diff.path == '' && rev == first_token && parent_svn
-				# A very special case. This is the first commit, and the entire tree is being
-				# copied from somewhere else. In this case, there isn't actually any change, just
-				# a change of branch_name. Return no diffs at all.
-				nil
-			elsif (diff.action == 'D' or diff.action == 'A') && is_directory?(diff.path, recurse_rev)
+			if (diff.action == 'D' or diff.action == 'A') && is_directory?(diff.path, recurse_rev)
 				# Deleting or adding a directory. Expand it out to show every file.
 				recurse_files(diff.path, recurse_rev).collect do |f|
 					Scm::Diff.new(:action => diff.action, :path => File.join(diff.path, f))
@@ -178,7 +132,7 @@ module Scm::Adapters
 			end
 		end
 
-		def base_verbose_commit(rev)
+		def verbose_commit(rev)
 			c = Scm::Parsers::SvnXmlParser.parse(single_revision_xml(rev)).first
 			c.scm = self
 			deepen_commit(strip_commit_branch(c))

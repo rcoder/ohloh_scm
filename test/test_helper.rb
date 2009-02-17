@@ -69,6 +69,15 @@ class Scm::Test < Test::Unit::TestCase
 		end
 	end
 
+	def with_svn_chain_repository(name, branch_name='')
+		with_repository(Scm::Adapters::SvnChainAdapter, name) do |svn|
+			svn.branch_name = branch_name
+			svn.url = File.join(svn.root, svn.branch_name)
+			svn.url = svn.url[0..-2] if svn.url[-1..-1] == '/' # Strip trailing /
+			yield svn
+		end
+	end
+
 	def with_cvs_repository(name)
 		with_repository(Scm::Adapters::CvsAdapter, name) { |cvs| yield cvs }
 	end

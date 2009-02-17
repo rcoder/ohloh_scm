@@ -121,40 +121,19 @@ module Scm::Adapters
 				# The full repository contains 4 revisions...
 				assert_equal 4, svn.commit_count
 
-				# ..however, looking only at the history of /trunk@4 shows 3 revisions.
-				# 
-				# That's because /trunk@3 was created by copying /branches/b@1
+				# ...however, the current trunk contains only revisions 3 and 4.
+				# That's because the branch was moved to replace the trunk at revision 3.
 				#
-				# I hope the following diagram helps to explain:
-				#
-				# r1              | r2             |        r3           |   r4
-				# ----------------|----------------|---------------------|---------------
-				#                 |                |                     |
-				# /trunk(x) ------|-> deleted(x)   |    /--> /trunk(*) --|--> /trunk(*)
-				#                 |                |   /                 |
-				# /branches/b(*)--|----------------|--/                  |
-				#                 |                |                     |
-				#
-				# (*) activity we track
-				# (x) activity we ignore
+				# Even though there was a different trunk directory present in
+				# revisions 1 and 2, it is not visible to Ohloh.
 
 				trunk = SvnAdapter.new(:url => File.join(svn.url,'trunk'), :branch_name => '/trunk').normalize
-				assert_equal 3, trunk.commit_count
-				assert_equal [1,3,4], trunk.commit_tokens
+				assert_equal 2, trunk.commit_count
+				assert_equal [3,4], trunk.commit_tokens
 
-				commits = []
-				trunk.each_commit { |c| commits << c }
 
-				# The first commit we should see is /branches/b@1.
-				# It should contain two files.
-
-				assert_equal 1, commits.first.token
-				assert_equal 2, commits.first.diffs.size # Two files seen
-
-				assert_equal 'A', commits.first.diffs[0].action
-				assert_equal '/subdir/bar.rb', commits.first.diffs[0].path
-				assert_equal 'A', commits.first.diffs[1].action
-				assert_equal '/subdir/foo.rb', commits.first.diffs[1].path
+				deep_commits = []
+				trunk.each_commit { |c| deep_commits << c }
 
 				# When the branch is moved to replace the trunk in revision 3,
 				# the Subversion log shows
@@ -162,34 +141,46 @@ module Scm::Adapters
 				#   D /branches/b
 				#   A /trunk (from /branches/b:2)
 				#
-				# The branch_name changes at this point, but none of the file contents
-				# actually change. So there are no diffs to report at this point.
-				assert_equal 3, commits[1].token
-				assert_equal 0, commits[1].diffs.size
+				# However, there are files in those directories. Make sure the commits
+				# that we generate include all of those files not shown by the log.
+				#
+				# Also, our commits do not include diffs for the actual directories;
+				# only the files within those directories.
+				#
+				# Also, since we are only tracking the /trunk and not /branches/b, then
+				# there should not be anything referring to activity in /branches/b.
 
-				# In Revision 4, a subdirectory is renamed. This shows in the Subversion log as
+				assert_equal 3, deep_commits.first.token # Make sure this is the right revision
+				assert_equal 2, deep_commits.first.diffs.size # Two files seen
+
+				assert_equal 'A', deep_commits.first.diffs[0].action
+				assert_equal '/subdir/bar.rb', deep_commits.first.diffs[0].path
+				assert_equal 'A', deep_commits.first.diffs[1].action
+				assert_equal '/subdir/foo.rb', deep_commits.first.diffs[1].path
+
+				# In Revision 4, a directory is renamed. This shows in the Subversion log as
 				#
 				#   A /trunk/newdir (from /trunk/subdir:3)
 				#   D /trunk/subdir
 				#
-				# There are files in this directory, so make sure our commit includes
+				# Again, there are files in this directory, so make sure our commit includes
 				# both delete and add events for all of the files in this directory, but does
 				# not actually refer to the directories themselves.
 
-				assert_equal 4, commits.last.token
+				assert_equal 4, deep_commits.last.token # Make sure we're checking the right revision
 
 				# There should be 2 files removed and two files added
-				assert_equal 4, commits.last.diffs.size
+				assert_equal 4, deep_commits.last.diffs.size
 
-				assert_equal 'A', commits.last.diffs[0].action
-				assert_equal '/newdir/bar.rb', commits.last.diffs[0].path
-				assert_equal 'A', commits.last.diffs[1].action
-				assert_equal '/newdir/foo.rb', commits.last.diffs[1].path
+				assert_equal 'A', deep_commits.last.diffs[0].action
+				assert_equal '/newdir/bar.rb', deep_commits.last.diffs[0].path
+				assert_equal 'A', deep_commits.last.diffs[1].action
+				assert_equal '/newdir/foo.rb', deep_commits.last.diffs[1].path
 
-				assert_equal 'D', commits.last.diffs[2].action
-				assert_equal '/subdir/bar.rb', commits.last.diffs[2].path
-				assert_equal 'D', commits.last.diffs[3].action
-				assert_equal '/subdir/foo.rb', commits.last.diffs[3].path
+				assert_equal 'D', deep_commits.last.diffs[2].action
+				assert_equal '/subdir/bar.rb', deep_commits.last.diffs[2].path
+				assert_equal 'D', deep_commits.last.diffs[3].action
+				assert_equal '/subdir/foo.rb', deep_commits.last.diffs[3].path
 			end
 		end
 
@@ -209,7 +200,6 @@ module Scm::Adapters
 						assert d.action.length == 1
 						assert d.path.length > 0
 					end
-					assert_equal svn, e.scm # Commit points back to its containing scm.
 				end
 				assert !FileTest.exist?(svn.log_filename) # Make sure we cleaned up after ourselves
 			end
@@ -252,41 +242,6 @@ module Scm::Adapters
 			assert_equal '/COPYING', commits[4].diffs[0].path
 			assert_equal 'A', commits[4].diffs[1].action
 			assert_equal '/trunk/COPYING', commits[4].diffs[1].path
-		end
-
-		def test_verbose_commit_with_chaining
-			with_svn_repository('svn_with_branching','/trunk') do |svn|
-
-				c = svn.verbose_commit(9)
-				assert_equal 'modified helloworld.c', c.message
-				assert_equal ['/helloworld.c'], c.diffs.collect { |d| d.path }
-				assert_equal '/trunk', c.scm.branch_name
-
-				c = svn.verbose_commit(8)
-				assert_equal [], c.diffs
-				assert_equal '/trunk', c.scm.branch_name
-
-				# Reaching these commits requires chaining
-				c = svn.verbose_commit(5)
-				assert_equal 'add a new branch, with goodbyeworld.c', c.message
-				assert_equal ['/goodbyeworld.c'], c.diffs.collect { |d| d.path }
-				assert_equal '/branches/development', c.scm.branch_name
-
-				# Reaching these commits requires chaining twice
-				c = svn.verbose_commit(4)
-				assert_equal [], c.diffs
-				assert_equal '/trunk', c.scm.branch_name
-
-				# And now a fourth chain (to skip over /trunk deletion in rev 3)
-				c = svn.verbose_commit(2)
-				assert_equal 'Added helloworld.c to trunk', c.message
-				assert_equal ['/helloworld.c'], c.diffs.collect { |d| d.path }
-				assert_equal '/trunk', c.scm.branch_name
-
-				c = svn.verbose_commit(1)
-				assert_equal [], c.diffs
-				assert_equal '/trunk', c.scm.branch_name
-			end
 		end
 
 	end

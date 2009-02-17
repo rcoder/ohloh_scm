@@ -4,7 +4,7 @@ module Scm::Parsers
 	class SvnChainTest < Scm::Test
 
 		def test_chain
-			with_svn_repository('svn_with_branching', '/trunk') do |svn|
+			with_svn_chain_repository('svn_with_branching', '/trunk') do |svn|
 				chain = svn.chain
 				assert_equal 4, chain.size
 
@@ -33,12 +33,10 @@ module Scm::Parsers
 		end
 
 		def test_parent_svn
-			with_svn_repository('svn_with_branching', '/trunk') do |svn|
+			with_svn_chain_repository('svn_with_branching', '/trunk') do |svn|
 				# In this repository, /branches/development becomes
-				# the /trunk in revision 8. So there should be no record
-				# before revision 8 in the 'traditional' base commit parser.
-				assert_equal [8,9], svn.base_commit_tokens
-
+				# the /trunk in revision 8. So there should be a parent
+				# will final_token 7.
 				p1 = svn.parent_svn
 				assert_equal p1.url, svn.root + '/branches/development'
 				assert_equal p1.branch_name, '/branches/development'
@@ -53,131 +51,8 @@ module Scm::Parsers
 			end
 		end
 
-		def test_chained_commit_tokens
-			with_svn_repository('svn_with_branching', '/trunk') do |svn|
-				assert_equal [1,2,4,5,8,9], svn.commit_tokens
-				assert_equal [2,4,5,8,9], svn.commit_tokens(1)
-				assert_equal [4,5,8,9], svn.commit_tokens(2)
-				assert_equal [4,5,8,9], svn.commit_tokens(3)
-				assert_equal [5,8,9], svn.commit_tokens(4)
-				assert_equal [8,9], svn.commit_tokens(5)
-				assert_equal [8,9], svn.commit_tokens(6)
-				assert_equal [8,9], svn.commit_tokens(7)
-				assert_equal [9], svn.commit_tokens(8)
-				assert_equal [], svn.commit_tokens(9)
-				assert_equal [], svn.commit_tokens(10)
-			end
-		end
-
-		def test_chained_commit_count
-			with_svn_repository('svn_with_branching', '/trunk') do |svn|
-				assert_equal 6, svn.commit_count
-				assert_equal 5, svn.commit_count(1)
-				assert_equal 4, svn.commit_count(2)
-				assert_equal 4, svn.commit_count(3)
-				assert_equal 3, svn.commit_count(4)
-				assert_equal 2, svn.commit_count(5)
-				assert_equal 2, svn.commit_count(6)
-				assert_equal 2, svn.commit_count(7)
-				assert_equal 1, svn.commit_count(8)
-				assert_equal 0, svn.commit_count(9)
-			end
-		end
-
-		def test_chained_commits
-			with_svn_repository('svn_with_branching', '/trunk') do |svn|
-				assert_equal [1,2,4,5,8,9], svn.commits.collect { |c| c.token }
-				assert_equal [2,4,5,8,9], svn.commits(1).collect { |c| c.token }
-				assert_equal [4,5,8,9], svn.commits(2).collect { |c| c.token }
-				assert_equal [4,5,8,9], svn.commits(3).collect { |c| c.token }
-				assert_equal [5,8,9], svn.commits(4).collect { |c| c.token }
-				assert_equal [8,9], svn.commits(5).collect { |c| c.token }
-				assert_equal [8,9], svn.commits(6).collect { |c| c.token }
-				assert_equal [8,9], svn.commits(7).collect { |c| c.token }
-				assert_equal [9], svn.commits(8).collect { |c| c.token }
-				assert_equal [], svn.commits(9).collect { |c| c.token }
-			end
-		end
-
-		# This test is primarly concerned with the checking the diffs
-		# of commits. Specifically, when an entire branch is moved
-		# to a new name, we should not see any diffs. From our
-		# point of view the code is unchanged; only the base directory
-		# has moved.
-		def test_chained_each_commit
-			commits = []
-			with_svn_repository('svn_with_branching', '/trunk') do |svn|
-				svn.each_commit { |c| commits << c }
-			end
-
-			assert_equal [1,2,4,5,8,9], commits.collect { |c| c.token }
-
-			# This repository spends a lot of energy moving directories around.
-			# File edits actually occur in just 3 commits.
-
-			# Revision 1: /trunk directory created, but it is empty
-			assert_equal 0, commits[0].diffs.size
-
-			# Revision 2: /trunk/helloworld.c is added
-			assert_equal 1, commits[1].diffs.size
-			assert_equal 'A', commits[1].diffs.first.action
-			assert_equal '/helloworld.c', commits[1].diffs.first.path
-
-			# Revision 3: /trunk is deleted. We can't see this revision.
-
-			# Revision 4: /trunk is re-created by copying it from revision 2.
-			# From our point of view, there has been no change at all, and thus no diffs.
-			assert_equal 0, commits[2].diffs.size
-
-			# Revision 5: /branches/development is created by copying /trunk.
-			# From our point of view, the contents of the repository are unchanged, so
-			# no diffs result from the copy.
-			# However, /branches/development/goodbyeworld.c is also created, so we should
-			# have a diff for that.
-			assert_equal 1, commits[3].diffs.size
-			assert_equal 'A', commits[3].diffs.first.action
-			assert_equal '/goodbyeworld.c', commits[3].diffs.first.path
-
-			# Revision 6: /trunk/goodbyeworld.c is created, but we only see activity
-			# on /branches/development, so no commit reported.
-
-			# Revision 7: /trunk is deleted, but again we don't see it.
-
-			# Revision 8: /branches/development is moved to become the new /trunk.
-			# The directory contents are unchanged, so no diffs result.
-			assert_equal 0, commits[4].diffs.size
-
-			# Revision 9: an edit to /trunk/helloworld.c
-			assert_equal 1, commits[5].diffs.size
-			assert_equal 'M', commits[5].diffs.first.action
-			assert_equal '/helloworld.c', commits[5].diffs.first.path
-		end
-
-		# Specifically tests this case:
-		# Suppose we're importing /myproject/trunk, and the log
-		# contains the following:
-		#
-		#   A /myproject (from /all/myproject:1)
-		#   D /all/myproject
-		#
-		# We need to make sure we detect the move here, even though
-		# "/myproject" is not an exact match for "/myproject/trunk".
-		def test_tree_move
-			with_svn_repository('svn_with_tree_move', '/myproject/trunk') do |svn|
-				assert_equal svn.url, svn.root + '/myproject/trunk'
-				assert_equal svn.branch_name, '/myproject/trunk'
-
-				p = svn.parent_svn
-				assert_equal p.url, svn.root + '/all/myproject/trunk'
-				assert_equal p.branch_name, '/all/myproject/trunk'
-				assert_equal p.final_token, 1
-
-				assert_equal [1, 2], svn.commit_tokens
-			end
-		end
-
 		def test_parent_branch_name
-			svn = Scm::Adapters::SvnAdapter.new(:branch_name => "/trunk")
+			svn = Scm::Adapters::SvnChainAdapter.new(:branch_name => "/trunk")
 
 			assert_equal "/branches/b", svn.parent_branch_name(Scm::Diff.new(:action => 'A',
 					:path => "/trunk", :from_revision => 1, :from_path => "/branches/b"))
