@@ -22,14 +22,14 @@ module Scm::Adapters
 		# Returns the count of commits following revision number 'since'.
 		def commit_count(since=0)
 			since ||= 0
-			return 0 if final_token && since >= final_token
+			return 0 if final_token && since.to_i >= final_token
 			run("svn log -q -r #{since.to_i + 1}:#{final_token || 'HEAD'} --stop-on-copy '#{SvnAdapter.uri_encode(File.join(root, branch_name.to_s))}@#{final_token || 'HEAD'}' | grep -E -e '^r[0-9]+ ' | wc -l").strip.to_i
 		end
 
 		# Returns an array of revision numbers for all commits following revision number 'since'.
 		def commit_tokens(since=0)
 			since ||= 0
-			return [] if final_token && since >= final_token
+			return [] if final_token && since.to_i >= final_token
 			cmd = "svn log -q -r #{since.to_i + 1}:#{final_token || 'HEAD'} --stop-on-copy '#{SvnAdapter.uri_encode(File.join(root, branch_name.to_s))}@#{final_token || 'HEAD'}' | grep -E -e '^r[0-9]+ ' | cut -f 1 -d '|' | cut -c 2-"
 			run(cmd).split.collect { |r| r.to_i }
 		end
