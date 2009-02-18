@@ -89,10 +89,13 @@ module Scm::Parsers
 			case action
 			when :rename
 				# A rename action requires two diffs: one to remove the old filename,
-				# another to add the new filename
-				before, after = line.scan(/(.+) => (.+)/).first
+				# another to add the new filename.
+				#
+				# Note that is possible to be renamed to the empty string!
+				# This happens when a subdirectory is moved to become the root.
+				before, after = line.scan(/(.+) => ?(.*)/).first
 				[ Scm::Diff.new(:action => 'D', :path => before),
-					Scm::Diff.new(:action => 'A', :path => after )]
+					Scm::Diff.new(:action => 'A', :path => after || '' )]
 			else
 				[Scm::Diff.new(:action => action, :path => line)]
 			end.each do |d|
