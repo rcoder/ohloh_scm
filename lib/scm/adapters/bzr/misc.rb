@@ -24,7 +24,7 @@ module Scm::Adapters
 			when /^\d+$/
 				r
 			else
-				"revid:#{r.to_s}"
+				"'revid:#{r.to_s}'"
 			end
 		end
 
