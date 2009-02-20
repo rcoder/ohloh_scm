@@ -15,7 +15,6 @@ spec = Gem::Specification.new do |s|
   s.summary = 'Ohloh Source Control Management Library'
   s.files = FileList['README', 'COPYING', '{bin,lib,test}/**/*']
   s.require_path = 'lib'
-  s.autorequire = 'scm'
   s.executables = 'ohlog'
   s.has_rdoc = true
   s.extra_rdoc_files = ['README']
