@@ -60,5 +60,17 @@ module Scm::Adapters
 				assert !svn.is_directory?('trunk/helloworld.c')
 			end
 		end
+
+		def test_restrict_url_to_trunk
+			with_svn_repository('svn') do |svn|
+				assert_equal svn.root, svn.url
+				assert_equal '', svn.branch_name
+
+				svn.restrict_url_to_trunk
+
+				assert_equal svn.root + '/trunk', svn.url
+				assert_equal "/trunk", svn.branch_name
+			end
+		end
 	end
 end

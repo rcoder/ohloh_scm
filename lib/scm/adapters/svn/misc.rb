@@ -32,7 +32,8 @@ module Scm::Adapters
 			return self.url unless list
 
 			if list.include? 'trunk/'
-				self.url = self.url + '/trunk'
+				self.url += '/trunk'
+				self.branch_name += '/trunk'
 				return restrict_url_to_trunk
 			elsif list.size == 1 and list.first[-1..-1] == '/'
 				self.url = self.url + '/' + list.first[0..-2]
@@ -58,7 +59,12 @@ module Scm::Adapters
 
 		def info(path=nil, revision=final_token || 'HEAD')
 			@info ||= {}
-			@info[[path, revision]] ||= run "svn info -r #{revision} #{opt_auth} '#{SvnAdapter.uri_encode(File.join(self.url, path.to_s))}@#{revision}'"
+			uri = if path
+							File.join(root, branch_name.to_s, path)
+						else
+							url
+						end
+			@info[[path, revision]] ||= run "svn info -r #{revision} #{opt_auth} '#{SvnAdapter.uri_encode(uri)}@#{revision}'"
 		end
 
 		def root
@@ -76,7 +82,7 @@ module Scm::Adapters
 		# A nil result means that the call failed and the remote server could not be queried.
 		def ls(path=nil, revision=final_token || 'HEAD')
 			begin
-				stdout = run "svn ls -r #{revision} #{opt_auth} '#{SvnAdapter.uri_encode(File.join(url, path.to_s))}@#{revision}'"
+				stdout = run "svn ls -r #{revision} #{opt_auth} '#{SvnAdapter.uri_encode(File.join(root, branch_name.to_s, path.to_s))}@#{revision}'"
 			rescue
 				return nil
 			end
