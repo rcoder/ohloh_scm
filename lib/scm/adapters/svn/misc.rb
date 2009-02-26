@@ -25,18 +25,19 @@ module Scm::Adapters
 		#  (2) If the current directory is empty except for a single subdirectory, go there.
 		# Repeat until neither rule is satisfied.
 		#
-		# The url of this object will be updated with the selected location.
+		# The url and branch_name of this object will be updated with the selected location.
 		# The url will be unmodified if there is a problem connecting to the server.
 		def restrict_url_to_trunk
 			list = ls
 			return self.url unless list
 
 			if list.include? 'trunk/'
-				self.url += '/trunk'
-				self.branch_name += '/trunk'
+				self.url = File.join(self.url, 'trunk')
+				self.branch_name = File.join(self.branch_name, 'trunk')
 				return restrict_url_to_trunk
 			elsif list.size == 1 and list.first[-1..-1] == '/'
-				self.url = self.url + '/' + list.first[0..-2]
+				self.url = File.join(self.url, list.first[0..-2])
+				self.branch_name = File.join(self.branch_name, list.first[0..-2])
 				return restrict_url_to_trunk
 			end
 			self.url
