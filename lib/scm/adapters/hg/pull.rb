@@ -12,7 +12,7 @@ module Scm::Adapters
 				run "rm -rf '#{self.url}'"
 				run "hg clone -U '#{from.url}' '#{self.url}'"
 			else
-				run "cd '#{self.url}' && hg pull -u -y '#{from.url}'"
+				run "cd '#{self.url}' && hg revert --all && hg pull -u -y '#{from.url}'"
 			end
 
 			yield(1,1) if block_given? # Progress bar callback
