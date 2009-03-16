@@ -33,7 +33,7 @@ module Scm::Adapters
 					@errors << [:failed, "The server did not respond to a 'svn info' command. Is the URL correct?"]
 				elsif self.url[0..root.length-1] != root
 					@errors << [:failed, "The URL did not match the Subversion root #{root}. Is the URL correct?"]
-				elsif ls.nil?
+				elsif recalc_branch_name && ls.nil?
 					@errors << [:failed, "The server did not respond to a 'svn ls' command. Is the URL correct?"]
 				end
 			rescue
