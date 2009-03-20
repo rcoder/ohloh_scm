@@ -15,20 +15,40 @@ module Scm::Adapters
 			@parent_svn ||={} # Poor man's memoize
 
 			@parent_svn[since] ||= begin
-			  parent = nil
-			  c = first_commit(since)
-			  if c
-				 c.diffs.each do |d|
-					 if (b = parent_branch_name(d))
-						 parent = SvnChainAdapter.new(
-							 :url => File.join(root, b), :branch_name => b,
-							 :username => username, :password => password,
-							 :final_token => d.from_revision).normalize
-						 break
-					 end
-				 end
-			  end
-			  parent
+				parent = nil
+				c = first_commit(since)
+				if c
+					# === Long explanation of real head-scratching bug fix. ===
+					#
+					# It is possible for some Subversion commits to include *multiple*
+					# renames/copies of a source directory. For example:
+					#
+					#    A /foo (from /trunk:1)
+					#    D /foo/my_branch
+					#    A /foo/bar (from /trunk:1)
+					#    D /trunk
+					#
+					# If we simply processed these entries in the order given, then
+					# we would conclude that /foo/bar/my_branch has parent
+					# /trunk/bar/my_branch (because the first A matches) and exit.
+					#
+					# This is incorrect! We must look for the *longest* A that matches
+					# our path, and follow that one. In the example above, the correct
+					# parent for /foo/bar/my_branch is /trunk/my_branch.
+					#
+					# Therefore, we must sort diffs by descending filename length, so
+					# that we choose the longest match.
+					c.diffs.sort { |a,b| b.path.length <=> a.path.length }.each do |d|
+						if (b = parent_branch_name(d))
+							parent = SvnChainAdapter.new(
+								:url => File.join(root, b), :branch_name => b,
+								:username => username, :password => password,
+								:final_token => d.from_revision).normalize
+								break
+						end
+					end
+				end
+				parent
 			end
 		end
 
