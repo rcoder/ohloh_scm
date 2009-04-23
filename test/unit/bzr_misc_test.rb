@@ -22,5 +22,14 @@ module Scm::Adapters
 			end
 		end
 
+		def test_export
+			with_bzr_repository('bzr') do |bzr|
+				Scm::ScratchDir.new do |dir|
+					bzr.export(dir)
+					assert_equal ['.', '..', 'file1.txt', 'file3.txt', 'file4.txt', 'file5.txt'], Dir.entries(dir).sort
+				end
+			end
+		end
+
 	end
 end
