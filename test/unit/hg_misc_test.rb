@@ -18,5 +18,14 @@ module Scm::Adapters
 			end
 		end
 
+		def test_export
+			with_hg_repository('hg') do |hg|
+				Scm::ScratchDir.new do |dir|
+					hg.export(dir)
+					assert_equal ['.', '..', 'README', 'makefile'], Dir.entries(dir).sort
+				end
+			end
+		end
+
 	end
 end
