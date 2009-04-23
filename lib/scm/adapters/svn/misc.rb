@@ -119,7 +119,7 @@ module Scm::Adapters
 
 		def export(dest_dir, commit_id = final_token || 'HEAD')
 			FileUtils.mkdir_p(File.dirname(dest_dir)) unless FileTest.exist?(File.dirname(dest_dir))
-			run "svn export --force -r #{commit_id} '#{SvnAdapter.uri_encode(File.join(root, branch_name.to_s))}' '#{dest_dir}'"
+			run "svn export --ignore-externals --force -r #{commit_id} '#{SvnAdapter.uri_encode(File.join(root, branch_name.to_s))}' '#{dest_dir}'"
 		end
 
 		def ls_tree(token)
