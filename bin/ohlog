@@ -26,6 +26,7 @@ Ohloh source control log parser
 [option] can be one of the following:
 
   --cvs             Parse a CVS rlog
+  --git             Parse a Git log (generated with or without --name-status option)
   --svn             Parse a Subversion log
   --svn-xml         Parse a Subversion XML log
   --hg              Parse a Mercurial log
@@ -54,6 +55,10 @@ HELP
 
 		def cvs
 			parse CvsParser
+		end
+
+		def git
+			parse GitParser
 		end
 
 		def svn
@@ -101,6 +106,8 @@ HELP
 			case option
 			when '--cvs'
 				self.subcommand = :cvs
+			when '--git'
+				self.subcommand = :git
 			when '--svn'
 				self.subcommand = :svn
 			when '--svn-xml'
