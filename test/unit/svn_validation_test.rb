@@ -2,6 +2,12 @@ require File.dirname(__FILE__) + '/../test_helper'
 
 module Scm::Adapters
 	class SvnValidationTest < Scm::Test
+		def test_valid_usernames
+			[nil,'','joe_36','a'*32,'robin@ohloh.net'].each do |username|
+				assert !SvnAdapter.new(:username => username).validate_username
+			end
+		end
+
 		def test_rejected_urls
 			[	nil, "", "foo", "http:/", "http:://", "http://",
 			"sourceforge.net/svn/project/trunk", # missing a protocol prefix

@@ -16,6 +16,14 @@ module Scm::Adapters
 			self
 		end
 
+		# Subversion usernames have been relaxed from the abstract rules. We allow email names as usernames.
+		def validate_username
+			return nil unless @username
+			return nil if @username.length == 0
+			return [:username, "The username must not be longer than 32 characters."] unless @username.length <= 32
+			return [:username, "The username contains illegal characters."] unless @username =~ /^\w[\w@\.\+\-]*$/
+		end
+
 		# If the URL is a simple directory path, make sure it is prefixed by file://
 		def path_to_file_url(path)
 			url =~ /:\/\// ? url : 'file://' + File.expand_path(path)
