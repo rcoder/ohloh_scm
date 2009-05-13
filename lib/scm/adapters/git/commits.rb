@@ -20,11 +20,28 @@ module Scm::Adapters
 			result
 		end
 
-		# Yields each commit following the commit with SHA1 'since'.
+		# Yields each commit in the repository following the commit with SHA1 'since'.
 		# These commits are populated with diffs.
 		def each_commit(since=nil)
+	
+			# Bug fix (hack) follows.
+			#
+			# git-whatchanged emits a merge commit multiple times, once for each parent, giving the
+			# delta to each parent in turn.
+			#
+			# This causes us to emit too many commits, with repeated merge commits.
+			#
+			# To fix this, we track the previous commit, and emit a new commit only if it is distinct
+			# from the previous.
+			#
+			# This means that the diffs for a merge commit yielded by this method will be the diffs
+			# vs. the first parent only, and diffs vs. other parents are lost. For Ohloh, this is fine
+			# because Ohloh ignores merge diffs anyway.
+
+			previous = nil
 			Scm::Parsers::GitStyledParser.parse(log(since)) do |e|
-				yield e
+				yield e unless previous && previous.token == e.token
+				previous = e
 			end
 		end
 
