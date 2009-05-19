@@ -130,10 +130,16 @@ module Scm::Adapters
 			cvs = CvsAdapter.new(:url => "garbage_in_garbage_out")
 			assert_equal nil, cvs.guess_forge
 
+			cvs = CvsAdapter.new(:url => ':pserver:anonymous:@boost.cvs.sourceforge.net:/cvsroot/boost')
+			assert_equal 'sourceforge.net', cvs.guess_forge
+
 			cvs = CvsAdapter.new(:url => ':pserver:guest:@cvs.dev.java.net:/cvs')
 			assert_equal 'java.net', cvs.guess_forge
 
 			cvs = CvsAdapter.new(:url => ":PSERVER:ANONCVS:@CVS.DEV.JAVA.NET:/cvs")
+			assert_equal 'java.net', cvs.guess_forge
+
+			cvs = CvsAdapter.new(:url => ":pserver:guest:@colorchooser.dev.java.net:/cvs")
 			assert_equal 'java.net', cvs.guess_forge
 		end
 	end

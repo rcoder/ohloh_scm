@@ -12,5 +12,15 @@ module Scm::Adapters
 			return unless valid?
 			@errors << [:failed, "The server did not respond to the 'hg id' command. Is the URL correct?"] unless self.exist?
 		end
+
+		def guess_forge
+			u = @url =~ /:\/\/(.*\.?hg\.)?([^\/^:]+)(:\d+)?\// ? $2 : nil
+			case u
+			when /(sourceforge\.net$)/
+				$1
+			else
+				u
+			end
+		end
 	end
 end

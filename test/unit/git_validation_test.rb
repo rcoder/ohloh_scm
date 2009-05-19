@@ -34,6 +34,9 @@ module Scm::Adapters
 			git = GitAdapter.new(:url => nil)
 			assert_equal nil, git.guess_forge
 
+			git = GitAdapter.new(:url => 'git://methabot.git.sourceforge.net/gitroot/methabot')
+			assert_equal 'sourceforge.net', git.guess_forge
+
 			git = GitAdapter.new( :url => 'http://kernel.org/pub/scm/linux/kernel/git/stable/linux-2.6.17.y.git')
 			assert_equal 'kernel.org', git.guess_forge
 		end

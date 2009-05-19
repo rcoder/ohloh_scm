@@ -18,5 +18,15 @@ module Scm::Adapters
 			return unless valid?
 			@errors << [:failed, "The server did not respond to the 'git-ls-remote' command. Is the URL correct?"] unless self.exists?
 		end
+
+		def guess_forge
+			u = @url =~ /:\/\/(.*\.?git\.)?([^\/^:]+)(:\d+)?\// ? $2 : nil
+			case u
+			when /(sourceforge\.net$)/
+				$1
+			else
+				u
+			end
+		end
 	end
 end

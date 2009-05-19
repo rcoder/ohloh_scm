@@ -71,7 +71,7 @@ module Scm::Adapters
 
 		# Based on the URL, take a guess about which forge this code is hosted on.
 		def guess_forge
-			@url =~ /.*pserver.*@(([^\.]+\.)?cvs\.)?(dev\.)?([^:]+):\//i ? $4.downcase : nil
+			@url =~ /.*pserver.*@(([^\.]+\.)?(cvs|dev)\.)?([^:]+):\//i ? $4.downcase : nil
 		end
 	end
 end

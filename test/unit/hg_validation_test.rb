@@ -49,6 +49,12 @@ module Scm::Adapters
 
 			hg = HgAdapter.new( :url => 'http://www.selenic.com/repo/hello')
 			assert_equal 'www.selenic.com', hg.guess_forge
+
+			hg = HgAdapter.new( :url => 'http://algoc.hg.sourceforge.net:8000/hgroot/algoc')
+			assert_equal 'sourceforge.net', hg.guess_forge
+
+			hg = HgAdapter.new( :url => 'http://poliqarp.sourceforge.net/hg/poliqarp/')
+			assert_equal 'sourceforge.net', hg.guess_forge
 		end
 	end
 end
