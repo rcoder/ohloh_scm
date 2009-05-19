@@ -73,6 +73,9 @@ module Scm::Adapters
 			svn = SvnAdapter.new(:url => 'svn://rubyforge.org:3960//var/svn/rubyomf2097')
 			assert_equal 'rubyforge.org', svn.guess_forge
 
+			svn = SvnAdapter.new(:url => 'http://bivouac.rubyforge.org/svn/trunk')
+			assert_equal 'rubyforge.org', svn.guess_forge
+
 			svn = SvnAdapter.new(:url => 'https://svn.sourceforge.net/svnroot/typo3/CoreDocs/trunk')
 			assert_equal 'sourceforge.net', svn.guess_forge
 

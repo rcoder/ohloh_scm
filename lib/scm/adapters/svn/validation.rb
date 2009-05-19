@@ -62,7 +62,7 @@ module Scm::Adapters
 			u = @url =~ /:\/\/(.*\.?svn\.)?([^\/^:]+)(:\d+)?\// ? $2 : nil
 			case u
 			when /(googlecode\.com$)/, /(tigris\.org$)/, /(sunsource\.net$)/, /(java\.net$)/,
-				/(openoffice\.org$)/, /(netbeans\.org$)/, /(dev2dev\.bea\.com$)/
+				/(openoffice\.org$)/, /(netbeans\.org$)/, /(dev2dev\.bea\.com$)/, /(rubyforge\.org$)/
 				$1
 			else
 				u
