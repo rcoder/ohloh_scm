@@ -39,6 +39,19 @@ module Scm::Adapters
 					# Therefore, we must sort diffs by descending filename length, so
 					# that we choose the longest match.
 					c.diffs.sort { |a,b| b.path.length <=> a.path.length }.each do |d|
+
+						# If this diff actually creates this branch, then a parent is impossible.
+						# Stop looking for parents.
+						#
+						# This check exists because of the following complicated commit:
+						# http://dendro.cornell.edu/svn/corina/branches/databasing/src/edu/cornell/dendro@813
+						# It's long to explain, but basically a directory is renamed and
+						# then our branch is created within it, all in a single commit.
+						# Without this check, our code mistakenly thinks there is a parent.
+						if diff_creates_branch(d)
+							return nil
+						end
+
 						if (b = parent_branch_name(d))
 							parent = SvnChainAdapter.new(
 								:url => File.join(root, b), :branch_name => b,
@@ -46,6 +59,7 @@ module Scm::Adapters
 								:final_token => d.from_revision).normalize
 								break
 						end
+
 					end
 				end
 				parent
@@ -75,6 +89,12 @@ module Scm::Adapters
 			if d.action == 'A' && branch_name[0, d.path.size] == d.path && d.from_path && d.from_revision
 				d.from_path + branch_name[d.path.size..-1]
 			end
+		end
+
+		# True if the passed diff represents the initial creation of the
+		# branch -- not a move or copy from somewhere else.
+		def diff_creates_branch(d)
+			d.action == 'A' && branch_name[0, d.path.size] == d.path && !d.from_path
 		end
 	end
 end
