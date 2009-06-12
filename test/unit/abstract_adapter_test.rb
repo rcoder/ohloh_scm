@@ -49,13 +49,13 @@ module Scm::Adapters
 		end
 
 		def test_invalid_branch_names
-			['%','a'*51].each do |branch_name|
+			['%','a'*81].each do |branch_name|
 				assert AbstractAdapter.new(:branch_name => branch_name).validate_branch_name.any?
 			end
 		end
 
 		def test_valid_branch_names
-			[nil,'','/trunk','_','a'*50].each do |branch_name|
+			[nil,'','/trunk','_','a'*80].each do |branch_name|
 				assert !AbstractAdapter.new(:branch_name => branch_name).validate_branch_name
 			end
 		end
