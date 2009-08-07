@@ -92,7 +92,7 @@ module Scm::Adapters
 		end
 
 		def rev_list_command(since=nil)
-			"cd '#{self.url}' && bzr log --long --show-id --forward -r #{to_rev_param(since)}.."
+			"cd '#{self.url}' && bzr log --long --show-id --forward --include-merges -r #{to_rev_param(since)}.."
 		end
 	end
 end
