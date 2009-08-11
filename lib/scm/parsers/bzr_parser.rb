@@ -107,13 +107,15 @@ module Scm::Parsers
 			path[-1..-1] == '*' ? path[0..-2] : path
 		end
 
-		# Bazaar may report that a file was both deleted, added, and/or modified all
-		# in a single commit.
-		#
-		# All such cases mean that the path in question still exists, and that some
-		# kind of modification occured, so we reduce all such multiple cases to
-		# a single diff with an 'M' action.
 		def self.remove_dupes(diffs)
+			# Bazaar may report that a file was added and modified in a single commit.
+			# Reduce these cases to a single 'A' action.
+			diffs.delete_if do |d|
+				d.action == 'M' && diffs.select { |x| x.path == d.path && x.action == 'A' }.any?
+			end
+
+			# Bazaar may report that a file was both deleted and added in a single commit.
+			# Reduce these cases to a single 'M' action.
 			diffs.each do |d|
 				d.action = 'M' if diffs.select { |x| x.path == d.path }.size > 1
 			end.uniq

@@ -433,5 +433,30 @@ added:
 			assert_equal "A", commits.first.diffs.last.action
 			assert_equal "", commits.first.diffs.last.path
 		end
+
+		# It is possible for Bzr to report a file as both renamed and modified
+		# in the same commit. We should treat this as only a rename -- that is, we
+		# should see a simple DELETE from the old location and an ADD to the new location.
+		def test_rename_and_modify_in_one_commit
+			log = <<-SAMPLE
+------------------------------------------------------------
+revno: 1
+message:
+  Changed the directory structure
+renamed:
+  oldname => newname
+modified:
+  newname
+			SAMPLE
+
+			commits = BzrParser.parse(log)
+
+			assert_equal 1, commits.size
+			assert_equal 2, commits.first.diffs.size
+			assert_equal "D", commits.first.diffs.first.action
+			assert_equal "oldname", commits.first.diffs.first.path
+			assert_equal "A", commits.first.diffs.last.action
+			assert_equal "newname", commits.first.diffs.last.path
+		end
 	end
 end
