@@ -3,7 +3,14 @@ module Scm::Adapters
 		def head_token
 			# This only returns first 12 characters.
 			# How can we make it return the entire hash?
-			run("hg id -q #{url}").strip
+			token = run("hg id -q #{url}").strip
+
+			# Recent versions of Hg now somtimes append a '+' char to the token.
+			# I believe this signifies pending changes... but we don't care.
+			# Strip the trailing '+', if any.
+			token = token[0..-2] if token[-1..-1] == '+'
+
+			token
 		end
 
 		def head
