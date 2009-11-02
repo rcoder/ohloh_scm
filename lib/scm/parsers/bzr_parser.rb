@@ -40,6 +40,10 @@ module Scm::Parsers
 					e.token = $1
 					show_id = true
 					next_state = :data
+				when /^#{indent}author:\s+(.+?)(\s+<(.+)>)?$/
+					e.author_name = $1
+					e.author_email = $3
+					next_state = :data
 				when /^#{indent}committer:\s+(.+?)(\s+<(.+)>)?$/
 					e.committer_name = $1
 					e.committer_email = $3

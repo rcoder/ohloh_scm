@@ -458,5 +458,26 @@ modified:
 			assert_equal "A", commits.first.diffs.last.action
 			assert_equal "newname", commits.first.diffs.last.path
 		end
+
+		def test_different_author_and_committer
+			log = <<-SAMPLE
+------------------------------------------------------------
+revno: 200
+author: Jason Allen <jason@ohloh.net>
+committer: Robin Luckey <robin@ohloh.net>
+branch nick: foo
+timestamp: Wed 2009-06-24 19:47:37 +0200
+message:
+	  Just a message
+			SAMPLE
+
+			commits = BzrParser.parse(log)
+
+			assert_equal 1, commits.size
+			assert_equal "Jason Allen", commits.first.author_name
+			assert_equal "jason@ohloh.net", commits.first.author_email
+			assert_equal "Robin Luckey", commits.first.committer_name
+			assert_equal "robin@ohloh.net", commits.first.committer_email
+		end
 	end
 end
