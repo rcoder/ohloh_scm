@@ -59,7 +59,7 @@ module Scm::Adapters
 		end
 
 		def guess_forge
-			u = @url =~ /:\/\/(.*\.?svn\.)?([^\/^:]+)(:\d+)?\// ? $2 : nil
+			u = @url =~ /:\/\/(.*\.?svn\.)?([^\/^:]+)(:\d+)?(\/|$)/ ? $2 : nil
 			case u
 			when /(googlecode\.com$)/, /(tigris\.org$)/, /(sunsource\.net$)/, /(java\.net$)/,
 				/(openoffice\.org$)/, /(netbeans\.org$)/, /(dev2dev\.bea\.com$)/, /(rubyforge\.org$)/

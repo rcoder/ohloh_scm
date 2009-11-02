@@ -90,6 +90,9 @@ module Scm::Adapters
 
 			svn = SvnAdapter.new(:url => 'http://moulinette.googlecode.com/svn/trunk')
 			assert_equal 'googlecode.com', svn.guess_forge
+
+			svn = SvnAdapter.new(:url => 'http://moulinette.googlecode.com')
+			assert_equal 'googlecode.com', svn.guess_forge
 		end
 
 		def test_sourceforge_requires_https
