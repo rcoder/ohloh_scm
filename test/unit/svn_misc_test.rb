@@ -61,6 +61,18 @@ module Scm::Adapters
 			end
 		end
 
+		def test_restrict_url_to_trunk_descend_no_further
+			with_svn_repository('deep_svn') do |svn|
+				assert_equal svn.root, svn.url
+				assert_equal '', svn.branch_name
+
+				svn.restrict_url_to_trunk
+
+				assert_equal svn.root + '/trunk', svn.url
+				assert_equal "/trunk", svn.branch_name
+			end
+		end
+
 		def test_restrict_url_to_trunk
 			with_svn_repository('svn') do |svn|
 				assert_equal svn.root, svn.url
