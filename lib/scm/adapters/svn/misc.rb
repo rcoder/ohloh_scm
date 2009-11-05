@@ -28,6 +28,8 @@ module Scm::Adapters
 		# The url and branch_name of this object will be updated with the selected location.
 		# The url will be unmodified if there is a problem connecting to the server.
 		def restrict_url_to_trunk
+			return self.url if self.url =~ /\/trunk\/?$/
+
 			list = ls
 			return self.url unless list
 
