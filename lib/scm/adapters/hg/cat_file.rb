@@ -10,7 +10,7 @@ module Scm::Adapters
 		end
 
 		def cat(revision, path)
-			out, err = run_with_err("cd '#{url}' && hg cat -r #{revision} #{escape(path)}")
+			out, err = run_with_err("cd '#{url}' && hg cat -r #{revision} '#{escape(path)}'")
 			return nil if err =~ /No such file in rev/
 			raise RuntimeError.new(err) unless err.to_s == ''
 			out
