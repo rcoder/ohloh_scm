@@ -50,7 +50,7 @@ module Scm::Adapters
 		end
 
 		def svnsync_init(from)
-			run "svnsync init #{from.opt_auth} '#{url}' #{from.root}"
+			run "svnsync init --trust-server-cert --non-interactive #{from.opt_auth} '#{url}' #{from.root}"
 		end
 
 		def self.svnsync_sync(src, dest)
@@ -61,15 +61,15 @@ module Scm::Adapters
 			dest.propset('sync-from-url', src.root)
 			dest.propset('sync-from-uuid', src.uuid)
 
-			run "svnsync sync #{src.opt_auth} --non-interactive '#{SvnAdapter.uri_encode(dest.root)}'"
+			run "svnsync sync #{src.opt_auth} --trust-server-cert --non-interactive '#{SvnAdapter.uri_encode(dest.root)}'"
 		end
 
 		def propget(propname)
-			run("svn propget #{opt_auth} --revprop -r 0 svn:#{propname} '#{SvnAdapter.uri_encode(root)}'").strip!
+			run("svn propget --trust-server-cert --non-interactive #{opt_auth} --revprop -r 0 svn:#{propname} '#{SvnAdapter.uri_encode(root)}'").strip!
 		end
 
 		def propset(propname, value)
-			run("svn propset #{opt_auth} --revprop -r 0 svn:#{propname} #{value} '#{SvnAdapter.uri_encode(root)}'")
+			run("svn propset --trust-server-cert --non-interactive #{opt_auth} --revprop -r 0 svn:#{propname} #{value} '#{SvnAdapter.uri_encode(root)}'")
 		end
 
 	end

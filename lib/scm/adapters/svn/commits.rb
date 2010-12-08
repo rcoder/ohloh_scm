@@ -23,14 +23,14 @@ module Scm::Adapters
 		def commit_count(since=0)
 			since ||= 0
 			return 0 if final_token && since.to_i >= final_token
-			run("svn log -q -r #{since.to_i + 1}:#{final_token || 'HEAD'} --stop-on-copy '#{SvnAdapter.uri_encode(File.join(root, branch_name.to_s))}@#{final_token || 'HEAD'}' | grep -E -e '^r[0-9]+ ' | wc -l").strip.to_i
+			run("svn log --trust-server-cert --non-interactive -q -r #{since.to_i + 1}:#{final_token || 'HEAD'} --stop-on-copy '#{SvnAdapter.uri_encode(File.join(root, branch_name.to_s))}@#{final_token || 'HEAD'}' | grep -E -e '^r[0-9]+ ' | wc -l").strip.to_i
 		end
 
 		# Returns an array of revision numbers for all commits following revision number 'since'.
 		def commit_tokens(since=0)
 			since ||= 0
 			return [] if final_token && since.to_i >= final_token
-			cmd = "svn log -q -r #{since.to_i + 1}:#{final_token || 'HEAD'} --stop-on-copy '#{SvnAdapter.uri_encode(File.join(root, branch_name.to_s))}@#{final_token || 'HEAD'}' | grep -E -e '^r[0-9]+ ' | cut -f 1 -d '|' | cut -c 2-"
+			cmd = "svn log --trust-server-cert --non-interactive -q -r #{since.to_i + 1}:#{final_token || 'HEAD'} --stop-on-copy '#{SvnAdapter.uri_encode(File.join(root, branch_name.to_s))}@#{final_token || 'HEAD'}' | grep -E -e '^r[0-9]+ ' | cut -f 1 -d '|' | cut -c 2-"
 			run(cmd).split.collect { |r| r.to_i }
 		end
 
@@ -143,7 +143,7 @@ module Scm::Adapters
 		#---------------------------------------------------------------------
 
 		def log(since=0)
-			run "svn log --xml --stop-on-copy -r #{since.to_i + 1}:#{final_token || 'HEAD'} '#{SvnAdapter.uri_encode(File.join(self.root, self.branch_name.to_s))}@#{final_token || 'HEAD'}' #{opt_auth}"
+			run "svn log --trust-server-cert --non-interactive --xml --stop-on-copy -r #{since.to_i + 1}:#{final_token || 'HEAD'} '#{SvnAdapter.uri_encode(File.join(self.root, self.branch_name.to_s))}@#{final_token || 'HEAD'}' #{opt_auth}"
 		end
 
 		def open_log_file(since=0)
@@ -153,7 +153,7 @@ module Scm::Adapters
 					# As a time optimization, just create an empty file rather than fetch a log we know will be empty.
 					File.open(log_filename, 'w') { |f| f.puts '<?xml version="1.0"?>' }
 				else
-					run "svn log --xml --stop-on-copy -r #{since.to_i + 1}:#{final_token || 'HEAD'} '#{SvnAdapter.uri_encode(File.join(self.root, self.branch_name))}@#{final_token || 'HEAD'}' #{opt_auth} > #{log_filename}"
+					run "svn log --trust-server-cert --non-interactive --xml --stop-on-copy -r #{since.to_i + 1}:#{final_token || 'HEAD'} '#{SvnAdapter.uri_encode(File.join(self.root, self.branch_name))}@#{final_token || 'HEAD'}' #{opt_auth} > #{log_filename}"
 				end
 				File.open(log_filename, 'r') { |io| yield io }
 			ensure
@@ -167,7 +167,7 @@ module Scm::Adapters
 
 		# Returns one commit with the exact revision number provided
 		def single_revision_xml(revision)
-			run "svn log --verbose --xml --stop-on-copy -r #{revision} --limit 1 #{opt_auth} '#{SvnAdapter.uri_encode(File.join(self.root, self.branch_name))}@#{revision}'"
+			run "svn log --trust-server-cert --non-interactive --verbose --xml --stop-on-copy -r #{revision} --limit 1 #{opt_auth} '#{SvnAdapter.uri_encode(File.join(self.root, self.branch_name))}@#{revision}'"
 		end
 
 		# Recurses the entire repository and returns an array of file names.
@@ -177,7 +177,7 @@ module Scm::Adapters
 		# A nil result means that the call failed and the remote server could not be queried.
 		def recurse_files(path=nil, revision=final_token || 'HEAD')
 			begin
-				stdout = run "svn ls -r #{revision} --recursive #{opt_auth} '#{SvnAdapter.uri_encode(File.join(root, branch_name.to_s, path.to_s))}@#{revision}'"
+				stdout = run "svn ls --trust-server-cert --non-interactive -r #{revision} --recursive #{opt_auth} '#{SvnAdapter.uri_encode(File.join(root, branch_name.to_s, path.to_s))}@#{revision}'"
 			rescue
 				puts $!.inspect
 				return nil

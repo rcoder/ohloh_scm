@@ -67,7 +67,7 @@ module Scm::Adapters
 							url
 						end
 			@info[[path, revision]] ||= begin
-			                              run "svn info -r #{revision} #{opt_auth} '#{SvnAdapter.uri_encode(uri)}@#{revision}'"
+			                              run "svn info --trust-server-cert --non-interactive -r #{revision} #{opt_auth} '#{SvnAdapter.uri_encode(uri)}@#{revision}'"
 			                            rescue
 			                              raise unless $!.message =~ /Not a valid URL/m
 			                            end
@@ -88,7 +88,7 @@ module Scm::Adapters
 		# A nil result means that the call failed and the remote server could not be queried.
 		def ls(path=nil, revision=final_token || 'HEAD')
 			begin
-				stdout = run "svn ls -r #{revision} #{opt_auth} '#{SvnAdapter.uri_encode(File.join(root, branch_name.to_s, path.to_s))}@#{revision}'"
+				stdout = run "svn ls --trust-server-cert --non-interactive -r #{revision} #{opt_auth} '#{SvnAdapter.uri_encode(File.join(root, branch_name.to_s, path.to_s))}@#{revision}'"
 			rescue
 				return nil
 			end
@@ -119,16 +119,16 @@ module Scm::Adapters
 
 		def checkout(rev, dest_dir)
 			FileUtils.mkdir_p(File.dirname(dest_dir)) unless FileTest.exist?(File.dirname(dest_dir))
-			run "svn checkout -r #{rev.token} '#{SvnAdapter.uri_encode(self.url)}@#{rev.token}' '#{dest_dir}' --ignore-externals #{opt_auth}"
+			run "svn checkout --trust-server-cert --non-interactive -r #{rev.token} '#{SvnAdapter.uri_encode(self.url)}@#{rev.token}' '#{dest_dir}' --ignore-externals #{opt_auth}"
 		end
 
 		def export(dest_dir, commit_id = final_token || 'HEAD')
 			FileUtils.mkdir_p(File.dirname(dest_dir)) unless FileTest.exist?(File.dirname(dest_dir))
-			run "svn export --ignore-externals --force -r #{commit_id} '#{SvnAdapter.uri_encode(File.join(root, branch_name.to_s))}' '#{dest_dir}'"
+			run "svn export --trust-server-cert --non-interactive --ignore-externals --force -r #{commit_id} '#{SvnAdapter.uri_encode(File.join(root, branch_name.to_s))}' '#{dest_dir}'"
 		end
 
 		def ls_tree(token)
-			run("svn ls -R -r #{token} '#{SvnAdapter.uri_encode(File.join(root, branch_name.to_s))}@#{token}'").split("\n")
+			run("svn ls --trust-server-cert --non-interactive -R -r #{token} '#{SvnAdapter.uri_encode(File.join(root, branch_name.to_s))}@#{token}'").split("\n")
 		end
 
 		def opt_auth
