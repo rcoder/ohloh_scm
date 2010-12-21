@@ -4,10 +4,9 @@ module Scm::Adapters
 	class CvsCommitsTest < Scm::Test
 
 		def test_commits
-			with_cvs_repository('cvs') do |cvs|
+			with_cvs_repository('cvs', 'simple') do |cvs|
 
-				assert_equal ['2006/06/29 16:19:58',
-											'2006/06/29 16:21:07',
+				assert_equal ['2006/06/29 16:21:07',
 											'2006/06/29 18:14:47',
 											'2006/06/29 18:45:29',
 											'2006/06/29 18:48:54',
@@ -25,7 +24,7 @@ module Scm::Adapters
 		end
 
 		def test_commits_sets_scm
-			with_cvs_repository('cvs') do |cvs|
+			with_cvs_repository('cvs', 'simple') do |cvs|
 				cvs.commits.each do |c|
 					assert_equal cvs, c.scm
 				end

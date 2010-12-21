@@ -52,7 +52,7 @@ module Scm::Adapters
 		end
 
 		def test_factory_from_cvs_checkout
-			with_cvs_repository('cvs') do |cvs|
+			with_cvs_repository('cvs', 'simple') do |cvs|
 				Scm::ScratchDir.new do |path|
 					`cd #{path} && cvsnt -d #{File.expand_path(cvs.url)} co simple 2> /dev/null`
 					factory_response = Factory.from_path(File.join(path, 'simple'))

@@ -78,8 +78,11 @@ class Scm::Test < Test::Unit::TestCase
 		end
 	end
 
-	def with_cvs_repository(name)
-		with_repository(Scm::Adapters::CvsAdapter, name) { |cvs| yield cvs }
+	def with_cvs_repository(name, module_name='')
+		with_repository(Scm::Adapters::CvsAdapter, name) do |cvs|
+			cvs.module_name = module_name
+			yield cvs
+		end
 	end
 
 	def with_git_repository(name)
