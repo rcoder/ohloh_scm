@@ -1,11 +1,11 @@
 module Scm::Adapters
 	class CvsAdapter
 		def self.url_regex
-			/^(:pserver:[\w\-\+\_]*(:[\w\-\+\_]*)?@[A-Za-z0-9_\-\+\.]+:[0-9]*)?\/[A-Za-z0-9_\-\+\.\/]*$/
+			/^(:(pserver|ext):[\w\-\+\_]*(:[\w\-\+\_]*)?@[A-Za-z0-9_\-\+\.]+:[0-9]*)?\/[A-Za-z0-9_\-\+\.\/]*$/
 		end
 
 		def self.public_url_regex
-			/^:pserver:[\w\-\+\_]*(:[\w\-\+\_]*)?@[A-Za-z0-9_\-\+\.]+:[0-9]*\/[A-Za-z0-9_\-\+\.\/]*$/
+			/^:(pserver|ext):[\w\-\+\_]*(:[\w\-\+\_]*)?@[A-Za-z0-9_\-\+\.]+:[0-9]*\/[A-Za-z0-9_\-\+\.\/]*$/
 		end
 
 		def validate
@@ -71,7 +71,7 @@ module Scm::Adapters
 
 		# Based on the URL, take a guess about which forge this code is hosted on.
 		def guess_forge
-			@url =~ /.*pserver.*@(([^\.]+\.)?(cvs|dev)\.)?([^:]+):\//i ? $4.downcase : nil
+			@url =~ /.*(pserver|ext).*@(([^\.]+\.)?(cvs|dev)\.)?([^:]+):\//i ? $5.downcase : nil
 		end
 	end
 end

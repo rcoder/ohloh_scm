@@ -19,7 +19,8 @@ module Scm::Adapters
 				"sourceforge.net/svn/project/trunk", # missing a protocol prefix
 				"file:///home/robin/cvs", # file protocol is not allowed
 				"http://svn.sourceforge.net", # http protocol is not allowed
-				"git://kernel.org/whatever/linux.git" # git protocol is not allowed
+				"git://kernel.org/whatever/linux.git", # git protocol is not allowed
+				"ext@kernel.org/whatever/linux.git" # ext protocol allowed, but starts with ':'
 			].each do |url|
 				# Rejected for both internal and public use
 				[true, false].each do |p|
@@ -42,7 +43,8 @@ module Scm::Adapters
 				":pserver:anonymous:@sc2.cvs.sourceforge.net:/cvsroot/sc2",
 				":pserver:cool-dev:@sc2.cvs.sourceforge.net:/cvsroot/sc2", # Hyphen should be OK in username
 				":pserver:cvs_anon:@cvs.scms.waikato.ac.nz:/usr/local/global-cvs/ml_cvs", # Underscores should be ok in path
-				":pserver:anonymous:freefem++@idared.ann.jussieu.fr:/Users/pubcvs/cvs" # Pluses should be OK
+				":pserver:anonymous:freefem++@idared.ann.jussieu.fr:/Users/pubcvs/cvs", # Pluses should be OK
+				":ext:anoncvs@opensource.conformal.com:/anoncvs/scrotwm" # scrotwm is a real life example
 			].each do |url|
 				# Valid for both internal and public use
 				[true, false].each do |p|

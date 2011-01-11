@@ -59,6 +59,7 @@ module Scm::Adapters
 		# That's better than missing revisions completely! Just be sure to check for duplicates.
 		def open_log_file(since=nil)
 			begin
+        ensure_host_key
 				run "cvsnt -d #{self.url} rlog #{opt_branch} #{opt_time(since)} '#{self.module_name}' > #{rlog_filename}"
 				File.open(rlog_filename, 'r') do |file|
 					yield file

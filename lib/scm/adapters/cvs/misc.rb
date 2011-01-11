@@ -12,6 +12,8 @@ module Scm::Adapters
 
 			cmd = "cvsnt -q -d #{url} ls -e '#{path}'"
 
+      ensure_host_key
+
 			stdout, stderr = run_with_err(cmd)
 
 			files = []
@@ -64,12 +66,14 @@ module Scm::Adapters
 		end
 
 		def log(most_recent_token=nil)
+      ensure_host_key
 			run "cvsnt -d #{self.url} rlog #{opt_branch} #{opt_time(most_recent_token)} '#{self.module_name}'"
 		end
 
 		def checkout(r, local_directory)
 			opt_D = r.token ? "-D'#{r.token}Z'" : ""
 
+      ensure_host_key
 			if FileTest.exists?(local_directory + '/CVS/Root')
 				# We already have a local enlistment, so do a quick update.
 				if r.directories.size > 0
@@ -146,7 +150,7 @@ module Scm::Adapters
 		end
 
 		def root
-			"#{$2}/#{self.module_name}/" if self.url =~ /^:pserver:.*@[^:]+:(\d+)?(\/.*)$/
+			"#{$3}/#{self.module_name}/" if self.url =~ /^:(pserver|ext):.*@[^:]+:(\d+)?(\/.*)$/
 		end
 
 		def opt_branch
@@ -156,5 +160,33 @@ module Scm::Adapters
 		"-b -r1:"
 			end
 		end
+
+    # returns the host this adapter is connecting to
+    def host
+      @host ||= begin
+        self.url =~ /@([^:]*):/
+        $1
+      end
+    end
+
+    # returns the protocol this adapter connects with
+    def protocol
+      @protocol ||= case self.url
+                    when /^:pserver/ then :pserver
+                    when /^:ext/ then :ext
+                    end
+    end
+
+    # using :ext (ssh) protocol might trigger ssh to confirm accepting the host's
+    # ssh key. This causes the UI to hang asking for manual confirmation. To avoid
+    # this we pre-populate the ~/.ssh/known_hosts file with the host's key.
+    def ensure_host_key
+      if self.protocol == :ext
+        ensure_key_file = File.dirname(__FILE__) + "/../../../../bin/ensure_key"
+        cmd = "#{ensure_key_file} '#{ self.host }'"
+        File.new("/home/jallen/LOG", "w+").write("RUNNING: '#{cmd}'")
+			  stdout, stderr = run_with_err(cmd)
+      end
+    end
 	end
 end

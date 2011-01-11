@@ -45,5 +45,17 @@ module Scm::Adapters
 			assert_equal "hello", l[2]
 			assert_equal "foo/bar", l[3]
 		end
+
+    def host
+			r = CvsAdapter.new(:url => ':ext:anonymous:@moodle.cvs.sourceforge.net:/cvsroot/moodle', :module_name => 'contrib')
+      assert_equal 'moodle.cvs.sourceforge.net', r.host
+    end
+
+    def protocol
+      assert_equal :pserver, CvsAdapter.new(:url => ':pserver:foo:@foo.com:/cvsroot/a', :module_name => 'b')
+      assert_equal :ext, CvsAdapter.new(:url => ':ext:foo:@foo.com:/cvsroot/a', :module_name => 'b')
+      assert_equal :pserver, CvsAdapter.new(:url => ':pserver:ext:@foo.com:/cvsroot/a', :module_name => 'b')
+    end
+
 	end
 end
