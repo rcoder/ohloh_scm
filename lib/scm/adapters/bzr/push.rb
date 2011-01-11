@@ -16,7 +16,7 @@ module Scm::Adapters
 					run "scp -rpqB #{bzr_path} #{to.hostname}:#{to.path}"
 				end
 			else
-				run "cd '#{self.url}' && bzr push '#{to.url}'"
+				run "cd '#{self.url}' && bzr revert && bzr push '#{to.url}'"
 			end
 
 			yield(1,1) if block_given? # Progress bar callback

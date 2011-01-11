@@ -12,7 +12,7 @@ module Scm::Adapters
 				run "rm -rf '#{self.url}'"
 				run "bzr branch '#{from.url}' '#{self.url}'"
 			else
-				run "cd '#{self.url}' && bzr pull --overwrite '#{from.url}'"
+				run "cd '#{self.url}' && bzr pull && bzr pull --overwrite '#{from.url}'"
 			end
 
 			yield(1,1) if block_given? # Progress bar callback
