@@ -11,7 +11,7 @@ module Scm::Parsers
 sample_log = <<SAMPLE
 commit 1df547800dcd168e589bb9b26b4039bff3a7f7e4
 Author: Jason Allen <jason@ohloh.net>
-Date:   Fri Jul 14 16:07:15 2006 -0700
+Date:   Fri, 14 Jul 2006 16:07:15 -0700
 
     moving COPYING
 
@@ -19,7 +19,7 @@ A	COPYING
 
 commit 2e9366dd7a786fdb35f211fff1c8ea05c51968b1
 Author: Robin Luckey <robin@ohloh.net>
-Date:   Sun Jun 11 11:34:17 2006 -0700
+Date:   Sun, 11 Jun 2006 11:34:17 -0700
 
     added some documentation and licensing info
 
