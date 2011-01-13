@@ -32,10 +32,33 @@ module Scm::Adapters
 			end
 		end
 
+		def test_trunk_only_rev_list
+			with_git_repository('git_walk') do |git|
+				# Full history to a commit
+				assert_equal [:A],             rev_list_trunk(git, nil, :A)
+				assert_equal [:A, :B],         rev_list_trunk(git, nil, :B)
+				assert_equal [:A, :B, :C],     rev_list_trunk(git, nil, :C)
+				assert_equal [:A, :B, :C, :D], rev_list_trunk(git, nil, :D)
+
+				# Limited history from one commit to another
+				assert_equal [],               rev_list_trunk(git, :A, :A)
+				assert_equal [:B],             rev_list_trunk(git, :A, :B)
+				assert_equal [:B, :C],         rev_list_trunk(git, :A, :C)
+				assert_equal [:B, :C, :D],     rev_list_trunk(git, :A, :D)
+				assert_equal [:C, :D],         rev_list_trunk(git, :B, :D)
+				assert_equal [:D],             rev_list_trunk(git, :C, :D)
+			end
+		end
+
 		protected
 
 		def rev_list_helper(git, from, to)
-			to_labels(git.commit_tokens(from_label(from), from_label(to)))
+			to_labels(git.commit_tokens(:since => from_label(from), :up_to => from_label(to)))
+		end
+
+		def rev_list_trunk(git, from, to)
+			to_labels(git.commit_tokens(:since => from_label(from), :up_to => from_label(to),
+																	:trunk_only => true))
 		end
 
 		def commit_labels

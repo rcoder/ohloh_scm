@@ -2,28 +2,29 @@ module Scm::Adapters
 	class GitAdapter < AbstractAdapter
 
 		# Returns the number of commits in the repository following the commit with SHA1 'since'.
-		def commit_count(since=nil)
-			run("#{rev_list_command(since)} | wc -l").to_i
+		def commit_count(opts={})
+			run("#{rev_list_command(opts)} | wc -l").to_i
 		end
 
 		# Returns the SHA1 hash for every commit in the repository following the commit with SHA1 'since'.
-		def commit_tokens(since=nil, up_to=branch_name)
-			run(rev_list_command(since, up_to)).split("\n")
+		def commit_tokens(opts={})
+			run(rev_list_command(opts)).split("\n")
 		end
 
 		# Yields each commit following the commit with SHA1 'since'.
-		# Officially, this method isn't required to provide diffs with these commits, and the Subversion equivalent of this method does not,
+		# Officially, this method isn't required to provide diffs with these commits,
+    # and the Subversion equivalent of this method does not,
 		# so if you really require the diffs you should be using each_commit() instead.
-		def commits(since=nil)
+		def commits(opts={})
 			result = []
-			each_commit(since) { |c| result << c }
+			each_commit(opts) { |c| result << c }
 			result
 		end
 
 		# Yields each commit in the repository following the commit with SHA1 'since'.
 		# These commits are populated with diffs.
-		def each_commit(since=nil)
-	
+		def each_commit(opts={})
+
 			# Bug fix (hack) follows.
 			#
 			# git-whatchanged emits a merge commit multiple times, once for each parent, giving the
@@ -39,7 +40,7 @@ module Scm::Adapters
 			# because Ohloh ignores merge diffs anyway.
 
 			previous = nil
-			Scm::Parsers::GitStyledParser.parse(log(since)) do |e|
+			Scm::Parsers::GitStyledParser.parse(log(opts)) do |e|
 				yield e unless previous && previous.token == e.token
 				previous = e
 			end
@@ -52,21 +53,25 @@ module Scm::Adapters
 
 		# Retrieves the git log in the format expected by GitStyledParser.
 		# We get the log forward chronological order (oldest first)
-		def log(since=nil)
+		def log(opts={})
 			if has_branch?
-				if since && since==self.head_token
+				if opts[:since] && opts[:since]==self.head_token
 					'' # Nothing new.
 				else
-					run "#{rev_list_command(since)} | xargs -n 1 #{Scm::Parsers::GitStyledParser.whatchanged}"
+					run "#{rev_list_command(opts)} | xargs -n 1 #{Scm::Parsers::GitStyledParser.whatchanged}"
 				end
 			else
 				''
 			end
 		end
 
-		def rev_list_command(since=nil, up_to=branch_name)
-			range = since ? "#{since}..#{up_to}" : up_to
-			"cd '#{url}' && git rev-list --topo-order --reverse #{range}"
+		def rev_list_command(opts={})
+      up_to = opts[:up_to] || branch_name
+			range = opts[:since] ? "#{opts[:since]}..#{up_to}" : up_to
+
+      trunk_only = opts[:trunk_only] ? "--first-parent" : ""
+
+			"cd '#{url}' && git rev-list --topo-order --reverse #{trunk_only} #{range}"
 		end
 	end
 end
