@@ -1,13 +1,15 @@
 module Scm::Adapters
 	class CvsAdapter
-		def commits(since=nil)
+		def commits(opts={})
+			since = opts[:since]
 			result = []
-			open_log_file(since) do |io|
+
+			open_log_file(opts) do |io|
 				result = Scm::Parsers::CvsParser.parse(io, :branch_name => branch_name)
 			end
-			
+
 			# Git converter needs a backpointer to the scm for each commit
-			result.each { |c| c.scm = self } 
+			result.each { |c| c.scm = self }
 
 			return result if result.size == 0 # Nothing found; we're done here.
 			return result if since.to_s == '' # We requested everything, so just return everything.
@@ -57,7 +59,8 @@ module Scm::Adapters
 		# In any case, to be sure not to miss any commits, this method subtracts 10 seconds from the provided timestamp.
 		# This means that the returned log might actually contain a few revisions that predate the requested time.
 		# That's better than missing revisions completely! Just be sure to check for duplicates.
-		def open_log_file(since=nil)
+		def open_log_file(opts={})
+			since = opts[:since]
 			begin
         ensure_host_key
 				run "cvsnt -d #{self.url} rlog #{opt_branch} #{opt_time(since)} '#{self.module_name}' > #{rlog_filename}"

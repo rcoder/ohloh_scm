@@ -6,46 +6,46 @@ module Scm::Parsers
 		def test_chained_commit_tokens
 			with_svn_chain_repository('svn_with_branching', '/trunk') do |svn|
 				assert_equal [1,2,4,5,8,9], svn.commit_tokens
-				assert_equal [2,4,5,8,9], svn.commit_tokens(1)
-				assert_equal [4,5,8,9], svn.commit_tokens(2)
-				assert_equal [4,5,8,9], svn.commit_tokens(3)
-				assert_equal [5,8,9], svn.commit_tokens(4)
-				assert_equal [8,9], svn.commit_tokens(5)
-				assert_equal [8,9], svn.commit_tokens(6)
-				assert_equal [8,9], svn.commit_tokens(7)
-				assert_equal [9], svn.commit_tokens(8)
-				assert_equal [], svn.commit_tokens(9)
-				assert_equal [], svn.commit_tokens(10)
+				assert_equal [2,4,5,8,9], svn.commit_tokens(:since => 1)
+				assert_equal [4,5,8,9], svn.commit_tokens(:since => 2)
+				assert_equal [4,5,8,9], svn.commit_tokens(:since => 3)
+				assert_equal [5,8,9], svn.commit_tokens(:since => 4)
+				assert_equal [8,9], svn.commit_tokens(:since => 5)
+				assert_equal [8,9], svn.commit_tokens(:since => 6)
+				assert_equal [8,9], svn.commit_tokens(:since => 7)
+				assert_equal [9], svn.commit_tokens(:since => 8)
+				assert_equal [], svn.commit_tokens(:since => 9)
+				assert_equal [], svn.commit_tokens(:since => 10)
 			end
 		end
 
 		def test_chained_commit_count
 			with_svn_chain_repository('svn_with_branching', '/trunk') do |svn|
 				assert_equal 6, svn.commit_count
-				assert_equal 5, svn.commit_count(1)
-				assert_equal 4, svn.commit_count(2)
-				assert_equal 4, svn.commit_count(3)
-				assert_equal 3, svn.commit_count(4)
-				assert_equal 2, svn.commit_count(5)
-				assert_equal 2, svn.commit_count(6)
-				assert_equal 2, svn.commit_count(7)
-				assert_equal 1, svn.commit_count(8)
-				assert_equal 0, svn.commit_count(9)
+				assert_equal 5, svn.commit_count(:since => 1)
+				assert_equal 4, svn.commit_count(:since => 2)
+				assert_equal 4, svn.commit_count(:since => 3)
+				assert_equal 3, svn.commit_count(:since => 4)
+				assert_equal 2, svn.commit_count(:since => 5)
+				assert_equal 2, svn.commit_count(:since => 6)
+				assert_equal 2, svn.commit_count(:since => 7)
+				assert_equal 1, svn.commit_count(:since => 8)
+				assert_equal 0, svn.commit_count(:since => 9)
 			end
 		end
 
 		def test_chained_commits
 			with_svn_chain_repository('svn_with_branching', '/trunk') do |svn|
 				assert_equal [1,2,4,5,8,9], svn.commits.collect { |c| c.token }
-				assert_equal [2,4,5,8,9], svn.commits(1).collect { |c| c.token }
-				assert_equal [4,5,8,9], svn.commits(2).collect { |c| c.token }
-				assert_equal [4,5,8,9], svn.commits(3).collect { |c| c.token }
-				assert_equal [5,8,9], svn.commits(4).collect { |c| c.token }
-				assert_equal [8,9], svn.commits(5).collect { |c| c.token }
-				assert_equal [8,9], svn.commits(6).collect { |c| c.token }
-				assert_equal [8,9], svn.commits(7).collect { |c| c.token }
-				assert_equal [9], svn.commits(8).collect { |c| c.token }
-				assert_equal [], svn.commits(9).collect { |c| c.token }
+				assert_equal [2,4,5,8,9], svn.commits(:since => 1).collect { |c| c.token }
+				assert_equal [4,5,8,9], svn.commits(:since => 2).collect { |c| c.token }
+				assert_equal [4,5,8,9], svn.commits(:since => 3).collect { |c| c.token }
+				assert_equal [5,8,9], svn.commits(:since => 4).collect { |c| c.token }
+				assert_equal [8,9], svn.commits(:since => 5).collect { |c| c.token }
+				assert_equal [8,9], svn.commits(:since => 6).collect { |c| c.token }
+				assert_equal [8,9], svn.commits(:since => 7).collect { |c| c.token }
+				assert_equal [9], svn.commits(:since => 8).collect { |c| c.token }
+				assert_equal [], svn.commits(:since => 9).collect { |c| c.token }
 			end
 		end
 

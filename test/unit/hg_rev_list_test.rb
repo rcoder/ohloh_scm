@@ -33,7 +33,7 @@ module Scm::Adapters
 		protected
 
 		def rev_list_helper(hg, from, to)
-			to_labels(hg.commit_tokens(from_label(from), from_label(to)))
+			to_labels(hg.commit_tokens(:since => from_label(from), :up_to => from_label(to)))
 		end
 
 		def commit_labels

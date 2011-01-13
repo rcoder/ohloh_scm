@@ -20,25 +20,25 @@ module Scm::Adapters
 		attr_accessor :final_token
 
 		# Returns the count of commits following revision number 'since'.
-		def commit_count(since=0)
-			since ||= 0
-			return 0 if final_token && since.to_i >= final_token
+		def commit_count(opts={})
+			since = (opts[:since] || 0).to_i
+			return 0 if final_token && since >= final_token
 			run("svn log --trust-server-cert --non-interactive -q -r #{since.to_i + 1}:#{final_token || 'HEAD'} --stop-on-copy '#{SvnAdapter.uri_encode(File.join(root, branch_name.to_s))}@#{final_token || 'HEAD'}' | grep -E -e '^r[0-9]+ ' | wc -l").strip.to_i
 		end
 
 		# Returns an array of revision numbers for all commits following revision number 'since'.
-		def commit_tokens(since=0)
-			since ||= 0
-			return [] if final_token && since.to_i >= final_token
-			cmd = "svn log --trust-server-cert --non-interactive -q -r #{since.to_i + 1}:#{final_token || 'HEAD'} --stop-on-copy '#{SvnAdapter.uri_encode(File.join(root, branch_name.to_s))}@#{final_token || 'HEAD'}' | grep -E -e '^r[0-9]+ ' | cut -f 1 -d '|' | cut -c 2-"
+		def commit_tokens(opts={})
+			since = (opts[:since] || 0).to_i
+			return [] if final_token && since >= final_token
+			cmd = "svn log --trust-server-cert --non-interactive -q -r #{since + 1}:#{final_token || 'HEAD'} --stop-on-copy '#{SvnAdapter.uri_encode(File.join(root, branch_name.to_s))}@#{final_token || 'HEAD'}' | grep -E -e '^r[0-9]+ ' | cut -f 1 -d '|' | cut -c 2-"
 			run(cmd).split.collect { |r| r.to_i }
 		end
 
 		# Returns an array of commits following revision number 'since'.
 		# These commit objects do not include diffs.
-		def commits(since=0)
+		def commits(opts={})
 			list = []
-			open_log_file(since.to_i) do |io|
+			open_log_file(opts) do |io|
 				list = Scm::Parsers::SvnXmlParser.parse(io)
 			end
 			list.each { |c| c.scm = self }
@@ -52,8 +52,8 @@ module Scm::Adapters
 		# directories, the complexity (and time) of this method comes in expanding directories with a recursion
 		# through every file in the directory.
 		#
-		def each_commit(since=nil)
-			commit_tokens(since).each do |rev|
+		def each_commit(opts={})
+			commit_tokens(opts).each do |rev|
 				yield verbose_commit(rev)
 			end
 		end
@@ -142,18 +142,19 @@ module Scm::Adapters
 		# Log-related code ; get log for entire file or single revision
 		#---------------------------------------------------------------------
 
-		def log(since=0)
+		def log(opts={})
+			since = (opts[:since] || 0).to_i
 			run "svn log --trust-server-cert --non-interactive --xml --stop-on-copy -r #{since.to_i + 1}:#{final_token || 'HEAD'} '#{SvnAdapter.uri_encode(File.join(self.root, self.branch_name.to_s))}@#{final_token || 'HEAD'}' #{opt_auth}"
 		end
 
-		def open_log_file(since=0)
-			since ||= 0
+		def open_log_file(opts={})
+			since = (opts[:since] || 0).to_i
 			begin
 				if (final_token && since >= final_token) || since >= head_token
 					# As a time optimization, just create an empty file rather than fetch a log we know will be empty.
 					File.open(log_filename, 'w') { |f| f.puts '<?xml version="1.0"?>' }
 				else
-					run "svn log --trust-server-cert --non-interactive --xml --stop-on-copy -r #{since.to_i + 1}:#{final_token || 'HEAD'} '#{SvnAdapter.uri_encode(File.join(self.root, self.branch_name))}@#{final_token || 'HEAD'}' #{opt_auth} > #{log_filename}"
+					run "svn log --trust-server-cert --non-interactive --xml --stop-on-copy -r #{since + 1}:#{final_token || 'HEAD'} '#{SvnAdapter.uri_encode(File.join(self.root, self.branch_name))}@#{final_token || 'HEAD'}' #{opt_auth} > #{log_filename}"
 				end
 				File.open(log_filename, 'r') { |io| yield io }
 			ensure

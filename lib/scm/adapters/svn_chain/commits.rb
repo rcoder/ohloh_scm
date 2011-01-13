@@ -2,22 +2,22 @@ module Scm::Adapters
 	class SvnChainAdapter < SvnAdapter
 
 		# Returns the count of commits following revision number 'since'.
-		def commit_count(since=0)
-			(parent_svn ? parent_svn.commit_count(since) : 0) + super(since)
+		def commit_count(opts={})
+			(parent_svn(opts[:since]) ? parent_svn(opts[:since]).commit_count(opts) : 0) + super(opts)
 		end
 
 		# Returns an array of revision numbers for all commits following revision number 'since'.
-		def commit_tokens(since=0)
-			(parent_svn(since) ? parent_svn.commit_tokens(since) : []) + super(since)
+		def commit_tokens(opts={})
+			(parent_svn(opts[:since]) ? parent_svn(opts[:since]).commit_tokens(opts) : []) + super(opts)
 		end
 
 		# Returns an array of commits following revision number 'since'.
-		def commits(since=0)
-			(parent_svn(since) ? parent_svn.commits(since) : []) + super(since)
+		def commits(opts={})
+			(parent_svn(opts[:since]) ? parent_svn(opts[:since]).commits(opts) : []) + super(opts)
 		end
 
-		def verbose_commit(since=0)
-			parent_svn(since) ? parent_svn.verbose_commit(since) : super(since)
+		def verbose_commit(rev=0)
+			parent_svn(rev) ? parent_svn.verbose_commit(rev) : super(rev)
 		end
 
 		# If the diff points to a file, simply returns the diff.

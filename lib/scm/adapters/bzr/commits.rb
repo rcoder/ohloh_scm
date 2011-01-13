@@ -2,13 +2,14 @@ module Scm::Adapters
 	class BzrAdapter < AbstractAdapter
 
 		# Return the number of commits in the repository following +since+.
-		def commit_count(since=nil)
-			commit_tokens(since).size
+		def commit_count(opts={})
+			commit_tokens(opts).size
 		end
 
 		# Return the list of commit tokens following +since+.
-		def commit_tokens(since=nil)
-			tokens = run("#{rev_list_command(since)} | grep -E -e '^( *)revision-id: ' | cut -f2 -d':' | cut -c 2-").split("\n")
+		def commit_tokens(opts={})
+			since = opts[:since]
+			tokens = run("#{rev_list_command(opts)} | grep -E -e '^( *)revision-id: ' | cut -f2 -d':' | cut -c 2-").split("\n")
 
 			# Bzr returns everything after *and including* since.
 			# We want to exclude it.
@@ -24,8 +25,9 @@ module Scm::Adapters
 		# we encounter massive repositories.  If you need all commits
 		# including diffs, you should use the each_commit() iterator,
 		# which only holds one commit in memory at a time.
-		def commits(since=nil)
-			log = run("#{rev_list_command(since)} | cat")
+		def commits(opts={})
+			since = opts[:since]
+			log = run("#{rev_list_command(opts)} | cat")
 			a = Scm::Parsers::BzrParser.parse(log)
 
 			if a.any? && a.first.token == since
@@ -46,8 +48,9 @@ module Scm::Adapters
 		# This is designed to prevent excessive RAM usage when we
 		# encounter a massive repository.  Only a single commit is ever
 		# held in memory at once.
-		def each_commit(since=nil)
-			open_log_file(since) do |io|
+		def each_commit(opts={})
+			since = opts[:since]
+			open_log_file(opts) do |io|
 				Scm::Parsers::BzrParser.parse(io) do |commit|
 					yield remove_directories(commit) if block_given? && commit.token != since
 				end
@@ -63,8 +66,8 @@ module Scm::Adapters
 
 
 		# Not used by Ohloh proper, but handy for debugging and testing
-		def log(since=nil)
-			run "#{rev_list_command(since)} -v"
+		def log(opts={})
+			run "#{rev_list_command(opts)} -v"
 		end
 
 		# Returns a file handle to the log.
@@ -72,14 +75,15 @@ module Scm::Adapters
 		# +since+. However, bzr doesn't work that way; it returns
 		# everything after and INCLUDING +since+. Therefore, consumers
 		# of this file should check for and reject the duplicate commit.
-		def open_log_file(since=nil)
+		def open_log_file(opts={})
+			since = opts[:since]
 			begin
 				if since == head_token # There are no new commits
 					# As a time optimization, just create an empty
 					# file rather than fetch a log we know will be empty.
 					File.open(log_filename, 'w') { }
 				else
-					run "#{rev_list_command(since)} -v > #{log_filename}"
+					run "#{rev_list_command(opts)} -v > #{log_filename}"
 				end
 				File.open(log_filename, 'r') { |io| yield io }
 			ensure
@@ -91,7 +95,8 @@ module Scm::Adapters
 		  File.join('/tmp', (self.url).gsub(/\W/,'') + '.log')
 		end
 
-		def rev_list_command(since=nil)
+		def rev_list_command(opts={})
+			since = opts[:since]
 			"cd '#{self.url}' && bzr log --long --show-id --forward --include-merges -r #{to_rev_param(since)}.."
 		end
 	end

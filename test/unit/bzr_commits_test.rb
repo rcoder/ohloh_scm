@@ -6,9 +6,9 @@ module Scm::Adapters
 		def test_commit_count
 			with_bzr_repository('bzr') do |bzr|
 				assert_equal 6, bzr.commit_count
-				assert_equal 5, bzr.commit_count(revision_ids.first)
-				assert_equal 1, bzr.commit_count(revision_ids[4])
-				assert_equal 0, bzr.commit_count(revision_ids.last)
+				assert_equal 5, bzr.commit_count(:since => revision_ids.first)
+				assert_equal 1, bzr.commit_count(:since => revision_ids[4])
+				assert_equal 0, bzr.commit_count(:since => revision_ids.last)
 			end
 		end
 
@@ -22,17 +22,17 @@ module Scm::Adapters
 		def test_commit_tokens
 			with_bzr_repository('bzr') do |bzr|
 				assert_equal revision_ids, bzr.commit_tokens
-				assert_equal revision_ids[1..5], bzr.commit_tokens(revision_ids.first)
-				assert_equal revision_ids[5..5], bzr.commit_tokens(revision_ids[4])
-				assert_equal [], bzr.commit_tokens(revision_ids.last)
+				assert_equal revision_ids[1..5], bzr.commit_tokens(:since => revision_ids.first)
+				assert_equal revision_ids[5..5], bzr.commit_tokens(:since => revision_ids[4])
+				assert_equal [], bzr.commit_tokens(:since => revision_ids.last)
 			end
 		end
 
 		def test_commits
 			with_bzr_repository('bzr') do |bzr|
 				assert_equal revision_ids, bzr.commits.collect { |c| c.token }
-				assert_equal revision_ids[5..5], bzr.commits(revision_ids[4]).collect { |c| c.token }
-				assert_equal [], bzr.commits(revision_ids.last).collect { |c| c.token }
+				assert_equal revision_ids[5..5], bzr.commits(:since => revision_ids[4]).collect { |c| c.token }
+				assert_equal [], bzr.commits(:since => revision_ids.last).collect { |c| c.token }
 
 				# Check that the diffs are not populated
 				assert_equal [], bzr.commits.first.diffs

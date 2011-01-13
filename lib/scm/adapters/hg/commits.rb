@@ -2,12 +2,15 @@ module Scm::Adapters
 	class HgAdapter < AbstractAdapter
 
 		# Return the number of commits in the repository following +since+.
-		def commit_count(since=0)
-			commit_tokens(since || 0).size
+		def commit_count(opts={})
+			commit_tokens(opts).size
 		end
 
 		# Return the list of commit tokens following +since+.
-		def commit_tokens(since=0, up_to='tip')
+		def commit_tokens(opts={})
+			since = opts[:since] || 0
+			up_to = opts[:up_to] || 'tip'
+
 			# We reverse the final result in Ruby, rather than passing the --reverse flag to hg.
 			# That's because the -f (follow) flag doesn't behave the same in both directions.
 			# Basically, we're trying very hard to make this act just like Git. The hg_rev_list_test checks this.
@@ -26,8 +29,10 @@ module Scm::Adapters
 		# Not including the diffs is meant to be a memory savings when we encounter massive repositories.
 		# If you need all commits including diffs, you should use the each_commit() iterator, which only holds one commit
 		# in memory at a time.
-		def commits(since=0)
-			log = run("cd '#{self.url}' && hg log -f -v -r tip:#{since || 0} --style #{Scm::Parsers::HgStyledParser.style_path}")
+		def commits(opts={})
+			since = opts[:since] || 0
+
+			log = run("cd '#{self.url}' && hg log -f -v -r tip:#{since} --style #{Scm::Parsers::HgStyledParser.style_path}")
 			a = Scm::Parsers::HgStyledParser.parse(log).reverse
 
 			if a.any? && a.first.token == since
@@ -47,7 +52,8 @@ module Scm::Adapters
 		# The log is stored in a temporary file.
 		# This is designed to prevent excessive RAM usage when we encounter a massive repository.
 		# Only a single commit is ever held in memory at once.
-		def each_commit(since=0)
+		def each_commit(opts={})
+			since = opts[:since] || 0
 			open_log_file(since) do |io|
 				Scm::Parsers::HgStyledParser.parse(io) do |commit|
 					yield commit if block_given? && commit.token != since
@@ -56,7 +62,8 @@ module Scm::Adapters
 		end
 
 		# Not used by Ohloh proper, but handy for debugging and testing
-		def log(since=0)
+		def log(opts={})
+			since = opts[:since] || 0
 			run "cd '#{url}' && hg log -f -v -r tip:#{since}"
 		end
 
@@ -64,7 +71,8 @@ module Scm::Adapters
 		# In our standard, the log should include everything AFTER +since+. However, hg doesn't work that way;
 		# it returns everything after and INCLUDING +since+. Therefore, consumers of this file should check for
 		# and reject the duplicate commit.
-		def open_log_file(since=0)
+		def open_log_file(opts={})
+			since = opts[:since] || 0
 			begin
 				if since == head_token # There are no new commits
 					# As a time optimization, just create an empty file rather than fetch a log we know will be empty.
