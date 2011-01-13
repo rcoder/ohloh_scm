@@ -1,19 +1,19 @@
 module Scm::Adapters
 	class BzrAdapter < AbstractAdapter
 
-		# Return the number of commits in the repository following +since+.
+		# Return the number of commits in the repository following +after+.
 		def commit_count(opts={})
 			commit_tokens(opts).size
 		end
 
-		# Return the list of commit tokens following +since+.
+		# Return the list of commit tokens following +after+.
 		def commit_tokens(opts={})
-			since = opts[:since]
+			after = opts[:after]
 			tokens = run("#{rev_list_command(opts)} | grep -E -e '^( *)revision-id: ' | cut -f2 -d':' | cut -c 2-").split("\n")
 
-			# Bzr returns everything after *and including* since.
+			# Bzr returns everything after *and including* after.
 			# We want to exclude it.
-			if tokens.any? && tokens.first == since
+			if tokens.any? && tokens.first == after
 				tokens[1..-1]
 			else
 				tokens
@@ -26,11 +26,11 @@ module Scm::Adapters
 		# including diffs, you should use the each_commit() iterator,
 		# which only holds one commit in memory at a time.
 		def commits(opts={})
-			since = opts[:since]
+			after = opts[:after]
 			log = run("#{rev_list_command(opts)} | cat")
 			a = Scm::Parsers::BzrParser.parse(log)
 
-			if a.any? && a.first.token == since
+			if a.any? && a.first.token == after
 				a[1..-1]
 			else
 				a
@@ -43,16 +43,16 @@ module Scm::Adapters
 			Scm::Parsers::BzrParser.parse(log).first
 		end
 
-		# Yields each commit after +since+, including its diffs.
+		# Yields each commit after +after+, including its diffs.
 		# The log is stored in a temporary file.
 		# This is designed to prevent excessive RAM usage when we
 		# encounter a massive repository.  Only a single commit is ever
 		# held in memory at once.
 		def each_commit(opts={})
-			since = opts[:since]
+			after = opts[:after]
 			open_log_file(opts) do |io|
 				Scm::Parsers::BzrParser.parse(io) do |commit|
-					yield remove_directories(commit) if block_given? && commit.token != since
+					yield remove_directories(commit) if block_given? && commit.token != after
 				end
 			end
 		end
@@ -72,13 +72,13 @@ module Scm::Adapters
 
 		# Returns a file handle to the log.
 		# In our standard, the log should include everything AFTER
-		# +since+. However, bzr doesn't work that way; it returns
-		# everything after and INCLUDING +since+. Therefore, consumers
+		# +after+. However, bzr doesn't work that way; it returns
+		# everything after and INCLUDING +after+. Therefore, consumers
 		# of this file should check for and reject the duplicate commit.
 		def open_log_file(opts={})
-			since = opts[:since]
+			after = opts[:after]
 			begin
-				if since == head_token # There are no new commits
+				if after == head_token # There are no new commits
 					# As a time optimization, just create an empty
 					# file rather than fetch a log we know will be empty.
 					File.open(log_filename, 'w') { }
@@ -96,8 +96,8 @@ module Scm::Adapters
 		end
 
 		def rev_list_command(opts={})
-			since = opts[:since]
-			"cd '#{self.url}' && bzr log --long --show-id --forward --include-merges -r #{to_rev_param(since)}.."
+			after = opts[:after]
+			"cd '#{self.url}' && bzr log --long --show-id --forward --include-merges -r #{to_rev_param(after)}.."
 		end
 	end
 end

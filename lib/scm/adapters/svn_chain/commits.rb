@@ -1,19 +1,19 @@
 module Scm::Adapters
 	class SvnChainAdapter < SvnAdapter
 
-		# Returns the count of commits following revision number 'since'.
+		# Returns the count of commits following revision number 'after'.
 		def commit_count(opts={})
-			(parent_svn(opts[:since]) ? parent_svn(opts[:since]).commit_count(opts) : 0) + super(opts)
+			(parent_svn(opts[:after]) ? parent_svn(opts[:after]).commit_count(opts) : 0) + super(opts)
 		end
 
-		# Returns an array of revision numbers for all commits following revision number 'since'.
+		# Returns an array of revision numbers for all commits following revision number 'after'.
 		def commit_tokens(opts={})
-			(parent_svn(opts[:since]) ? parent_svn(opts[:since]).commit_tokens(opts) : []) + super(opts)
+			(parent_svn(opts[:after]) ? parent_svn(opts[:after]).commit_tokens(opts) : []) + super(opts)
 		end
 
-		# Returns an array of commits following revision number 'since'.
+		# Returns an array of commits following revision number 'after'.
 		def commits(opts={})
-			(parent_svn(opts[:since]) ? parent_svn(opts[:since]).commits(opts) : []) + super(opts)
+			(parent_svn(opts[:after]) ? parent_svn(opts[:after]).commits(opts) : []) + super(opts)
 		end
 
 		def verbose_commit(rev=0)

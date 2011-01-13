@@ -7,7 +7,7 @@ module Scm::Adapters
 	#
 	# The problem with this is that directories often get moved about.  What is
 	# called "/trunk" today might have been in a branch directory at some point
-	# in the past. But since we completely ignore other directories, we never see
+	# in the past. But after we completely ignore other directories, we never see
 	# that old history.
 	#
 	# Suppose for example that from revisions 1 to 100, development occured in

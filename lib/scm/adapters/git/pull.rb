@@ -71,8 +71,8 @@ module Scm::Adapters
 		def convert(source_scm)
 			yield(0,1) if block_given? # Progress bar callback
 
-			# Any new work to be done since last time we were here?
-			commits = source_scm.commits(:since => read_token)
+			# Any new work to be done since the last time we were here?
+			commits = source_scm.commits(:after => read_token)
 			if commits and commits.size > 0
 				# Start by making sure we are in a known good state. Set up our working directory.
 				clean_up_disk

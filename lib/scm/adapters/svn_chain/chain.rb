@@ -9,14 +9,14 @@ module Scm::Adapters
 		# If this adapter's branch was created by copying or renaming another branch,
 		# then return a new adapter that points to that prior branch.
 		#
-		# Only commits following +since+ are considered, so if the copy or rename
-		# occured on or before +since+, then no parent will be found or returned.
-		def parent_svn(since=0)
+		# Only commits following +after+ are considered, so if the copy or rename
+		# occured on or before +after+, then no parent will be found or returned.
+		def parent_svn(after=0)
 			@parent_svn ||={} # Poor man's memoize
 
-			@parent_svn[since] ||= begin
+			@parent_svn[after] ||= begin
 				parent = nil
-				c = first_commit(since)
+				c = first_commit(after)
 				if c
 					# === Long explanation of real head-scratching bug fix. ===
 					#
@@ -66,20 +66,20 @@ module Scm::Adapters
 			end
 		end
 
-		def first_token(since=0)
-			c = first_commit(since)
+		def first_token(after=0)
+			c = first_commit(after)
 			c && c.token
 		end
 
-		def first_commit(since=0)
+		def first_commit(after=0)
 			@first_commit ||={} # Poor man's memoize
-			@first_commit[since] ||= Scm::Parsers::SvnXmlParser.parse(next_revision_xml(since)).first
+			@first_commit[after] ||= Scm::Parsers::SvnXmlParser.parse(next_revision_xml(after)).first
 		end
 
 		# Returns the first commit with a revision number greater than the provided revision number
-		def next_revision_xml(since=0)
-			return "<?xml?>" if since.to_i >= head_token
-			run "svn log --trust-server-cert --non-interactive --verbose --xml --stop-on-copy -r #{since.to_i+1}:#{final_token || 'HEAD'} --limit 1 #{opt_auth} '#{SvnAdapter.uri_encode(File.join(self.root, self.branch_name))}@#{final_token || 'HEAD'}'"
+		def next_revision_xml(after=0)
+			return "<?xml?>" if after.to_i >= head_token
+			run "svn log --trust-server-cert --non-interactive --verbose --xml --stop-on-copy -r #{after.to_i+1}:#{final_token || 'HEAD'} --limit 1 #{opt_auth} '#{SvnAdapter.uri_encode(File.join(self.root, self.branch_name))}@#{final_token || 'HEAD'}'"
 		end
 
 		# If the passed diff represents the wholesale movement of the entire

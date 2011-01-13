@@ -6,16 +6,16 @@ module Scm::Adapters
 		def test_commits
 			with_svn_repository('svn') do |svn|
 				assert_equal 5, svn.commit_count
-				assert_equal 3, svn.commit_count(:since => 2)
-				assert_equal 0, svn.commit_count(:since => 1000)
+				assert_equal 3, svn.commit_count(:after => 2)
+				assert_equal 0, svn.commit_count(:after => 1000)
 
 				assert_equal [1,2,3,4,5], svn.commit_tokens
-				assert_equal [3,4,5], svn.commit_tokens(:since => 2)
-				assert_equal [], svn.commit_tokens(:since => 1000)
+				assert_equal [3,4,5], svn.commit_tokens(:after => 2)
+				assert_equal [], svn.commit_tokens(:after => 1000)
 
 				assert_equal [1,2,3,4,5], svn.commits.collect { |c| c.token }
-				assert_equal [3,4,5], svn.commits(:since => 2).collect { |c| c.token }
-				assert_equal [], svn.commits(:since => 1000)
+				assert_equal [3,4,5], svn.commits(:after => 2).collect { |c| c.token }
+				assert_equal [], svn.commits(:after => 1000)
 				assert !FileTest.exist?(svn.log_filename)
 			end
 		end
@@ -147,7 +147,7 @@ module Scm::Adapters
 				# Also, our commits do not include diffs for the actual directories;
 				# only the files within those directories.
 				#
-				# Also, since we are only tracking the /trunk and not /branches/b, then
+				# Also, after we are only tracking the /trunk and not /branches/b, then
 				# there should not be anything referring to activity in /branches/b.
 
 				assert_equal 3, deep_commits.first.token # Make sure this is the right revision

@@ -3,7 +3,7 @@ require 'rexml/document'
 module Scm::Adapters
 	class SvnAdapter < AbstractAdapter
 
-		# In all commit- and log-related methods, 'since' refers to the revision
+		# In all commit- and log-related methods, 'after' refers to the revision
 		# number of the last known commit, and the methods return the commits
 		# *following* this commit.
 		#
@@ -19,22 +19,22 @@ module Scm::Adapters
 		# this adapter ever return information regarding commits after this point.
 		attr_accessor :final_token
 
-		# Returns the count of commits following revision number 'since'.
+		# Returns the count of commits following revision number 'after'.
 		def commit_count(opts={})
-			since = (opts[:since] || 0).to_i
-			return 0 if final_token && since >= final_token
-			run("svn log --trust-server-cert --non-interactive -q -r #{since.to_i + 1}:#{final_token || 'HEAD'} --stop-on-copy '#{SvnAdapter.uri_encode(File.join(root, branch_name.to_s))}@#{final_token || 'HEAD'}' | grep -E -e '^r[0-9]+ ' | wc -l").strip.to_i
+			after = (opts[:after] || 0).to_i
+			return 0 if final_token && after >= final_token
+			run("svn log --trust-server-cert --non-interactive -q -r #{after.to_i + 1}:#{final_token || 'HEAD'} --stop-on-copy '#{SvnAdapter.uri_encode(File.join(root, branch_name.to_s))}@#{final_token || 'HEAD'}' | grep -E -e '^r[0-9]+ ' | wc -l").strip.to_i
 		end
 
-		# Returns an array of revision numbers for all commits following revision number 'since'.
+		# Returns an array of revision numbers for all commits following revision number 'after'.
 		def commit_tokens(opts={})
-			since = (opts[:since] || 0).to_i
-			return [] if final_token && since >= final_token
-			cmd = "svn log --trust-server-cert --non-interactive -q -r #{since + 1}:#{final_token || 'HEAD'} --stop-on-copy '#{SvnAdapter.uri_encode(File.join(root, branch_name.to_s))}@#{final_token || 'HEAD'}' | grep -E -e '^r[0-9]+ ' | cut -f 1 -d '|' | cut -c 2-"
+			after = (opts[:after] || 0).to_i
+			return [] if final_token && after >= final_token
+			cmd = "svn log --trust-server-cert --non-interactive -q -r #{after + 1}:#{final_token || 'HEAD'} --stop-on-copy '#{SvnAdapter.uri_encode(File.join(root, branch_name.to_s))}@#{final_token || 'HEAD'}' | grep -E -e '^r[0-9]+ ' | cut -f 1 -d '|' | cut -c 2-"
 			run(cmd).split.collect { |r| r.to_i }
 		end
 
-		# Returns an array of commits following revision number 'since'.
+		# Returns an array of commits following revision number 'after'.
 		# These commit objects do not include diffs.
 		def commits(opts={})
 			list = []
@@ -44,7 +44,7 @@ module Scm::Adapters
 			list.each { |c| c.scm = self }
 		end
 
-		# Yields each commit following revision number 'since'. These commit object are populated with diffs.
+		# Yields each commit following revision number 'after'. These commit object are populated with diffs.
 		#
 		# With Subversion, populating the diffs can be tricky because when an entire directory is affected,
 		# Subversion abbreviates the log by simply listing the directory name, rather than all of the directory
@@ -143,18 +143,18 @@ module Scm::Adapters
 		#---------------------------------------------------------------------
 
 		def log(opts={})
-			since = (opts[:since] || 0).to_i
-			run "svn log --trust-server-cert --non-interactive --xml --stop-on-copy -r #{since.to_i + 1}:#{final_token || 'HEAD'} '#{SvnAdapter.uri_encode(File.join(self.root, self.branch_name.to_s))}@#{final_token || 'HEAD'}' #{opt_auth}"
+			after = (opts[:after] || 0).to_i
+			run "svn log --trust-server-cert --non-interactive --xml --stop-on-copy -r #{after.to_i + 1}:#{final_token || 'HEAD'} '#{SvnAdapter.uri_encode(File.join(self.root, self.branch_name.to_s))}@#{final_token || 'HEAD'}' #{opt_auth}"
 		end
 
 		def open_log_file(opts={})
-			since = (opts[:since] || 0).to_i
+			after = (opts[:after] || 0).to_i
 			begin
-				if (final_token && since >= final_token) || since >= head_token
+				if (final_token && after >= final_token) || after >= head_token
 					# As a time optimization, just create an empty file rather than fetch a log we know will be empty.
 					File.open(log_filename, 'w') { |f| f.puts '<?xml version="1.0"?>' }
 				else
-					run "svn log --trust-server-cert --non-interactive --xml --stop-on-copy -r #{since + 1}:#{final_token || 'HEAD'} '#{SvnAdapter.uri_encode(File.join(self.root, self.branch_name))}@#{final_token || 'HEAD'}' #{opt_auth} > #{log_filename}"
+					run "svn log --trust-server-cert --non-interactive --xml --stop-on-copy -r #{after + 1}:#{final_token || 'HEAD'} '#{SvnAdapter.uri_encode(File.join(self.root, self.branch_name))}@#{final_token || 'HEAD'}' #{opt_auth} > #{log_filename}"
 				end
 				File.open(log_filename, 'r') { |io| yield io }
 			ensure

@@ -1,17 +1,17 @@
 module Scm::Adapters
 	class GitAdapter < AbstractAdapter
 
-		# Returns the number of commits in the repository following the commit with SHA1 'since'.
+		# Returns the number of commits in the repository following the commit with SHA1 'after'.
 		def commit_count(opts={})
 			run("#{rev_list_command(opts)} | wc -l").to_i
 		end
 
-		# Returns the SHA1 hash for every commit in the repository following the commit with SHA1 'since'.
+		# Returns the SHA1 hash for every commit in the repository following the commit with SHA1 'after'.
 		def commit_tokens(opts={})
 			run(rev_list_command(opts)).split("\n")
 		end
 
-		# Yields each commit following the commit with SHA1 'since'.
+		# Yields each commit following the commit with SHA1 'after'.
 		# Officially, this method isn't required to provide diffs with these commits,
     # and the Subversion equivalent of this method does not,
 		# so if you really require the diffs you should be using each_commit() instead.
@@ -21,7 +21,7 @@ module Scm::Adapters
 			result
 		end
 
-		# Yields each commit in the repository following the commit with SHA1 'since'.
+		# Yields each commit in the repository following the commit with SHA1 'after'.
 		# These commits are populated with diffs.
 		def each_commit(opts={})
 
@@ -55,7 +55,7 @@ module Scm::Adapters
 		# We get the log forward chronological order (oldest first)
 		def log(opts={})
 			if has_branch?
-				if opts[:since] && opts[:since]==self.head_token
+				if opts[:after] && opts[:after]==self.head_token
 					'' # Nothing new.
 				else
 					run "#{rev_list_command(opts)} | xargs -n 1 #{Scm::Parsers::GitStyledParser.whatchanged}"
@@ -67,7 +67,7 @@ module Scm::Adapters
 
 		def rev_list_command(opts={})
       up_to = opts[:up_to] || branch_name
-			range = opts[:since] ? "#{opts[:since]}..#{up_to}" : up_to
+			range = opts[:after] ? "#{opts[:after]}..#{up_to}" : up_to
 
       trunk_only = opts[:trunk_only] ? "--first-parent" : ""
 

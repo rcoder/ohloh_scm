@@ -14,14 +14,14 @@ module Scm::Adapters
 
 				assert_equal ['2006/06/29 18:48:54',
 											'2006/06/29 18:52:23'],
-					cvs.commits(:since => '2006/06/29 18:45:29').collect { |c| c.token }
+					cvs.commits(:after => '2006/06/29 18:45:29').collect { |c| c.token }
 
 				# Make sure we are date format agnostic (2008/01/01 is the same as 2008-01-01)
 				assert_equal ['2006/06/29 18:48:54',
 											'2006/06/29 18:52:23'],
-					cvs.commits(:since => '2006-06-29 18:45:29').collect { |c| c.token }
+					cvs.commits(:after => '2006-06-29 18:45:29').collect { |c| c.token }
 
-				assert_equal [], cvs.commits(:since => '2006/06/29 18:52:23').collect { |c| c.token }
+				assert_equal [], cvs.commits(:after => '2006/06/29 18:52:23').collect { |c| c.token }
 			end
 		end
 

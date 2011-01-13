@@ -53,11 +53,11 @@ module Scm::Adapters
 		protected
 
 		def rev_list_helper(git, from, to)
-			to_labels(git.commit_tokens(:since => from_label(from), :up_to => from_label(to)))
+			to_labels(git.commit_tokens(:after => from_label(from), :up_to => from_label(to)))
 		end
 
 		def rev_list_trunk(git, from, to)
-			to_labels(git.commit_tokens(:since => from_label(from), :up_to => from_label(to),
+			to_labels(git.commit_tokens(:after => from_label(from), :up_to => from_label(to),
 																	:trunk_only => true))
 		end
 
