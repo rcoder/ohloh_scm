@@ -54,7 +54,7 @@ module Scm::Adapters
 		# Only a single commit is ever held in memory at once.
 		def each_commit(opts={})
 			after = opts[:after] || 0
-			open_log_file(after) do |io|
+			open_log_file(opts) do |io|
 				Scm::Parsers::HgStyledParser.parse(io) do |commit|
 					yield commit if block_given? && commit.token != after
 				end

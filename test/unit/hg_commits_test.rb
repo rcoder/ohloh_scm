@@ -59,6 +59,17 @@ module Scm::Adapters
 											'75532c1e1f1de55c2271f6fd29d98efbe35397c4'], commits.collect { |c| c.token }
 			end
 		end
+
+		def test_each_commit_after
+			commits = []
+			with_hg_repository('hg') do |hg|
+				hg.each_commit(:after => 'b14fa4692f949940bd1e28da6fb4617de2615484') do |c|
+					commits << c
+				end
+				assert_equal ['468336c6671cbc58237a259d1b7326866afc2817',
+											'75532c1e1f1de55c2271f6fd29d98efbe35397c4'], commits.collect { |c| c.token }
+			end
+		end
 	end
 end
 
