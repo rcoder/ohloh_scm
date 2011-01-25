@@ -14,7 +14,7 @@ module Scm::Adapters
 			# We reverse the final result in Ruby, rather than passing the --reverse flag to hg.
 			# That's because the -f (follow) flag doesn't behave the same in both directions.
 			# Basically, we're trying very hard to make this act just like Git. The hg_rev_list_test checks this.
-			tokens = run("cd '#{self.url}' && hg log -f -r #{up_to || 'tip'}:#{after || 0} --template='{node}\\n'").split("\n").reverse
+			tokens = run("cd '#{self.url}' && hg log -f #{trunk_only(opts)} -r #{up_to || 'tip'}:#{after || 0} --template='{node}\\n'").split("\n").reverse
 
 			# Hg returns everything after *and including* after.
 			# We want to exclude it.
@@ -32,7 +32,7 @@ module Scm::Adapters
 		def commits(opts={})
 			after = opts[:after] || 0
 
-			log = run("cd '#{self.url}' && hg log -f -v -r tip:#{after} --style #{Scm::Parsers::HgStyledParser.style_path}")
+			log = run("cd '#{self.url}' && hg log -f #{trunk_only(opts)} -v -r tip:#{after} --style #{Scm::Parsers::HgStyledParser.style_path}")
 			a = Scm::Parsers::HgStyledParser.parse(log).reverse
 
 			if a.any? && a.first.token == after
@@ -64,7 +64,7 @@ module Scm::Adapters
 		# Not used by Ohloh proper, but handy for debugging and testing
 		def log(opts={})
 			after = opts[:after] || 0
-			run "cd '#{url}' && hg log -f -v -r tip:#{after}"
+			run "cd '#{url}' && hg log -f #{trunk_only(opts)} -v -r tip:#{after}"
 		end
 
 		# Returns a file handle to the log.
@@ -78,7 +78,7 @@ module Scm::Adapters
 					# As a time optimization, just create an empty file rather than fetch a log we know will be empty.
 					File.open(log_filename, 'w') { }
 				else
-					run "cd '#{url}' && hg log --verbose -r #{after || 0}:tip --style #{Scm::Parsers::HgStyledParser.verbose_style_path} > #{log_filename}"
+					run "cd '#{url}' && hg log --verbose #{trunk_only(opts)} -r #{after || 0}:tip --style #{Scm::Parsers::HgStyledParser.verbose_style_path} > #{log_filename}"
 				end
 				File.open(log_filename, 'r') { |io| yield io }
 			ensure
@@ -88,6 +88,14 @@ module Scm::Adapters
 
 		def log_filename
 		  File.join('/tmp', (self.url).gsub(/\W/,'') + '.log')
+		end
+
+		def trunk_only(opts={})
+			if opts[:trunk_only]
+				'--follow-first'
+			else
+				''
+			end
 		end
 
 	end
