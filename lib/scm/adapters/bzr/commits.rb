@@ -8,11 +8,11 @@ module Scm::Adapters
 
 		# Return the list of commit tokens following +after+.
 		def commit_tokens(opts={})
-			after = opts[:after]
 			tokens = run("#{rev_list_command(opts)} | grep -E -e '^( *)revision-id: ' | cut -f2- -d':' | cut -c 2-").split("\n")
 
 			# Bzr returns everything after *and including* after.
 			# We want to exclude it.
+			after = opts[:after]
 			if tokens.any? && tokens.first == after
 				tokens[1..-1]
 			else
@@ -97,7 +97,8 @@ module Scm::Adapters
 
 		def rev_list_command(opts={})
 			after = opts[:after]
-			"cd '#{self.url}' && bzr log --long --show-id --forward --include-merges -r #{to_rev_param(after)}.."
+			trunk_only = opts[:trunk_only] ? '--levels=1' : '--include-merges'
+			"cd '#{self.url}' && bzr log --long --show-id --forward #{trunk_only} -r #{to_rev_param(after)}.."
 		end
 	end
 end

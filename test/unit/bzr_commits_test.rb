@@ -19,12 +19,68 @@ module Scm::Adapters
 			end
 		end
 
-		def test_commit_tokens
+		def test_commit_count_trunk_only
+			with_bzr_repository('bzr_with_branch') do |bzr|
+				# Only 3 commits are on main line
+				assert_equal 3, bzr.commit_count(:trunk_only => true)
+			end
+		end
+
+		def test_commit_tokens_after
 			with_bzr_repository('bzr') do |bzr|
 				assert_equal revision_ids, bzr.commit_tokens
 				assert_equal revision_ids[1..5], bzr.commit_tokens(:after => revision_ids.first)
 				assert_equal revision_ids[5..5], bzr.commit_tokens(:after => revision_ids[4])
 				assert_equal [], bzr.commit_tokens(:after => revision_ids.last)
+			end
+		end
+
+		def test_commit_tokens_trunk_only_false
+			# There's some funny business with commit ordering here.
+			# When we request that Bzr iterate commits in the '--forward' direction,
+			# we actually get the branch commits *after* the merge that brought them in.
+			# This makes my head hurt, and I'm not yet sure whether this will be a problem
+			# down the road. For now, just accepts that bzr does this.
+			with_bzr_repository('bzr_with_branch') do |bzr|
+				assert_equal [
+					'test@example.com-20090206214301-s93cethy9atcqu9h',
+					'test@example.com-20090206214451-lzjngefdyw3vmgms',
+					'test@example.com-20090206214515-21lkfj3dbocao5pr', # merge commit
+					'test@example.com-20090206214350-rqhdpz92l11eoq2t'  # branch commit -- after merge!
+				], bzr.commit_tokens(:trunk_only => false)
+			end
+		end
+
+		def test_commit_tokens_trunk_only_true
+			with_bzr_repository('bzr_with_branch') do |bzr|
+				assert_equal [
+					'test@example.com-20090206214301-s93cethy9atcqu9h',
+					'test@example.com-20090206214451-lzjngefdyw3vmgms',
+					'test@example.com-20090206214515-21lkfj3dbocao5pr',  # merge commit
+					# 'test@example.com-20090206214350-rqhdpz92l11eoq2t' # branch commit
+				], bzr.commit_tokens(:trunk_only => true)
+			end
+		end
+
+		def test_commits_trunk_only_false
+			with_bzr_repository('bzr_with_branch') do |bzr|
+				assert_equal [
+					'test@example.com-20090206214301-s93cethy9atcqu9h',
+					'test@example.com-20090206214451-lzjngefdyw3vmgms',
+					'test@example.com-20090206214515-21lkfj3dbocao5pr', # merge commit
+					'test@example.com-20090206214350-rqhdpz92l11eoq2t'  # branch commit -- after merge!
+				], bzr.commits(:trunk_only => false).map { |c| c.token }
+			end
+		end
+
+		def test_commits_trunk_only_true
+			with_bzr_repository('bzr_with_branch') do |bzr|
+				assert_equal [
+					'test@example.com-20090206214301-s93cethy9atcqu9h',
+					'test@example.com-20090206214451-lzjngefdyw3vmgms',
+					'test@example.com-20090206214515-21lkfj3dbocao5pr',  # merge commit
+					# 'test@example.com-20090206214350-rqhdpz92l11eoq2t' # branch commit
+				], bzr.commits(:trunk_only => true).map { |c| c.token }
 			end
 		end
 
@@ -60,6 +116,32 @@ module Scm::Adapters
 
 				# Verify that we got the commits in forward chronological order
 				assert_equal revision_ids, commits.collect{ |c| c.token }
+			end
+		end
+
+		def test_each_commit_trunk_only_false
+			with_bzr_repository('bzr_with_branch') do |bzr|
+				commits = []
+				bzr.each_commit(:trunk_only => false) { |c| commits << c }
+				assert_equal [
+					'test@example.com-20090206214301-s93cethy9atcqu9h',
+					'test@example.com-20090206214451-lzjngefdyw3vmgms',
+					'test@example.com-20090206214515-21lkfj3dbocao5pr', # merge commit
+					'test@example.com-20090206214350-rqhdpz92l11eoq2t'  # branch commit -- after merge!
+				], commits.map { |c| c.token }
+			end
+		end
+
+		def test_each_commit_trunk_only_true
+			with_bzr_repository('bzr_with_branch') do |bzr|
+				commits = []
+				bzr.each_commit(:trunk_only => true) { |c| commits << c }
+				assert_equal [
+					'test@example.com-20090206214301-s93cethy9atcqu9h',
+					'test@example.com-20090206214451-lzjngefdyw3vmgms',
+					'test@example.com-20090206214515-21lkfj3dbocao5pr'   # merge commit
+					# 'test@example.com-20090206214350-rqhdpz92l11eoq2t' # branch commit -- after merge!
+				], commits.map { |c| c.token }
 			end
 		end
 
