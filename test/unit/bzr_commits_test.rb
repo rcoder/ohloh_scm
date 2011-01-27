@@ -80,6 +80,13 @@ module Scm::Adapters
 			end
 		end
 
+		# Verfies OTWO-344
+		def test_commit_tokens_with_colon_character
+			with_bzr_repository('bzr_colon') do |bzr|
+				assert_equal ['svn-v4:364a429a-ab12-11de-804f-e3d9c25ff3d2::0'], bzr.commit_tokens
+			end
+		end
+
 		protected
 
 		def revision_ids

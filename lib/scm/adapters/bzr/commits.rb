@@ -9,7 +9,7 @@ module Scm::Adapters
 		# Return the list of commit tokens following +after+.
 		def commit_tokens(opts={})
 			after = opts[:after]
-			tokens = run("#{rev_list_command(opts)} | grep -E -e '^( *)revision-id: ' | cut -f2 -d':' | cut -c 2-").split("\n")
+			tokens = run("#{rev_list_command(opts)} | grep -E -e '^( *)revision-id: ' | cut -f2- -d':' | cut -c 2-").split("\n")
 
 			# Bzr returns everything after *and including* after.
 			# We want to exclude it.
