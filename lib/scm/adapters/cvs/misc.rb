@@ -184,7 +184,6 @@ module Scm::Adapters
       if self.protocol == :ext
         ensure_key_file = File.dirname(__FILE__) + "/../../../../bin/ensure_key"
         cmd = "#{ensure_key_file} '#{ self.host }'"
-        File.new("/home/jallen/LOG", "w+").write("RUNNING: '#{cmd}'")
 			  stdout, stderr = run_with_err(cmd)
       end
     end
