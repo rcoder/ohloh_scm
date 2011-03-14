@@ -66,11 +66,7 @@ module Scm::Adapters
 						else
 							url
 						end
-			@info[[path, revision]] ||= begin
-			                              run "svn info --trust-server-cert --non-interactive -r #{revision} #{opt_auth} '#{SvnAdapter.uri_encode(uri)}@#{revision}'"
-			                            rescue
-			                              raise unless $!.message =~ /Not a valid URL/m
-			                            end
+			@info[[path, revision]] ||= run "svn info --trust-server-cert --non-interactive -r #{revision} #{opt_auth} '#{SvnAdapter.uri_encode(uri)}@#{revision}'"
 		end
 
 		def root
