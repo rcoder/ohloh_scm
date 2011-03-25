@@ -105,7 +105,7 @@ module Scm::Adapters
 			begin
 				return node_kind(path, revision) == 'directory'
 			rescue
-				if $!.message =~ /svn: .* is not a directory in filesystem/
+				if $!.message =~ /svn: .* is not a directory in filesystem/ || $!.message =~ /.*Not a valid URL.*/
 					return false
 				else
 					raise

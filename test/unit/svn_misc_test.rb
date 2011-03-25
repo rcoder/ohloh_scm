@@ -58,6 +58,7 @@ module Scm::Adapters
 			with_svn_repository('svn') do |svn|
 				assert svn.is_directory?('trunk')
 				assert !svn.is_directory?('trunk/helloworld.c')
+				assert !svn.is_directory?('invalid/path')
 			end
 		end
 
