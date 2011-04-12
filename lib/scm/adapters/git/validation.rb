@@ -10,9 +10,23 @@ module Scm::Adapters
 
 		def normalize
 			super
+      @url = read_only_url
 			@branch_name = 'master' if @branch_name.to_s == ''
 			self
 		end
+
+    # Given a Github read-write URL, return a read-only URL.
+    # Otherwise, return the original URL.
+    def read_only_url
+      case @url
+      when /^https:\/\/\w+@github.com\/(.+)\.git$/
+        "git://github.com/#{$1}.git"
+      when /^git@github.com:(.+)\.git$/
+        "git://github.com/#{$1}.git"
+      else
+        @url
+      end
+    end
 
 		def validate_server_connection
 			return unless valid?

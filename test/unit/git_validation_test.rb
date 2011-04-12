@@ -40,5 +40,33 @@ module Scm::Adapters
 			git = GitAdapter.new( :url => 'http://kernel.org/pub/scm/linux/kernel/git/stable/linux-2.6.17.y.git')
 			assert_equal 'kernel.org', git.guess_forge
 		end
+
+    def test_read_only_url
+      assert_equal nil, GitAdapter.new(:url => nil).read_only_url
+      assert_equal '', GitAdapter.new(:url => '').read_only_url
+      assert_equal 'foo', GitAdapter.new(:url => 'foo').read_only_url
+
+      # A non-Github URL: no change
+			assert_equal 'git://kernel.org/pub/scm/git/git.git',
+        GitAdapter.new(:url => 'git://kernel.org/pub/scm/git/git.git').read_only_url
+
+      # A Github read-write URL: converted to read-only
+      assert_equal 'git://github.com/robinluckey/ohcount.git',
+        GitAdapter.new(:url => 'https://robinluckey@github.com/robinluckey/ohcount.git').read_only_url
+
+      # A Github read-write URL: converted to read-only
+      assert_equal 'git://github.com/robinluckey/ohcount.git',
+        GitAdapter.new(:url => 'git@github.com:robinluckey/ohcount.git').read_only_url
+
+      # A Github read-only URL: no change
+      assert_equal 'git://github.com/robinluckey/ohcount.git',
+        GitAdapter.new(:url => 'git@github.com:robinluckey/ohcount.git').read_only_url
+    end
+
+    def test_normalize_converts_to_read_only
+      git = GitAdapter.new(:url => 'https://robinluckey@github.com/robinluckey/ohcount.git')
+      git.normalize
+      assert_equal 'git://github.com/robinluckey/ohcount.git', git.url
+    end
 	end
 end
