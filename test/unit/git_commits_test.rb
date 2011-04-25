@@ -101,5 +101,31 @@ module Scm::Adapters
 			end
     end
 
+    # In rare cases, a merge commit's resulting tree is identical to its first parent's tree.
+    # I believe this is a result of developer trickery, and not a common situation.
+    #
+    # When this happens, `git whatchanged` will omit the changes relative to the first parent,
+    # and instead output only the changes relative to the second parent.
+    #
+    # Our commit parser became confused by this, assuming that these changes relative to the
+    # second parent were in fact the missing changes relative to the first.
+    #
+    # This is bug OTWO-623. This test confirms the fix.
+    def test_verbose_commit_with_null_merge
+      with_git_repository('git_with_null_merge') do |git|
+        c = git.verbose_commit('d3bd0bedbf4b197b2c4eb827e1ec4c35b834482f')
+        # This commit's tree is identical to its parent's. Thus it should contain no diffs.
+        assert_equal [], c.diffs
+      end
+    end
+
+    def test_each_commit_with_null_merge
+      with_git_repository('git_with_null_merge') do |git|
+        git.each_commit do |c|
+          assert_equal [], c.diffs if c.token == 'd3bd0bedbf4b197b2c4eb827e1ec4c35b834482f'
+        end
+      end
+    end
+
 	end
 end

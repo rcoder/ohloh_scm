@@ -41,15 +41,35 @@ module Scm::Adapters
 
 			previous = nil
 			Scm::Parsers::GitStyledParser.parse(log(opts)) do |e|
-				yield e unless previous && previous.token == e.token
+				yield fixup_null_merge(e) unless previous && previous.token == e.token
 				previous = e
 			end
 		end
 
 		# Returns a single commit, including its diffs
 		def verbose_commit(token)
-			Scm::Parsers::GitStyledParser.parse(run("cd '#{url}' && #{Scm::Parsers::GitStyledParser.whatchanged} #{token}")).first
+			c = Scm::Parsers::GitStyledParser.parse(run("cd '#{url}' && #{Scm::Parsers::GitStyledParser.whatchanged} #{token}")).first
+      fixup_null_merge(c)
 		end
+
+    # For a merge commit, we ask `git whatchanged` to output the changes relative to each parent.
+    # It is possible, through developer hackery, to create a merge commit which does not change the tree.
+    # When this happens, `git whatchanged` will suppress its output relative to the first parent,
+    # and jump immediately to the second (branch) parent. Our code mistakenly interprets this output
+    # as the missing changes relative to the first parent.
+    #
+    # To avoid this calamity, we must compare the tree hash of this commit with its first parent's.
+    # If they are the same, then the diff should be empty, regardless of what `git whatchanged` says.
+    #
+    # Yes, this is a convoluted, time-wasting hack to address a very rare circumstance. Ultimatley
+    # we should stop parsing `git whatchanged` to extract commit data.
+    def fixup_null_merge(c)
+      first_parent_token = parent_tokens(c).first
+      if first_parent_token && get_commit_tree(first_parent_token) == get_commit_tree(c.token)
+        c.diffs = []
+      end
+      c
+    end
 
 		# Retrieves the git log in the format expected by GitStyledParser.
 		# We get the log forward chronological order (oldest first)

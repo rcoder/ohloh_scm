@@ -21,6 +21,11 @@ module Scm::Adapters
 			run("cd #{url} && git ls-tree -r #{token} | cut -f 2 -d '\t'").split("\n")
 		end
 
+    # For a given commit ID, returns the SHA1 hash of its tree
+    def get_commit_tree(token='HEAD')
+      run("cd #{url} && git cat-file commit #{token} | grep '^tree' | cut -d ' ' -f 2").strip
+    end
+
 		# Moves us the correct branch and checks out the most recent files.
 		#
 		# Anything not tracked by Git is deleted.
