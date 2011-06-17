@@ -38,14 +38,14 @@ module Scm::Adapters
 					/-m wrapper option is not supported remotely; ignored/,
 					/cannot open directory .* No such file or directory/,
 					/ignoring module/,
-					/skipping directory/,
-					/existing repository .* does not match/,
-					/nothing known about/
-				]
+          /skipping directory/,
+          /existing repository .* does not match/,
+          /nothing known about/,
 
-				# The signal 11 error should not really be ignored, but dev.eclipse.org
-				# returns it at the end of every ls. Yes, this sucks.
-				ignored_error_messages << /Terminated with fatal signal 11/ if guess_forge == 'eclipse.org'
+          # The signal 11 error should not really be ignored, but many CVS servers
+          # including dev.eclipse.org return it at the end of every ls.
+          /Terminated with fatal signal 11/
+				]
 
 				if s.length == 0
 					error_handled = true
