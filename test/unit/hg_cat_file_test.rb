@@ -31,7 +31,7 @@ EXPECTED
 		def test_funny_file_name_chars
 			Scm::ScratchDir.new do |dir|
 				# Make a file with a problematic filename
-				funny_name = '#|file_name` (&\'")#'
+				funny_name = '#|file_name` $(&\'")#'
 				File.open(File.join(dir, funny_name), 'w') { |f| f.write "contents" }
 
 				# Add it to an hg repository

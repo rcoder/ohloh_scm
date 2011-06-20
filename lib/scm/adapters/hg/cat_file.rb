@@ -20,7 +20,7 @@ module Scm::Adapters
 		# Example:
 		#     "Foo Bar & Baz" => "Foo\ Bar\ \&\ Baz"
 		def escape(path)
-			path.gsub(/[ `'"&()<>|#]/) { |c| '\\' + c }
+			path.gsub(/[ `'"&()<>|#\$]/) { |c| '\\' + c }
 		end
 	end
 end
