@@ -4,10 +4,10 @@ module Scm::Adapters
 			cat(commit.token, diff.path)
 		end
 
-		def cat_file_parent(commit, diff)
-			p = parents(commit)
-			cat(p.first.token, diff.path) if p.first
-		end
+    def cat_file_parent(commit, diff)
+      first_parent_token = parent_tokens(commit).first
+      cat(first_parent_token, diff.path) if first_parent_token
+    end
 
 		def cat(revision, path)
 			out, err, status = run_with_err("cd '#{url}' && bzr cat --name-from-revision -r #{to_rev_param(revision)} '#{escape(path)}'")
