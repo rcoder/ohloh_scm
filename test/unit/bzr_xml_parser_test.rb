@@ -14,8 +14,33 @@ module Scm::Parsers
 		def test_empty_xml
 			assert_equal("<?xml version=\"1.0\"?>\n<ohloh_log scm=\"bzr\">\n</ohloh_log>\n", BzrXmlParser.parse('', :writer => XmlWriter.new))
 		end
-		
-		def test_basic_xml
+	
+    def test_basic_xml
+      xml = <<-XML
+<?xml version="1.0" encoding="UTF-8"?>
+<logs>
+  <log>
+    <revno>10</revno>
+    <revisionid>test@example.com-20110725174345-brbpkwumeh07aoh8</revisionid>
+    <parents>
+      <parent>amujumdar@blackducksoftware.com-20110722185038-e0i4d1mdxwpipxc4</parent>
+    </parents>
+    <committer>test &lt;test@example.com&gt;</committer>
+    <branch-nick>myproject</branch-nick>
+    <timestamp>Mon 2011-07-25 13:43:45 -0400</timestamp>
+    <message><![CDATA[Renamed test1.txt to subdir/test_b.txt, removed test2.txt and added test_a.txt.]]></message>
+  </log>
+</logs>
+      XML
+			commits = BzrXmlParser.parse(xml)
+			assert_equal 1, commits.size
+      c = commits.first
+			assert_equal 0, c.diffs.size 
+      assert_equal "Renamed test1.txt to subdir/test_b.txt, removed test2.txt and added test_a.txt.", c.message
+      assert_equal "test@example.com-20110725174345-brbpkwumeh07aoh8", c.token
+    end
+
+		def test_verbose_xml
       xml = <<-XML
 <?xml version="1.0" encoding="UTF-8"?>
 <logs>

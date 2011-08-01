@@ -33,9 +33,9 @@ module Scm::Parsers
 			when 'log'
 				@callback.call(@commit)
       when 'revisionid'
-        @token = @text
+        @commit.token = @text
       when 'message'
-        @message = @text
+        @commit.message = @cdata
 			when 'committer'
 				@commit.committer_name = @text[/(.+?)(\s+<(.+)>)/, 1]
 				@commit.committer_email = @text[/(.+?)(\s+<(.+)>)/, 3]
@@ -54,6 +54,10 @@ module Scm::Parsers
         @merge_commit = nil
 			end
 		end
+
+    def cdata(data)
+      @cdata = data
+    end
 
 		def text(text)
 			@text = text
