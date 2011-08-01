@@ -1,0 +1,121 @@
+require 'parsedate'
+require 'rexml/document'
+require 'rexml/streamlistener'
+
+module Scm::Parsers
+	class BazaarListener
+		include REXML::StreamListener
+		attr_accessor :callback
+
+		def initialize(callback)
+			@callback = callback
+		end
+
+		attr_accessor :text, :commit, :diff
+
+		def tag_start(name, attrs)
+      case name
+      when 'log'
+				@commit = Scm::Commit.new
+				@commit.diffs = []
+      when 'affected-files'
+        @diffs = []
+      when 'file'
+        @before_path = attrs['oldpath']
+      when 'merge'
+        # This is a merge commit, save it and pop it after all branch commits
+        @merge_commit = @commit
+			end
+		end
+
+		def tag_end(name)
+			case name
+			when 'log'
+				@callback.call(@commit)
+      when 'revisionid'
+        @token = @text
+      when 'message'
+        @message = @text
+			when 'committer'
+				@commit.committer_name = @text[/(.+?)(\s+<(.+)>)/, 1]
+				@commit.committer_email = @text[/(.+?)(\s+<(.+)>)/, 3]
+			when 'timestamp'
+				@commit.committer_date = Time.parse(@text)
+      when 'file'
+        @path = @text
+      when 'added', 'modified', 'removed', 'renamed'
+        @diffs.concat(parse_diff(name, @path, @before_path))
+        @before_path = nil
+        @path = nil
+      when 'affected-files'
+			  @commit.diffs = remove_dupes(@diffs)
+      when 'merge'
+        @callback.call(@merge_commit)
+        @merge_commit = nil
+			end
+		end
+
+		def text(text)
+			@text = text
+		end
+
+    private
+    # Parse one single diff
+    def parse_diff(action, path, before_path)
+      diffs = []
+      case action
+        # A rename action requires two diffs: one to remove the old filename,
+        # another to add the new filename.
+        #   
+        # Note that is possible to be renamed to the empty string!
+        # This happens when a subdirectory is moved to become the root.
+      when 'renamed'
+        diffs = [ Scm::Diff.new(:action => 'D', :path => before_path),
+                  Scm::Diff.new(:action => 'A', :path => path || '')]
+      when 'added'
+        diffs = [Scm::Diff.new(:action => 'A', :path => path)]
+      when 'modified'
+        diffs = [Scm::Diff.new(:action => 'M', :path => path)]
+      when 'removed'
+        diffs = [Scm::Diff.new(:action => 'D', :path => path)]
+      end
+      diffs.each do |d|
+        d.path = strip_trailing_asterisk(d.path)
+      end
+      diffs
+    end
+
+    def strip_trailing_asterisk(path)
+      path[-1..-1] == '*' ? path[0..-2] : path
+    end 
+
+    def remove_dupes(diffs)
+      # Bazaar may report that a file was added and modified in a single commit.
+      # Reduce these cases to a single 'A' action.
+      diffs.delete_if do |d| 
+        d.action == 'M' && diffs.select { |x| x.path == d.path && x.action == 'A' }.any?
+      end 
+
+      # Bazaar may report that a file was both deleted and added in a single commit.
+      # Reduce these cases to a single 'M' action.
+      diffs.each do |d| 
+        d.action = 'M' if diffs.select { |x| x.path == d.path }.size > 1 
+      end.uniq
+    end 
+
+	end
+
+	class BzrXmlParser < Parser
+		def self.internal_parse(buffer, opts)
+			buffer = '<?xml?>' if buffer.is_a?(StringIO) and buffer.length < 2
+			begin
+				REXML::Document.parse_stream(buffer, BazaarListener.new(Proc.new { |c| yield c if block_given? }))
+			rescue EOFError
+			end
+		end
+
+		def self.scm
+			'bzr'
+		end
+	end
+end

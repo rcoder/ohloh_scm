@@ -28,6 +28,7 @@ require 'lib/scm/parsers/git_parser'
 require 'lib/scm/parsers/git_styled_parser'
 require 'lib/scm/parsers/hg_parser'
 require 'lib/scm/parsers/hg_styled_parser'
+require 'lib/scm/parsers/bzr_xml_parser'
 require 'lib/scm/parsers/bzr_parser'
 
 require 'lib/scm/parsers/array_writer'
