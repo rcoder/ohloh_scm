@@ -1,6 +1,4 @@
 require File.dirname(__FILE__) + '/../test_helper'
-require 'rubygems'
-require 'ruby-debug'
 
 module Scm::Adapters
 	class BzrCommitsTest < Scm::Test
