@@ -17,7 +17,7 @@ module Scm::Adapters
 
 					# Commit some new code on the original and pull again
 					src.run "cd '#{src.url}' && touch foo && bzr add foo && bzr whoami 'test <test@example.com>' && bzr commit -m test"
-					assert_equal "test\n", src.commits.last.message
+					assert_equal "test", src.commits.last.message
 					assert_equal "test", src.commits.last.committer_name
 					assert_equal "test@example.com", src.commits.last.committer_email
 
