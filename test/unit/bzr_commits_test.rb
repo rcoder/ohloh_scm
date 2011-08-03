@@ -60,6 +60,39 @@ module Scm::Adapters
 			end
 		end
 
+    def test_nested_branches_commit_tokens_trunk_only_false
+      with_bzr_repository('bzr_with_nested_branches') do |bzr|
+        assert_equal [
+          'obnox@samba.org-20090204002342-5r0q4gejk69rk6uv',
+          'obnox@samba.org-20090204002422-5ylnq8l4713eqfy0',
+          'obnox@samba.org-20090204002453-u70a3ehf3ae9kay1',
+          'obnox@samba.org-20090204002518-yb0x153oa6mhoodu',
+          'obnox@samba.org-20090204002540-gmana8tk5f9gboq9',
+          'obnox@samba.org-20090204004942-73rnw0izen42f154',
+          'test@example.com-20110803170302-fz4mbr89n8f5agha',
+          'test@example.com-20110803170341-v1icvy05b430t68l',
+          'test@example.com-20110803170504-z7xz5uxj02e5x3z6',
+          'test@example.com-20110803170522-asv6i9z6m22jc8zz',
+          'test@example.com-20110803170648-o0xcbni7lwp97azj',
+          'test@example.com-20110803170818-v44umypquqg8migo'
+        ], bzr.commit_tokens(:trunk_only => false)
+      end 
+    end 
+
+    def test_nested_branches_commit_tokens_trunk_only_true
+      with_bzr_repository('bzr_with_nested_branches') do |bzr|
+        assert_equal [
+          'obnox@samba.org-20090204002342-5r0q4gejk69rk6uv',
+          'obnox@samba.org-20090204002422-5ylnq8l4713eqfy0',
+          'obnox@samba.org-20090204002453-u70a3ehf3ae9kay1',
+          'obnox@samba.org-20090204002518-yb0x153oa6mhoodu',
+          'obnox@samba.org-20090204002540-gmana8tk5f9gboq9',
+          'obnox@samba.org-20090204004942-73rnw0izen42f154',
+          'test@example.com-20110803170818-v44umypquqg8migo'
+        ], bzr.commit_tokens(:trunk_only => true)
+      end 
+    end 
+
 		def test_commits_trunk_only_false
 			with_bzr_repository('bzr_with_branch') do |bzr|
 				assert_equal [
@@ -80,6 +113,39 @@ module Scm::Adapters
 				], bzr.commits(:trunk_only => true).map { |c| c.token }
 			end
 		end
+
+    def test_nested_branches_commits_trunk_only_false
+      with_bzr_repository('bzr_with_nested_branches') do |bzr|
+        assert_equal [
+          'obnox@samba.org-20090204002342-5r0q4gejk69rk6uv',
+          'obnox@samba.org-20090204002422-5ylnq8l4713eqfy0',
+          'obnox@samba.org-20090204002453-u70a3ehf3ae9kay1',
+          'obnox@samba.org-20090204002518-yb0x153oa6mhoodu',
+          'obnox@samba.org-20090204002540-gmana8tk5f9gboq9',
+          'obnox@samba.org-20090204004942-73rnw0izen42f154',
+          'test@example.com-20110803170302-fz4mbr89n8f5agha',
+          'test@example.com-20110803170341-v1icvy05b430t68l',
+          'test@example.com-20110803170504-z7xz5uxj02e5x3z6',
+          'test@example.com-20110803170522-asv6i9z6m22jc8zz',
+          'test@example.com-20110803170648-o0xcbni7lwp97azj',
+          'test@example.com-20110803170818-v44umypquqg8migo'
+        ], bzr.commits(:trunk_only => false).map { |c| c.token }
+      end 
+    end 
+
+    def test_nested_branches_commits_trunk_only_true
+      with_bzr_repository('bzr_with_nested_branches') do |bzr|
+        assert_equal [
+          'obnox@samba.org-20090204002342-5r0q4gejk69rk6uv',
+          'obnox@samba.org-20090204002422-5ylnq8l4713eqfy0',
+          'obnox@samba.org-20090204002453-u70a3ehf3ae9kay1',
+          'obnox@samba.org-20090204002518-yb0x153oa6mhoodu',
+          'obnox@samba.org-20090204002540-gmana8tk5f9gboq9',
+          'obnox@samba.org-20090204004942-73rnw0izen42f154',
+          'test@example.com-20110803170818-v44umypquqg8migo'
+        ], bzr.commits(:trunk_only => true).map { |c| c.token }
+      end 
+    end 
 
 		def test_commits
 			with_bzr_repository('bzr') do |bzr|
@@ -138,6 +204,43 @@ module Scm::Adapters
 					'test@example.com-20090206214451-lzjngefdyw3vmgms',
 					'test@example.com-20090206214515-21lkfj3dbocao5pr'   # merge commit
 					# 'test@example.com-20090206214350-rqhdpz92l11eoq2t' # branch commit -- after merge!
+				], commits.map { |c| c.token }
+			end
+		end
+
+    def test_nested_branches_each_commit_trunk_only_false
+      with_bzr_repository('bzr_with_nested_branches') do |bzr|
+        commits = []
+        bzr.each_commit(:trunk_only => false) { |c| commits << c}
+        assert_equal [
+          'obnox@samba.org-20090204002342-5r0q4gejk69rk6uv',
+          'obnox@samba.org-20090204002422-5ylnq8l4713eqfy0',
+          'obnox@samba.org-20090204002453-u70a3ehf3ae9kay1',
+          'obnox@samba.org-20090204002518-yb0x153oa6mhoodu',
+          'obnox@samba.org-20090204002540-gmana8tk5f9gboq9',
+          'obnox@samba.org-20090204004942-73rnw0izen42f154',
+          'test@example.com-20110803170302-fz4mbr89n8f5agha',
+          'test@example.com-20110803170341-v1icvy05b430t68l',
+          'test@example.com-20110803170504-z7xz5uxj02e5x3z6',
+          'test@example.com-20110803170522-asv6i9z6m22jc8zz',
+          'test@example.com-20110803170648-o0xcbni7lwp97azj',
+          'test@example.com-20110803170818-v44umypquqg8migo'
+        ], commits.map { |c| c.token }
+      end
+    end
+
+		def test_nested_branches_each_commit_trunk_only_true
+			with_bzr_repository('bzr_with_nested_branches') do |bzr|
+				commits = []
+				bzr.each_commit(:trunk_only => true) { |c| commits << c }
+				assert_equal [
+          'obnox@samba.org-20090204002342-5r0q4gejk69rk6uv',
+          'obnox@samba.org-20090204002422-5ylnq8l4713eqfy0',
+          'obnox@samba.org-20090204002453-u70a3ehf3ae9kay1',
+          'obnox@samba.org-20090204002518-yb0x153oa6mhoodu',
+          'obnox@samba.org-20090204002540-gmana8tk5f9gboq9',
+          'obnox@samba.org-20090204004942-73rnw0izen42f154',
+          'test@example.com-20110803170818-v44umypquqg8migo'
 				], commits.map { |c| c.token }
 			end
 		end

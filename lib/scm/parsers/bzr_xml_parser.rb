@@ -9,6 +9,7 @@ module Scm::Parsers
 
 		def initialize(callback)
 			@callback = callback
+      @merge_commit = []
 		end
 
 		attr_accessor :text, :commit, :diff
@@ -26,7 +27,7 @@ module Scm::Parsers
         @before_path = attrs['oldpath']
       when 'merge'
         # This is a merge commit, save it and pop it after all branch commits
-        @merge_commit = @commit
+        @merge_commit.push(@commit)
 			end
 		end
 
@@ -49,8 +50,7 @@ module Scm::Parsers
       when 'affected-files'
 			  @commit.diffs = remove_dupes(@diffs)
       when 'merge'
-        @commit = @merge_commit
-        @merge_commit = nil
+        @commit = @merge_commit.pop
 			end
 		end
 
