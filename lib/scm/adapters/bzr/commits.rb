@@ -8,7 +8,7 @@ module Scm::Adapters
 
 		# Return the list of commit tokens following +after+.
 		def commit_tokens(opts={})
-			tokens = run("#{rev_list_command(opts)} | grep -E -e '^( *)revision-id: ' | cut -f2- -d':' | cut -c 2-").split("\n")
+      tokens = commits(opts).map { |c| c.token }
 
 			# Bzr returns everything after *and including* after.
 			# We want to exclude it.
@@ -28,7 +28,7 @@ module Scm::Adapters
 		def commits(opts={})
 			after = opts[:after]
 			log = run("#{rev_list_command(opts)} | cat")
-			a = Scm::Parsers::BzrParser.parse(log)
+			a = Scm::Parsers::BzrXmlParser.parse(log)
 
 			if a.any? && a.first.token == after
 				a[1..-1]
@@ -39,8 +39,8 @@ module Scm::Adapters
 
 		# Returns a single commit, including its diffs
 		def verbose_commit(token)
-			log = run("cd '#{self.url}' && bzr log --long --show-id -v --limit 1 -c #{to_rev_param(token)}")
-			Scm::Parsers::BzrParser.parse(log).first
+			log = run("cd '#{self.url}' && bzr xmllog --show-id -v --limit 1 -c #{to_rev_param(token)}")
+			Scm::Parsers::BzrXmlParser.parse(log).first
 		end
 
 		# Yields each commit after +after+, including its diffs.
@@ -51,7 +51,7 @@ module Scm::Adapters
 		def each_commit(opts={})
 			after = opts[:after]
 			open_log_file(opts) do |io|
-				Scm::Parsers::BzrParser.parse(io) do |commit|
+				Scm::Parsers::BzrXmlParser.parse(io) do |commit|
 					yield remove_directories(commit) if block_given? && commit.token != after
 				end
 			end
@@ -95,10 +95,12 @@ module Scm::Adapters
 		  File.join('/tmp', (self.url).gsub(/\W/,'') + '.log')
 		end
 
+    # Uses xmllog command for output to be used by BzrXmlParser.
 		def rev_list_command(opts={})
 			after = opts[:after]
 			trunk_only = opts[:trunk_only] ? '--levels=1' : '--include-merges'
-			"cd '#{self.url}' && bzr log --long --show-id --forward #{trunk_only} -r #{to_rev_param(after)}.."
+			"cd '#{self.url}' && bzr xmllog --show-id --forward #{trunk_only} -r #{to_rev_param(after)}.."
 		end
-	end
+	
+  end
 end
