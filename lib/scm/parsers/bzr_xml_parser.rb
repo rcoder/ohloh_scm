@@ -49,7 +49,7 @@ module Scm::Parsers
       when 'affected-files'
 			  @commit.diffs = remove_dupes(@diffs)
       when 'merge'
-        @callback.call(@merge_commit)
+        @commit = @merge_commit
         @merge_commit = nil
 			end
 		end
