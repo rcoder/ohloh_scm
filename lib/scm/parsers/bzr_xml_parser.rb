@@ -20,6 +20,8 @@ module Scm::Parsers
 				@commit.diffs = []
       when 'affected-files'
         @diffs = []
+      when 'added', 'modified', 'removed', 'renamed'
+        @action = name
       when 'file'
         @before_path = attrs['oldpath']
       when 'merge'
@@ -42,11 +44,8 @@ module Scm::Parsers
 			when 'timestamp'
 				@commit.committer_date = Time.parse(@text)
       when 'file'
-        @path = @text
-      when 'added', 'modified', 'removed', 'renamed'
-        @diffs.concat(parse_diff(name, @path, @before_path))
+        @diffs.concat(parse_diff(@action, @text, @before_path))
         @before_path = nil
-        @path = nil
       when 'affected-files'
 			  @commit.diffs = remove_dupes(@diffs)
       when 'merge'
