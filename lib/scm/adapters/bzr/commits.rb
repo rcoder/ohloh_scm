@@ -81,7 +81,7 @@ module Scm::Adapters
 				if after == head_token # There are no new commits
 					# As a time optimization, just create an empty
 					# file rather than fetch a log we know will be empty.
-					File.open(log_filename, 'w') { }
+          File.open(log_filename, 'w') { |f| f.puts '<?xml version="1.0"?>' }
 				else
 					run "#{rev_list_command(opts)} -v > #{log_filename}"
 				end
