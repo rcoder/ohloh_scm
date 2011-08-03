@@ -1,4 +1,6 @@
 require File.dirname(__FILE__) + '/../test_helper'
+require 'rubygems'
+require 'ruby-debug'
 
 module Scm::Adapters
 	class BzrCommitsTest < Scm::Test
@@ -36,17 +38,14 @@ module Scm::Adapters
 		end
 
 		def test_commit_tokens_trunk_only_false
-			# There's some funny business with commit ordering here.
-			# When we request that Bzr iterate commits in the '--forward' direction,
-			# we actually get the branch commits *after* the merge that brought them in.
-			# This makes my head hurt, and I'm not yet sure whether this will be a problem
-			# down the road. For now, just accepts that bzr does this.
+			# Funny business with commit ordering has been fixed by BzrXmlParser.
+      # Now we always see branch commits before merge commit.
 			with_bzr_repository('bzr_with_branch') do |bzr|
 				assert_equal [
 					'test@example.com-20090206214301-s93cethy9atcqu9h',
 					'test@example.com-20090206214451-lzjngefdyw3vmgms',
-					'test@example.com-20090206214515-21lkfj3dbocao5pr', # merge commit
-					'test@example.com-20090206214350-rqhdpz92l11eoq2t'  # branch commit -- after merge!
+					'test@example.com-20090206214350-rqhdpz92l11eoq2t', # branch commit 
+					'test@example.com-20090206214515-21lkfj3dbocao5pr'  # merge commit
 				], bzr.commit_tokens(:trunk_only => false)
 			end
 		end
@@ -56,8 +55,7 @@ module Scm::Adapters
 				assert_equal [
 					'test@example.com-20090206214301-s93cethy9atcqu9h',
 					'test@example.com-20090206214451-lzjngefdyw3vmgms',
-					'test@example.com-20090206214515-21lkfj3dbocao5pr',  # merge commit
-					# 'test@example.com-20090206214350-rqhdpz92l11eoq2t' # branch commit
+					'test@example.com-20090206214515-21lkfj3dbocao5pr'  # merge commit
 				], bzr.commit_tokens(:trunk_only => true)
 			end
 		end
@@ -67,8 +65,8 @@ module Scm::Adapters
 				assert_equal [
 					'test@example.com-20090206214301-s93cethy9atcqu9h',
 					'test@example.com-20090206214451-lzjngefdyw3vmgms',
-					'test@example.com-20090206214515-21lkfj3dbocao5pr', # merge commit
-					'test@example.com-20090206214350-rqhdpz92l11eoq2t'  # branch commit -- after merge!
+					'test@example.com-20090206214350-rqhdpz92l11eoq2t', # branch commit 
+					'test@example.com-20090206214515-21lkfj3dbocao5pr'  # merge commit
 				], bzr.commits(:trunk_only => false).map { |c| c.token }
 			end
 		end
@@ -78,8 +76,7 @@ module Scm::Adapters
 				assert_equal [
 					'test@example.com-20090206214301-s93cethy9atcqu9h',
 					'test@example.com-20090206214451-lzjngefdyw3vmgms',
-					'test@example.com-20090206214515-21lkfj3dbocao5pr',  # merge commit
-					# 'test@example.com-20090206214350-rqhdpz92l11eoq2t' # branch commit
+					'test@example.com-20090206214515-21lkfj3dbocao5pr'  # merge commit
 				], bzr.commits(:trunk_only => true).map { |c| c.token }
 			end
 		end
@@ -126,8 +123,8 @@ module Scm::Adapters
 				assert_equal [
 					'test@example.com-20090206214301-s93cethy9atcqu9h',
 					'test@example.com-20090206214451-lzjngefdyw3vmgms',
-					'test@example.com-20090206214515-21lkfj3dbocao5pr', # merge commit
-					'test@example.com-20090206214350-rqhdpz92l11eoq2t'  # branch commit -- after merge!
+					'test@example.com-20090206214350-rqhdpz92l11eoq2t', # branch commit
+					'test@example.com-20090206214515-21lkfj3dbocao5pr'  # merge commit
 				], commits.map { |c| c.token }
 			end
 		end
