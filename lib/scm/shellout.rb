@@ -19,7 +19,7 @@ class Shellout
       to.join
       te.join
     end
-    return status.exitstatus, outbuf.string, errbuf.string
+    return status, outbuf.string, errbuf.string
   end
 
 end
@@ -27,15 +27,15 @@ end
 if $0 == __FILE__
   date = %q( ruby -e"  t = Time.now; STDOUT.puts t; STDERR.puts t  " )
   status, stdout, stderr = Shellout.run(date)
-  p [status, stdout, stderr]
+  p [status.exitstatus, stdout, stderr]
 
   sleep = %q( ruby -e"  p(sleep(1))  " )
   status, stdout, stderr = Shellout.run(sleep)
-  p [status, stdout, stderr]
+  p [status.exitstatus, stdout, stderr]
 
   cat = 'ruby -e"  puts Array.new(65536){ 42 }  "'
   status, stdout, stderr = Shellout.run(cat)
-  p [status, stdout, stderr]
+  p [status.exitstatus, stdout, stderr]
 
 end
 
