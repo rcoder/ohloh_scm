@@ -5,7 +5,7 @@ require 'rbconfig'
 
 $: << File.join(File.dirname(__FILE__),"..")
 
-require 'lib/scm/systemu'
+require 'lib/scm/shellout'
 require 'lib/scm/scratch_dir'
 require 'lib/scm/commit'
 require 'lib/scm/diff'
