@@ -37,6 +37,9 @@ if $0 == __FILE__
   status, stdout, stderr = Shellout.run(cat)
   p [status.exitstatus, stdout, stderr]
 
+  status, stdout, stderr = Shellout.run('osiudfoisynajtet32')
+  p [status.exitstatus, stdout, stderr]
+
 end
 
 

@@ -68,5 +68,34 @@ module Scm::Adapters
 			assert_equal "joe", scm.username
 			assert_equal "abc", scm.password
 		end
+
+    def test_shellout
+      cmd =  %q( ruby -e"  t = 'Hello World'; STDOUT.puts t; STDERR.puts t  " )
+      stdout = AbstractAdapter.run(cmd)
+      assert_equal "Hello World\n", stdout
+    end
+    
+    def test_shellout_with_stderr
+      cmd = %q( ruby -e"  t = 'Hello World'; STDOUT.puts t; STDERR.puts t  " )
+      stdout, stderr, status = AbstractAdapter.run_with_err(cmd)
+      assert_equal 0, status.exitstatus
+      assert_equal "Hello World\n", stdout
+      assert_equal "Hello World\n", stderr
+    end
+    
+    def test_shellout_large_output
+      cat = 'ruby -e"  puts Array.new(65536){ 42 }  "'
+      stdout = AbstractAdapter.run(cat)
+      assert_equal Array.new(65536){ 42 }.join("\n").concat("\n"), stdout
+    end
+
+    def test_shellout_error
+      cmd = "xxxxiiddosufso"
+      assert_raise RuntimeError do 
+        #RuntimeError.new("#{cmd} failed`
+        stdout = AbstractAdapter.run(cmd)
+      end
+    end
+
 	end
 end
