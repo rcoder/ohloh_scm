@@ -90,9 +90,8 @@ module Scm::Adapters
     end
 
     def test_shellout_error
-      cmd = "xxxxiiddosufso"
+      cmd = "false"
       assert_raise RuntimeError do 
-        #RuntimeError.new("#{cmd} failed`
         stdout = AbstractAdapter.run(cmd)
       end
     end
