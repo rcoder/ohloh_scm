@@ -15,7 +15,8 @@ module Scm::Adapters
 
 		# If you want to pass a revision-id as a bzr parameter, you
 		# must prefix it with "revid:". This takes care of that.
-		def to_rev_param(r=nil)
+    # When passed to bzrlib calls, we don't need to enquote it.
+		def to_rev_param(r=nil, enquote=true)
 			case r
 			when nil
 				1
@@ -24,7 +25,11 @@ module Scm::Adapters
 			when /^\d+$/
 				r
 			else
-				"'revid:#{r.to_s}'"
+				if enquote
+          "'revid:#{r.to_s}'"
+        else
+          "revid:#{r.to_s}"
+        end
 			end
 		end
 
