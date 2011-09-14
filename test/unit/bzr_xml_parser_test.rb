@@ -3,10 +3,6 @@ require File.dirname(__FILE__) + '/../test_helper'
 module Scm::Parsers
 	class BzrXmlParserTest < Scm::Test
 
-		#def test_basic
-		#	assert_convert(BzrXmlParser, DATA_DIR + '/simple.svn_xml_log', DATA_DIR + '/simple.ohlog')
-		#end
-
 		def test_empty_array
 			assert_equal([], BzrXmlParser.parse(''))
 		end
@@ -86,5 +82,91 @@ module Scm::Parsers
       assert_equal "A", c.diffs[3].action
 		end
 
-	end
+    # When an directory is deleted, bzr outputs one delete entry
+    # per file and one for the directory. For empty dirs, there 
+    # is only one directory remove entry. 
+    # Ohloh keeps file delete entries but ignores directory 
+    # delete entry.
+    def test_ignore_dir_delete_xml
+      xml = <<-XML
+<?xml version="1.0" encoding="UTF-8"?>
+<logs>
+  <log>
+    <revno>720.9.33</revno>
+    <revisionid>jano.vesely@gmail.com-20110127220929-d3af6kj4d53lh70t</revisionid>
+    <parents>
+      <parent>jano.vesely@gmail.com-20110125225108-0vxoig7z3d3q0w0w</parent>
+      <parent>vojtechhorky@users.sourceforge.net-20110126145255-4xdar4rxwcrh6s0a</parent>
+    </parents>
+    <committer>Jan Vesely &lt;jano.vesely@gmail.com&gt;</committer>
+    <branch-nick>helenos</branch-nick>
+    <timestamp>Thu 2011-01-27 23:09:29 +0100</timestamp>
+    <message><![CDATA[Changes from development branch]]></message>
+    <affected-files>
+      <removed>
+        <file fid="nil_interface.h-20100102161837-cblex61ev6y80vjk-59">uspace/lib/net/include/nil_interface.h</file>
+        <directory suffix="usb-20100909152052-761ob4st359n02ai-1">uspace/srv/hw/bus/usb/</directory>
+        <directory suffix="hcd-20100909152052-761ob4st359n02ai-2">uspace/srv/hw/bus/usb/hcd/</directory>
+      </removed>
+    </affected-files>
+  </log>
+</logs>
+    XML
+      commits = BzrXmlParser.parse(xml)
+      assert_equal 1, commits.size
+    
+      c = commits.first
+      assert_equal 1, c.diffs.size
+      assert_equal "uspace/lib/net/include/nil_interface.h", c.diffs.first.path
+    end
+
+    # bzr also outputs a kind_changed entry when file kind changes, for example
+    # a symlink is changed to file.
+    # Ohloh ignores such changes.
+    def test_ignore_kind_changed_xml
+      xml = <<-XML
+<?xml version="1.0" encoding="UTF-8"?>
+<logs>
+  <log>
+    <revno>720.9.33</revno>
+    <revisionid>jano.vesely@gmail.com-20110127220929-d3af6kj4d53lh70t</revisionid>
+    <parents>
+      <parent>jano.vesely@gmail.com-20110125225108-0vxoig7z3d3q0w0w</parent>
+      <parent>vojtechhorky@users.sourceforge.net-20110126145255-4xdar4rxwcrh6s0a</parent>
+    </parents>
+    <committer>Jan Vesely &lt;jano.vesely@gmail.com&gt;</committer>
+    <branch-nick>helenos</branch-nick>
+    <timestamp>Thu 2011-01-27 23:09:29 +0100</timestamp>
+    <message><![CDATA[Changes from development branch]]></message>
+    <affected-files>
+      <removed>
+        <file fid="nil_interface.h-20100102161837-cblex61ev6y80vjk-59">uspace/lib/net/include/nil_interface.h</file>
+      </removed>
+      <added>
+        <file fid="mapping1.c-20110121134727-estgg81esab4nuxp-1">uspace/app/tester/mm/mapping1.c</file>
+      </added>
+      <kind_changed>
+        <file oldkind="symlink" suffix="hcd.h-20101204222916-3azlzykk6cxygbzm-1">uspace/lib/usb/include/usb/hcd.h</file>
+        <symlink oldkind="file" suffix="addrkeep.h-20101217213828-t8uh2yzhdva01rl9-1">uspace/lib/usb/include/usb/addrkeep.h</symlink>
+      </kind_changed>
+      <modified>
+        <file fid="bzrignore-20101004081108-t6mbnn0isj1l3cpk-1">.bzrignore</file>
+      </modified>
+    </affected-files>
+  </log>
+</logs>
+      XML
+      commits = BzrXmlParser.parse(xml)
+      assert_equal 1, commits.size
+
+      c = commits.first
+      assert_equal 3, c.diffs.size
+      assert_equal "D", c.diffs[0].action
+      assert_equal "uspace/lib/net/include/nil_interface.h", c.diffs[0].path
+      assert_equal "A", c.diffs[1].action
+      assert_equal "uspace/app/tester/mm/mapping1.c", c.diffs[1].path
+      assert_equal "M", c.diffs[2].action
+      assert_equal ".bzrignore", c.diffs[2].path
+    end
+  end
 end

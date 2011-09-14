@@ -10,6 +10,7 @@ module Scm::Parsers
 		def initialize(callback)
 			@callback = callback
       @merge_commit = []
+      @state = :none
 		end
 
 		attr_accessor :text, :commit, :diff
@@ -23,6 +24,7 @@ module Scm::Parsers
         @diffs = []
       when 'added', 'modified', 'removed', 'renamed'
         @action = name
+        @state = :collect_files
       when 'file'
         @before_path = attrs['oldpath']
       when 'merge'
@@ -45,8 +47,13 @@ module Scm::Parsers
 			when 'timestamp'
 				@commit.committer_date = Time.parse(@text)
       when 'file'
-        @diffs.concat(parse_diff(@action, @text, @before_path))
+        if @state == :collect_files
+          @diffs.concat(parse_diff(@action, @text, @before_path))
+        end
         @before_path = nil
+        @text = nil
+      when 'added', 'modified', 'removed', 'renamed'
+        @state = :none
       when 'affected-files'
 			  @commit.diffs = remove_dupes(@diffs)
       when 'merge'
