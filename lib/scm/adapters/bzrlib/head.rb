@@ -10,25 +10,13 @@ module Scm::Adapters
 		end
 
 		def parent_tokens(commit)
-			#run("cd '#{url}' && bzr log --long --show-id --limit 1 -c #{to_rev_param(commit.token)} | grep ^parent | cut -f2 -d' '").split("\n")
-      s = bzr_log(to_rev_param(commit.token, false))
-      bzr_log(to_rev_param(commit.token, false)).scan(/^parent:\s(.*)$/)[0]
+      tokens = []
+      bzr_commander.get_parent_tokens(to_rev_param(commit.token, false)).to_enum.each {|t| tokens << t}
+      return tokens
 		end
 
 		def parents(commit)
 			parent_tokens(commit).collect { |token| verbose_commit(token) }
 		end
-
-    def bzr_log(revision)
-      pwd = Dir.pwd
-      begin
-        out = bzrlib_commands.bzr_log(self.url, revision)
-      rescue => expt
-        raise RuntimeError.new(expt.message)
-      ensure
-        Dir.chdir(pwd)
-      end 
-      out.to_s
-    end
 	end
 end

@@ -6,14 +6,18 @@ module Scm::Adapters
 		def english_name
 			"Bazaar"
 		end
-    def bzrlib_commands
-      @bzrlib_commands ||= begin
-        ENV['PYTHONPATH'] = File.dirname(__FILE__) + '/bzrlib'
-        RubyPython.start
-        RubyPython.import('bzrlib_commands')
-      end
+    def setup
+      ENV['PYTHONPATH'] = File.dirname(__FILE__) + '/bzrlib'
+      RubyPython.start
+      @bzrlib = RubyPython.import('bzrlib_commands')
+      @commander = @bzrlib.BzrCommander.new(url)
+    end
+    def bzr_commander
+      setup unless @commander
+      return @commander
     end
     def cleaup
+      bzr_commander.cleanup
       RubyPython.stop
     end
 	end

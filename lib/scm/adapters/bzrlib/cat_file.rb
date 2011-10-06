@@ -10,18 +10,17 @@ module Scm::Adapters
     end
 
 		def cat(revision, path)
-      pwd = Dir.pwd
       begin
-        out = bzrlib_commands.bzr_cat(self.url, path, to_rev_param(revision, false)).to_s
-      rescue => expt
-			  # return nil if err =~ / is not present in revision /
-        if expt.message =~ / is not present in revision /
-          out = nil
+        content = bzr_commander.get_file_content(path, to_rev_param(revision, false)) 
+        # When file is not present in a revision, get_file_content returns None python object.
+        # None cannot be used as nil, hence must be compared to nil and converted. 
+        if content != nil
+          out = content.to_s
         else
-          raise RuntimeError.new(expt.message)
+          out = nil
         end
-      ensure
-        Dir.chdir(pwd)
+      rescue => expt
+        raise RuntimeError.new(expt.message)
       end
 			out
 		end
