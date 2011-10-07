@@ -17,14 +17,14 @@ class BzrPipeClient
     send_command("REP_OPEN|#{@repository_url}")
   end
   def cat_file(revision, file)
-    send_command("CAT_FILE|#{revision}|#{file}", true)
+    send_command("CAT_FILE|#{revision}|#{file}")
   end
 
   def parent_tokens(revision)
-    send_command("PAR_TKNS|#{revision}", true).split('|')
+    send_command("PAR_TKNS|#{revision}").split('|')
   end
 
-  def send_command(cmd, capture_output=false)
+  def send_command(cmd)
     outbuf = StringIO.new
     errbuf = StringIO.new
 
@@ -45,9 +45,7 @@ class BzrPipeClient
     end
 
     # read content from stdout
-    if capture_output
-      return @stdout.read(size)
-    end
+    return @stdout.read(size)
   end
 
   def shutdown
