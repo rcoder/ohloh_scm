@@ -1,24 +1,22 @@
 require 'rubygems'
 require 'rubypython'
 
+require 'lib/scm/adapters/bzrlib/bzrlib_pipe_client'
 module Scm::Adapters
 	class BzrlibAdapter < BzrAdapter
 
     def setup
-      ENV['PYTHONPATH'] = File.dirname(__FILE__) + '/bzrlib'
-      RubyPython.start
-      @bzrlib = RubyPython.import('bzrlib_commands')
-      @commander = @bzrlib.BzrCommander.new(url)
+      @bzr_client = BzrPipeClient.new(url)
+      @bzr_client.start
     end
 
-    def bzr_commander
-      setup unless @commander
-      return @commander
+    def bzr_client
+      setup unless @bzr_client
+      return @bzr_client
     end
 
     def cleanup
-      bzr_commander.cleanup
-      RubyPython.stop
+      @bzr_client.shutdown
     end
 
 	end
