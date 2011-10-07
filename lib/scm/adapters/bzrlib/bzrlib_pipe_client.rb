@@ -36,7 +36,7 @@ class BzrPipeClient
     # remaing value indicates length of the file content
     status = @stderr.read(10)
     flag = status[0,1]
-    size = status[1,10].to_i
+    size = status[1,9].to_i
     if flag == 'F'
       return nil
     elsif flag == 'E'
