@@ -1,7 +1,7 @@
 require File.dirname(__FILE__) + '/../test_helper'
 
 module Scm::Adapters
-	class BzrCatFileTest < Scm::Test
+	class BzrlibCatFileTest < Scm::Test
 
 		def test_cat_file
 			with_bzrlib_repository('bzr') do |bzr|
