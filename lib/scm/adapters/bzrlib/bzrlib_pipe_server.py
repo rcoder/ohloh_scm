@@ -89,11 +89,6 @@ def command_loop():
 if __name__ == "__main__":
   try:
     command_loop()
-    #commander = BzrPipeServer('/home/amujumdar/bzrlib_examples/bzr.2.1')
-    #tokens = commander.get_parent_tokens('mbp@sourcefrog.net-20050309040929-eee0eb3e6d1e7627')
-    #tokens = commander.get_parent_tokens('XXXXXXXXXXXXXX')
-    #tokens = '|'.join(tokens)
-    #print tokens
   except:
     exc_trace = traceback.format_exc()
     send_error(len(exc_trace))

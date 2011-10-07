@@ -25,8 +25,6 @@ class BzrPipeClient
   end
 
   def send_command(cmd, capture_output=false)
-    #puts "COMMAND - #{cmd}"
-    STDOUT.flush
     outbuf = StringIO.new
     errbuf = StringIO.new
 
@@ -37,7 +35,6 @@ class BzrPipeClient
     # get status on stderr, first letter indicates state, 
     # remaing value indicates length of the file content
     status = @stderr.read(10)
-    #puts "STATUS - #{status}"
     flag = status[0,1]
     size = status[1,10].to_i
     if flag == 'F'
