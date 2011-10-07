@@ -3,9 +3,6 @@ module Scm::Adapters
 
 		def cat(revision, path)
       content = bzr_client.cat_file(revision, path)
-      # When file is not present in a revision, get_file_content returns None python object.
-      # None cannot be used as nil, hence must be compared to nil and converted.
-      return content
 		end
 
 	end
