@@ -4,7 +4,7 @@ import sys
 import time 
 import traceback
 
-class BzrCommander:
+class BzrPipeServer:
   def __init__(self, repository_url):
     self.branch = Branch.open(repository_url)
     self.branch.lock_read()
@@ -62,7 +62,7 @@ def command_loop():
   while True:
     cmd = Command(sys.stdin.readline())
     if cmd.get_action() == 'REP_OPEN':
-      commander = BzrCommander(cmd.get_arg(1))
+      commander = BzrPipeServer(cmd.get_arg(1))
       send_success()
     elif cmd.get_action() == 'CAT_FILE':
       content = commander.get_file_content(cmd.get_arg(2), cmd.get_arg(1))
@@ -89,7 +89,7 @@ def command_loop():
 if __name__ == "__main__":
   try:
     command_loop()
-    #commander = BzrCommander('/home/amujumdar/bzrlib_examples/bzr.2.1')
+    #commander = BzrPipeServer('/home/amujumdar/bzrlib_examples/bzr.2.1')
     #tokens = commander.get_parent_tokens('mbp@sourcefrog.net-20050309040929-eee0eb3e6d1e7627')
     #tokens = commander.get_parent_tokens('XXXXXXXXXXXXXX')
     #tokens = '|'.join(tokens)
