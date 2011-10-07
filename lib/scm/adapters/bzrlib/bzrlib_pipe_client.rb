@@ -76,11 +76,3 @@ def all_parent_tokens(client, datafile)
     puts client.parent_tokens(parts[0])
   end
 end
-
-#datafile = 'revs_only.txt'
-#c = BzrPipeClient.new('/home/amujumdar/bzrlib_examples/bzr.2.1')
-#c.start
-#all_parent_tokens(c, datafile)
-#cat_all_files(c,datafile)
-#c.shutdown
-
