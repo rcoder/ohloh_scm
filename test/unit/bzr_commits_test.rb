@@ -19,6 +19,13 @@ module Scm::Adapters
 			end
 		end
 
+    def test_commit_count_after_merge
+      with_bzr_repository('bzr_with_branch') do |bzr|
+        last_commit = bzr.commits.last
+        assert_equal 0, bzr.commit_count(:trunk_only => false, :after => last_commit.token)
+      end
+    end
+
 		def test_commit_count_trunk_only
 			with_bzr_repository('bzr_with_branch') do |bzr|
 				# Only 3 commits are on main line
@@ -34,6 +41,20 @@ module Scm::Adapters
 				assert_equal [], bzr.commit_tokens(:after => revision_ids.last)
 			end
 		end
+
+    def test_commit_tokens_after_merge
+      with_bzr_repository('bzr_with_branch') do |bzr|
+        last_commit = bzr.commits.last
+        assert_equal [], bzr.commit_tokens(:trunk_only => false, :after => last_commit.token)
+      end
+    end
+
+    def test_commit_tokens_after_nested_merge
+      with_bzr_repository('bzr_with_nested_branches') do |bzr|
+        last_commit = bzr.commits.last
+        assert_equal [], bzr.commit_tokens(:trunk_only => false, :after => last_commit.token)
+      end
+    end
 
 		def test_commit_tokens_trunk_only_false
 			# Funny business with commit ordering has been fixed by BzrXmlParser.
@@ -111,6 +132,20 @@ module Scm::Adapters
 				], bzr.commits(:trunk_only => true).map { |c| c.token }
 			end
 		end
+
+    def test_commits_after_merge
+      with_bzr_repository('bzr_with_branch') do |bzr|
+        last_commit = bzr.commits.last
+        assert_equal [], bzr.commits(:trunk_only => false, :after => last_commit.token)
+      end
+    end
+
+    def test_commits_after_nested_merge
+      with_bzr_repository('bzr_with_nested_branches') do |bzr|
+        last_commit = bzr.commits.last
+        assert_equal [], bzr.commits(:trunk_only => false, :after => last_commit.token)
+      end
+    end
 
     def test_nested_branches_commits_trunk_only_false
       with_bzr_repository('bzr_with_nested_branches') do |bzr|
@@ -205,6 +240,37 @@ module Scm::Adapters
 				], commits.map { |c| c.token }
 			end
 		end
+
+    def test_each_commit_after_merge
+      with_bzr_repository('bzr_with_branch') do |bzr|
+        last_commit = bzr.commits.last
+
+        commits = []
+        bzr.each_commit(:trunk_only => false, :after => last_commit.token) { |c| commits << c }
+        assert_equal [], commits
+      end
+    end
+
+    def test_each_commit_after_nested_merge_at_tip
+      with_bzr_repository('bzr_with_nested_branches') do |bzr|
+        last_commit = bzr.commits.last
+
+        commits = []
+        bzr.each_commit(:trunk_only => false, :after => last_commit.token) { |c| commits << c }
+        assert_equal [], commits
+      end
+    end
+
+    def test_each_commit_after_nested_merge_not_at_tip
+      with_bzr_repository('bzr_with_nested_branches') do |bzr|
+        last_commit = bzr.commits.last
+        next_to_last_commit = bzr.commits[-2]
+
+        yielded_commits = []
+        bzr.each_commit(:trunk_only => false, :after => next_to_last_commit.token) { |c| yielded_commits << c }
+        assert_equal [last_commit.token], yielded_commits.map(&:token)
+      end
+    end
 
     def test_nested_branches_each_commit_trunk_only_false
       with_bzr_repository('bzr_with_nested_branches') do |bzr|

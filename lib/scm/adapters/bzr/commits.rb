@@ -8,16 +8,7 @@ module Scm::Adapters
 
 		# Return the list of commit tokens following +after+.
 		def commit_tokens(opts={})
-      tokens = commits(opts).map { |c| c.token }
-
-			# Bzr returns everything after *and including* after.
-			# We want to exclude it.
-			after = opts[:after]
-			if tokens.any? && tokens.first == after
-				tokens[1..-1]
-			else
-				tokens
-			end
+      commits(opts).map(&:token)
 		end
 
 		# Returns a list of shallow commits (i.e., the diffs are not populated).
@@ -30,11 +21,11 @@ module Scm::Adapters
 			log = run("#{rev_list_command(opts)} | cat")
 			a = Scm::Parsers::BzrXmlParser.parse(log)
 
-			if a.any? && a.first.token == after
-				a[1..-1]
-			else
-				a
-			end
+      if after && i = a.index { |commit| commit.token == after }
+        a[(i+1)..-1]
+      else
+        a
+      end
 		end
 
 		# Returns a single commit, including its diffs
@@ -48,14 +39,17 @@ module Scm::Adapters
 		# This is designed to prevent excessive RAM usage when we
 		# encounter a massive repository.  Only a single commit is ever
 		# held in memory at once.
-		def each_commit(opts={})
-			after = opts[:after]
-			open_log_file(opts) do |io|
-				Scm::Parsers::BzrXmlParser.parse(io) do |commit|
-					yield remove_directories(commit) if block_given? && commit.token != after
-				end
-			end
-		end
+    def each_commit(opts={})
+      after = opts[:after]
+      skip_commits = !!after # Don't emit any commits until the 'after' resume point passes
+
+      open_log_file(opts) do |io|
+        Scm::Parsers::BzrXmlParser.parse(io) do |commit|
+          yield remove_directories(commit) if block_given? && !skip_commits
+          skip_commits = false if commit.token == after
+        end
+      end
+    end
 
 		# Ohloh tracks only files, not directories. This function removes directories
 		# from the commit diffs.
