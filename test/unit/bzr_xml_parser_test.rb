@@ -209,6 +209,17 @@ module Scm::Parsers
     <timestamp>Tue 2011-10-11 12:26:01 -0400</timestamp>
     <message><![CDATA[Updated by two authors.]]></message>
   </log>
+  <log>
+    <revno>4</revno>
+    <revisionid>test@example.com-20111011162601-dummyrevision</revisionid>
+    <parents>
+      <parent>test@example.com-20111011162601-ud1nidteswfdbhbu</parent>
+    </parents>
+    <committer>test &lt;test@example.com&gt;</committer>
+    <branch-nick>bzr_with_authors</branch-nick>
+    <timestamp>Tue 2011-10-11 12:28:01 -0400</timestamp>
+    <message><![CDATA[Updated by committer.]]></message>
+  </log>
 </logs>
       XML
       commits = BzrXmlParser.parse(xml)
@@ -227,6 +238,12 @@ module Scm::Parsers
       assert_equal "test@example.com", c.committer_email
       assert_equal "Jim Beam", c.author_name
       assert_equal "jimbeam@example.com", c.author_email
+
+      c = commits[3]
+      assert_equal "test", c.committer_name
+      assert_equal "test@example.com", c.committer_email
+      assert_equal nil, c.author_name
+      assert_equal nil, c.author_email      
     end
   end
 end
