@@ -61,7 +61,7 @@ def exit_delayed(status, delay=1):
 def command_loop():
   while True:
     cmd = Command(sys.stdin.readline())
-    if cmd.get_action() == 'REP_OPEN':
+    if cmd.get_action() == 'REPO_OPEN':
       commander = BzrPipeServer(cmd.get_arg(1))
       send_success()
     elif cmd.get_action() == 'CAT_FILE':
@@ -71,7 +71,7 @@ def command_loop():
       else:
         send_success(len(content))
         send_data(content)
-    elif cmd.get_action() == 'PAR_TKNS':
+    elif cmd.get_action() == 'PARENT_TOKENS':
       tokens = commander.get_parent_tokens(cmd.get_arg(1))
       tokens = '|'.join(tokens)
       send_success(len(tokens))

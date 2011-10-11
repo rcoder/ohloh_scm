@@ -13,14 +13,14 @@ class BzrPipeClient
   end
 
   def open_repository
-    send_command("REP_OPEN|#{@repository_url}")
+    send_command("REPO_OPEN|#{@repository_url}")
   end
   def cat_file(revision, file)
     send_command("CAT_FILE|#{revision}|#{file}")
   end
 
   def parent_tokens(revision)
-    send_command("PAR_TKNS|#{revision}").split('|')
+    send_command("PARENT_TOKENS|#{revision}").split('|')
   end
 
   def send_command(cmd)
