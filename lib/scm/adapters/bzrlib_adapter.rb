@@ -1,5 +1,4 @@
 require 'rubygems'
-require 'rubypython'
 
 require 'lib/scm/adapters/bzrlib/bzrlib_pipe_client'
 module Scm::Adapters
