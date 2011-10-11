@@ -1,6 +1,5 @@
 require 'rubygems'
 require 'open4'
-require 'stringio'
 
 class BzrPipeClient
   def initialize(repository_url)
@@ -25,9 +24,6 @@ class BzrPipeClient
   end
 
   def send_command(cmd)
-    outbuf = StringIO.new
-    errbuf = StringIO.new
-
     # send the command
     @stdin.puts cmd
     @stdin.flush
