@@ -245,5 +245,122 @@ module Scm::Parsers
       assert_equal nil, c.author_name
       assert_equal nil, c.author_email      
     end
+
+    def test_rename
+      xml = <<-XML
+<logs>    
+  <log>
+    <revno>10</revno>
+    <revisionid>test@example.com-20110725174345-brbpkwumeh07aoh8</revisionid>
+    <parents>
+      <parent>amujumdar@blackducksoftware.com-20110722185038-e0i4d1mdxwpipxc4</parent>
+    </parents>
+    <committer>test &lt;test@example.com&gt;</committer>
+    <branch-nick>myproject</branch-nick>
+    <timestamp>Mon 2011-07-25 13:43:45 -0400</timestamp>
+    <message><![CDATA[Renamed test1.txt to subdir/test_b.txt, removed test2.txt and added test_a.txt.]]></message>
+    <affected-files>
+      <renamed>
+        <file oldpath="test1.txt" fid="test1.txt-20110722163813-257mjqqrvw3mav0f-2">subdir/test_b.txt</file>
+      </renamed>
+    </affected-files>
+  </log>
+</logs>    
+      XML
+      commits = BzrXmlParser.parse(xml)
+      assert_equal 1, commits.size
+      assert_equal 2, commits.first.diffs.size
+      assert_equal 'D', commits.first.diffs.first.action
+      assert_equal 'test1.txt', commits.first.diffs.first.path
+
+      assert_equal 'A', commits.first.diffs.last.action
+      assert_equal 'subdir/test_b.txt', commits.first.diffs.last.path
+    end
+
+    def test_remove_dupes_add_remove
+      diffs = BzrXmlParser.remove_dupes([ Scm::Diff.new(:action => "A", :path => "foo"),
+                                        Scm::Diff.new(:action => "D", :path => "foo") ])
+      assert_equal 1, diffs.size
+      assert_equal 'M', diffs.first.action
+      assert_equal 'foo', diffs.first.path
+    end    
+
+    # A complex delete/rename/modify test. 
+    # Removed test_a.txt, Renamed test3.txt to test_a.txt, edited test_a.txt 
+    #   
+    # This is what Ohloh expects to see:
+    #   
+    #   D  test3.txt 
+    #   M  test_a.txt
+    #   
+    def test_complex_rename
+      xml = <<-XML
+<logs>
+  <log>
+    <revno>11</revno>
+    <revisionid>test@example.com-20111012191732-h3bt3lp6l38vbm9v</revisionid>
+    <parents>
+      <parent>test@example.com-20110725174345-brbpkwumeh07aoh8</parent>
+    </parents>
+    <committer>test &lt;test@example.com&gt;</committer>
+    <branch-nick>myproject</branch-nick>
+    <timestamp>Wed 2011-10-12 15:17:32 -0400</timestamp>
+    <message><![CDATA[Removed test_a.txt, Renamed test3.txt to test_a.txt, edited test_a.txt.]]></message>
+    <affected-files>
+      <removed>
+        <file fid="test_a.txt-20110725174250-y989xbb6y8ae027k-1">test_a.txt</file>
+      </removed>
+      <renamed>
+        <file oldpath="test3.txt" fid="test3.txt-20110722163813-257mjqqrvw3mav0f-4">test_a.txt</file>
+      </renamed>
+      <modified>
+        <file fid="test3.txt-20110722163813-257mjqqrvw3mav0f-4">test_a.txt</file>
+      </modified>
+    </affected-files>
+  </log>
+</logs>
+      XML
+      diffs = BzrXmlParser.parse(xml).first.diffs
+      diffs.sort! { |a,b| a.action <=> b.action }
+      assert_equal 2, diffs.size
+      assert_equal 'D', diffs.first.action
+      assert_equal 'test3.txt', diffs.first.path
+      assert_equal 'M', diffs.last.action
+      assert_equal 'test_a.txt', diffs.last.path
+    end
+
+    # This test-case also tests rename and modify in the same commit.
+    # A rename and modify should result in a DELETE and an ADD.
+    def test_strip_trailing_asterisk_from_executables
+      xml = <<-XML
+<logs>
+  <log>
+    <revno>14</revno>
+    <revisionid>test@example.com-20111012195747-seei62z2wmefjhmo</revisionid>
+    <parents>
+      <parent>test@example.com-20111012195606-0shla0kf4e8hq4mq</parent>
+    </parents>
+    <committer>test &lt;test@example.com&gt;</committer>
+    <branch-nick>myproject</branch-nick>
+    <timestamp>Wed 2011-10-12 15:57:47 -0400</timestamp>
+    <message><![CDATA[Changed +x on arch and then renamed arch to renamed_arch.]]></message>
+    <affected-files>
+      <renamed>
+        <file oldpath="arch" meta_modified="true" fid="arch-20111012194919-geu209qc2loshh3i-1">renamed_arch</file>
+      </renamed>
+      <modified>
+        <file fid="arch-20111012194919-geu209qc2loshh3i-1">renamed_arch*</file>
+      </modified>
+    </affected-files>
+  </log>
+</logs>
+      XML
+      diffs = BzrXmlParser.parse(xml).first.diffs
+      diffs.sort! { |a,b| a.action <=> b.action }
+      assert_equal 'A', diffs[0].action
+      assert_equal 'renamed_arch', diffs[0].path
+      assert_equal 'D', diffs[1].action
+      assert_equal 'arch', diffs[1].path
+    end
   end
 end

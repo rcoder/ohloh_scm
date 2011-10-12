@@ -110,17 +110,18 @@ module Scm::Parsers
     end 
 
     def remove_dupes(diffs)
+      BzrXmlParser.remove_dupes(diffs)
       # Bazaar may report that a file was added and modified in a single commit.
       # Reduce these cases to a single 'A' action.
-      diffs.delete_if do |d| 
-        d.action == 'M' && diffs.select { |x| x.path == d.path && x.action == 'A' }.any?
-      end 
+      #diffs.delete_if do |d| 
+      #  d.action == 'M' && diffs.select { |x| x.path == d.path && x.action == 'A' }.any?
+      #end 
 
       # Bazaar may report that a file was both deleted and added in a single commit.
       # Reduce these cases to a single 'M' action.
-      diffs.each do |d| 
-        d.action = 'M' if diffs.select { |x| x.path == d.path }.size > 1 
-      end.uniq
+      #diffs.each do |d| 
+      #  d.action = 'M' if diffs.select { |x| x.path == d.path }.size > 1 
+      #end.uniq
     end 
 
 	end
@@ -137,5 +138,19 @@ module Scm::Parsers
 		def self.scm
 			'bzr'
 		end
+
+    def self.remove_dupes(diffs)
+      # Bazaar may report that a file was added and modified in a single commit.
+      # Reduce these cases to a single 'A' action.
+      diffs.delete_if do |d| 
+        d.action == 'M' && diffs.select { |x| x.path == d.path && x.action == 'A' }.any?
+      end 
+
+      # Bazaar may report that a file was both deleted and added in a single commit.
+      # Reduce these cases to a single 'M' action.
+      diffs.each do |d| 
+        d.action = 'M' if diffs.select { |x| x.path == d.path }.size > 1 
+      end.uniq
+    end
 	end
 end
