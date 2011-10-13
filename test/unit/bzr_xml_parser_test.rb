@@ -362,5 +362,48 @@ module Scm::Parsers
       assert_equal 'D', diffs[1].action
       assert_equal 'arch', diffs[1].path
     end
+
+    def test_committer_name_capture
+      name, email = BzrXmlParser.capture_name('John')
+      assert_equal name, 'John'
+      assert_equal email, nil
+      assert_equal ['John Doe', nil], BzrXmlParser.capture_name('John Doe')
+      assert_equal ['John Doe jdoe@example.com', nil], BzrXmlParser.capture_name('John Doe jdoe@example.com')
+      assert_equal ['John Doe <jdoe@example.com', nil], BzrXmlParser.capture_name('John Doe <jdoe@example.com')
+      assert_equal ['John Doe jdoe@example.com>', nil], BzrXmlParser.capture_name('John Doe jdoe@example.com>')
+      assert_equal ['John Doe', 'jdoe@example.com'], BzrXmlParser.capture_name('John Doe <jdoe@example.com>')
+      assert_equal ['John Doe', 'jdoe@example.com'], BzrXmlParser.capture_name('John Doe     <jdoe@example.com>   ')
+      assert_equal ['jdoe@example.com', nil], BzrXmlParser.capture_name('jdoe@example.com')
+      xml = <<-XML
+<logs>
+  <log>
+    <revno>15</revno>
+    <revisionid>a@b.com-20111013152207-q8uec9pp1330gfbh</revisionid>
+    <parents>
+      <parent>test@example.com-20111012195747-seei62z2wmefjhmo</parent>
+    </parents>
+    <committer>a@b.com</committer>
+    <authors>
+      <author>author@c.com</author>
+    </authors>
+    <branch-nick>myproject</branch-nick>
+    <timestamp>Thu 2011-10-13 11:22:07 -0400</timestamp>
+    <message><![CDATA[Updated with only email as committer name.]]></message>
+    <affected-files>
+      <modified>
+        <file fid="test3.txt-20110722163813-257mjqqrvw3mav0f-4">test_a.txt</file>
+      </modified>
+    </affected-files>
+  </log>
+</logs>
+      XML
+      c = BzrXmlParser.parse(xml).first
+      assert_equal 'M', c.diffs.first.action
+      assert_equal 'test_a.txt', c.diffs.first.path
+      assert_equal 'a@b.com', c.committer_name
+      assert_equal nil, c.committer_email
+      assert_equal 'author@c.com', c.author_name
+      assert_equal nil, c.author_email
+    end
   end
 end
