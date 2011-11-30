@@ -17,7 +17,15 @@ class HglibClient
   end
 
   def cat_file(revision, file)
-    send_command("CAT_FILE\t#{revision}\t#{file}")
+    begin
+      send_command("CAT_FILE\t#{revision}\t#{file}")
+    rescue RuntimeError => e
+      if e.message =~ /not found in manifest/
+        return nil # File does not exist.
+      else
+        raise
+      end
+    end
   end
 
   def parent_tokens(revision)

@@ -22,3 +22,4 @@ module Scm::Adapters
 end
 
 require 'lib/scm/adapters/hglib/cat_file'
+require 'lib/scm/adapters/hglib/head'
