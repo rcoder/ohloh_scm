@@ -65,7 +65,7 @@ def command_loop():
         send_failure() # Assume file not found
     elif cmd.get_action() == 'PARENT_TOKENS':
       tokens = commander.get_parent_tokens(cmd.get_arg(1))
-      tokens = '\n'.join(tokens)
+      tokens = '\t'.join(tokens)
       send_success(len(tokens))
       send_data(tokens)
     else:
