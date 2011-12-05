@@ -12,7 +12,6 @@ module Scm::Adapters
 			[	nil, "", "foo", "http:/", "http:://", "http://",
 			"sourceforge.net/svn/project/trunk", # missing a protocol prefix
 			"http://robin@svn.sourceforge.net/", # must not include a username with the url
-			"http://svn.sourceforge.net/asdf/asdf/ malicious code", # no spaces allowed
 			"/home/robin/cvs", # local file paths not allowed
 			"git://kernel.org/whatever/linux.git", # git protocol is not allowed
 			":pserver:anonymous:@juicereceiver.cvs.sourceforge.net:/cvsroot/juicereceiver", # pserver is just wrong
@@ -38,7 +37,8 @@ module Scm::Adapters
 			"http://svn.gnome.org/svn/gtk+/trunk", # + character OK
 			"http://svn.gnome.org", # no path, no trailing /, just a domain name is OK
 			"http://brlcad.svn.sourceforge.net/svnroot/brlcad/rt^3/trunk", # a caret ^ is allowed
-			"http://www.thus.ch/~patrick/svn/pvalsecc" # ~ is allowed
+			"http://www.thus.ch/~patrick/svn/pvalsecc", # ~ is allowed
+			"http://franklinmath.googlecode.com/svn/trunk/Franklin Math", # space is allowed in path
 			].each do |url|
 				# Accepted for both internal and public use
 				[true, false].each do |p|
