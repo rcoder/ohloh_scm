@@ -93,6 +93,10 @@ class Scm::Test < Test::Unit::TestCase
 		with_repository(Scm::Adapters::HgAdapter, name) { |hg| yield hg }
 	end
 
+	def with_hglib_repository(name)
+		with_repository(Scm::Adapters::HglibAdapter, name) { |hg| yield hg }
+	end
+
 	def with_bzr_repository(name)
 		with_repository(Scm::Adapters::BzrAdapter, name) { |bzr| yield bzr }
 	end
