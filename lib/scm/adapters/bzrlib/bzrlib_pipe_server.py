@@ -12,7 +12,7 @@ class BzrPipeServer:
   def get_file_content(self, filename, revision):
     rev_spec = RevisionSpec.from_string(revision)
     tree = rev_spec.as_tree(self.branch)
-    file_id = tree.path2id(filename)
+    file_id = tree.path2id(unicode(filename, 'utf8'))
     if file_id == None:
       return None
     content = tree.get_file_text(file_id)
