@@ -19,6 +19,18 @@ EXPECTED
 			end
 		end
 
+    def test_cat_file_non_ascii_name
+      with_bzr_repository('bzr') do |bzr|
+        expected = <<-EXPECTED
+first file
+second line
+EXPECTED
+        assert_equal expected,
+          bzr.cat_file(Scm::Commit::new(:token => 7), 
+                 Scm::Diff.new(:path => "Cédric.txt"))
+      end 
+    end 
+
 		def test_cat_file_parent
 			with_bzr_repository('bzr') do |bzr|
 				expected = <<-EXPECTED
