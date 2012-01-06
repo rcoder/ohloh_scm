@@ -1,4 +1,4 @@
-require 'sha1'
+require 'digest/sha1'
 
 NULL_SHA1 = '0000000000000000000000000000000000000000' unless defined?(NULL_SHA1)
 
@@ -11,7 +11,7 @@ module Scm::Adapters
 		# that match those generated natively by Git.
 
 		def compute_sha1(blob)
-			blob.to_s == '' ? NULL_SHA1 : SHA1.sha1("blob #{blob.length}\0#{blob}").to_s
+			blob.to_s == '' ? NULL_SHA1 : Digest::SHA1.hexdigest("blob #{blob.length}\0#{blob}")
 		end
 
 		# Populates the SHA1 values for each diff in a commit.
