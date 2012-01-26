@@ -14,7 +14,8 @@ module Scm::Adapters
 
 		def test_ls_tree
 			with_bzr_repository('bzr') do |bzr|
-				assert_equal ['file1.txt',
+				assert_equal ['Cédric.txt',
+                'file1.txt',
 					      'file3.txt',
 					      'file4.txt',
 					      'file5.txt'],
@@ -26,7 +27,7 @@ module Scm::Adapters
 			with_bzr_repository('bzr') do |bzr|
 				Scm::ScratchDir.new do |dir|
 					bzr.export(dir)
-					assert_equal ['.', '..', 'file1.txt', 'file3.txt', 'file4.txt', 'file5.txt'], Dir.entries(dir).sort
+					assert_equal ['.', '..', 'Cédric.txt', 'file1.txt', 'file3.txt', 'file4.txt', 'file5.txt'], Dir.entries(dir).sort
 				end
 			end
 		end

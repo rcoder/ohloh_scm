@@ -5,9 +5,9 @@ module Scm::Adapters
 
 		def test_commit_count
 			with_bzr_repository('bzr') do |bzr|
-				assert_equal 6, bzr.commit_count
-				assert_equal 5, bzr.commit_count(:after => revision_ids.first)
-				assert_equal 1, bzr.commit_count(:after => revision_ids[4])
+				assert_equal 7, bzr.commit_count
+				assert_equal 6, bzr.commit_count(:after => revision_ids.first)
+				assert_equal 1, bzr.commit_count(:after => revision_ids[5])
 				assert_equal 0, bzr.commit_count(:after => revision_ids.last)
 			end
 		end
@@ -36,8 +36,8 @@ module Scm::Adapters
 		def test_commit_tokens_after
 			with_bzr_repository('bzr') do |bzr|
 				assert_equal revision_ids, bzr.commit_tokens
-				assert_equal revision_ids[1..5], bzr.commit_tokens(:after => revision_ids.first)
-				assert_equal revision_ids[5..5], bzr.commit_tokens(:after => revision_ids[4])
+				assert_equal revision_ids[1..6], bzr.commit_tokens(:after => revision_ids.first)
+				assert_equal revision_ids[6..6], bzr.commit_tokens(:after => revision_ids[5])
 				assert_equal [], bzr.commit_tokens(:after => revision_ids.last)
 			end
 		end
@@ -183,7 +183,7 @@ module Scm::Adapters
 		def test_commits
 			with_bzr_repository('bzr') do |bzr|
 				assert_equal revision_ids, bzr.commits.collect { |c| c.token }
-				assert_equal revision_ids[5..5], bzr.commits(:after => revision_ids[4]).collect { |c| c.token }
+				assert_equal revision_ids[6..6], bzr.commits(:after => revision_ids[5]).collect { |c| c.token }
 				assert_equal [], bzr.commits(:after => revision_ids.last).collect { |c| c.token }
 
 				# Check that the diffs are not populated
@@ -368,7 +368,8 @@ module Scm::Adapters
 				'obnox@samba.org-20090204002453-u70a3ehf3ae9kay1', # 3
 				'obnox@samba.org-20090204002518-yb0x153oa6mhoodu', # 4
 				'obnox@samba.org-20090204002540-gmana8tk5f9gboq9', # 5
-				'obnox@samba.org-20090204004942-73rnw0izen42f154'  # 6
+				'obnox@samba.org-20090204004942-73rnw0izen42f154', # 6
+        'test@example.com-20111222183733-y91if5npo3pe8ifs', # 7
 			]
 		end
 
