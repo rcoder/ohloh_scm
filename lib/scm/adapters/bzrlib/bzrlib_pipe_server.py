@@ -1,8 +1,10 @@
 from bzrlib.branch import Branch
 from bzrlib.revisionspec import RevisionSpec
+from cStringIO import StringIO
 import sys
 import time 
 import traceback
+import logging
 
 class BzrPipeServer:
   def __init__(self, repository_url):
@@ -88,6 +90,9 @@ def command_loop():
 
 if __name__ == "__main__":
   try:
+    stream = StringIO()
+    handler = logging.StreamHandler(stream)
+    logging.getLogger('bzr').addHandler(handler)
     command_loop()
   except:
     exc_trace = traceback.format_exc()
