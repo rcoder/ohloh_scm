@@ -40,10 +40,12 @@ module Scm::Adapters
 			# because Ohloh ignores merge diffs anyway.
 
 			previous = nil
-			Scm::Parsers::GitStyledParser.parse(log(opts)) do |e|
-				yield fixup_null_merge(e) unless previous && previous.token == e.token
-				previous = e
-			end
+      open_log_file(opts) do |io|
+			  Scm::Parsers::GitStyledParser.parse(io) do |e|
+				  yield fixup_null_merge(e) unless previous && previous.token == e.token
+				  previous = e
+			  end
+      end
 		end
 
 		# Returns a single commit, including its diffs
@@ -84,6 +86,30 @@ module Scm::Adapters
 				''
 			end
 		end
+
+
+		# Same as log() method above, except that it writes the log to 
+    # a file.
+		def open_log_file(opts={})
+			if has_branch?
+				if opts[:after] && opts[:after]==self.head_token
+					'' # Nothing new.
+				else
+          begin
+					  run "#{rev_list_command(opts)} | xargs -n 1 #{Scm::Parsers::GitStyledParser.whatchanged} > #{log_filename}"
+            File.open(log_filename, 'r') { |io| yield io } 
+          ensure
+            File.delete(log_filename) if FileTest.exist?(log_filename)
+          end
+				end
+			else
+				''
+			end
+		end
+
+    def log_filename
+      File.join('/tmp', (self.url).gsub(/\W/,'') + '.log')
+    end 
 
 		def rev_list_command(opts={})
       up_to = opts[:up_to] || branch_name
