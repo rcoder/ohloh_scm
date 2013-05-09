@@ -56,5 +56,16 @@ module Scm::Adapters
 			hg = HgAdapter.new( :url => 'http://poliqarp.sourceforge.net/hg/poliqarp/')
 			assert_equal 'sourceforge.net', hg.guess_forge
 		end
+
+    def test_it_should_match_URL_with_pipe
+      hg = HgAdapter.new(:url => "http://hg.linux-ha.org/|experimental/assimilation/")
+      assert_equal nil,  hg.validate_url
+    end
+
+    def test_it_should_match_URL_with_pipe_with_public_urls
+      hg = HgAdapter.new(:url => "http://hg.linux-ha.org/|experimental/assimilation/", :public_urls_only => true)
+      assert_equal true, hg.public_urls_only
+      assert_equal nil,  hg.validate_url
+    end
 	end
 end
