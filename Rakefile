@@ -3,7 +3,7 @@ require 'rake/clean'
 require 'rake/testtask'
 
 require 'rubygems'
-require 'rake/gempackagetask'
+require 'rubygems/package_task'
 
 spec = Gem::Specification.new do |s|
   s.name = 'ohloh_scm'
@@ -21,7 +21,7 @@ spec = Gem::Specification.new do |s|
   s.test_files = FileList["test/**/*"]
 end
 
-Rake::GemPackageTask.new(spec) do |pkg|
+Gem::PackageTask.new(spec) do |pkg|
   pkg.need_tar = true
   pkg.need_zip = true
 end

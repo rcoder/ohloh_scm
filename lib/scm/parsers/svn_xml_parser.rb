@@ -1,4 +1,3 @@
-require 'parsedate'
 require 'rexml/document'
 require 'rexml/streamlistener'
 
@@ -33,7 +32,7 @@ module Scm::Parsers
 			when 'author'
 				@commit.committer_name = @text
 			when 'date'
-				@commit.committer_date = Time.utc(*ParseDate.parsedate(@text))
+				@commit.committer_date = Time.parse(@text).round.utc
 			when 'path'
 				@diff.path = @text
 				@commit.diffs << @diff

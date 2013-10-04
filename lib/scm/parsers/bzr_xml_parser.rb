@@ -1,4 +1,3 @@
-require 'parsedate'
 require 'rexml/document'
 require 'rexml/streamlistener'
 

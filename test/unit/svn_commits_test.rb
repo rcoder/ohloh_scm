@@ -207,11 +207,11 @@ module Scm::Adapters
 			assert_equal [1, 2, 3, 4, 5], commits.collect { |c| c.token }
 			assert_equal ['robin','robin','robin','jason','jason'], commits.collect { |c| c.committer_name }
 
-			assert commits[0].committer_date - Time.utc(2006,6,11,18,28,0) < 1 # commits include milliseconds
-			assert commits[1].committer_date - Time.utc(2006,6,11,18,32,13) < 1
-			assert commits[2].committer_date - Time.utc(2006,6,11,18,34,17) < 1
-			assert commits[3].committer_date - Time.utc(2006,7,14,22,17,8) < 1
-			assert commits[4].committer_date - Time.utc(2006,7,14,23,7,15) < 1
+			assert_equal Time.utc(2006,6,11,18,28, 0), commits[0].committer_date
+			assert_equal Time.utc(2006,6,11,18,32,14), commits[1].committer_date
+			assert_equal Time.utc(2006,6,11,18,34,18), commits[2].committer_date
+			assert_equal Time.utc(2006,7,14,22,17, 9), commits[3].committer_date
+			assert_equal Time.utc(2006,7,14,23, 7,16), commits[4].committer_date
 
 			assert_equal "Initial Checkin\n", commits[0].message
 			assert_equal "added makefile", commits[1].message

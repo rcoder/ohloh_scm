@@ -42,6 +42,7 @@ module Scm::Adapters
 			FileUtils.rmdir path
 			run "svnadmin create #{path}"
 			FileUtils.cp pre_revprop_change_template, pre_revprop_change_path
+      FileUtils.chmod 0755, pre_revprop_change_path
 		end
 
 		def svnadmin_create_remote
