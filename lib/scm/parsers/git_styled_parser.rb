@@ -42,7 +42,9 @@ module Scm::Parsers
 					elsif line =~ /^Author: (.+)$/
 						e.author_name = $1
 					elsif line =~ /^Date: (.*)$/
-						e.author_date = Time.parse($1).utc # Note strongly: MUST be RFC2822 format to parse properly
+            # default to EPOCH when there's no date info
+            e.author_date = Time.at(0).utc if $1.strip.empty?
+						e.author_date ||= Time.parse($1).utc # Note strongly: MUST be RFC2822 format to parse properly
 					elsif line == "__BEGIN_COMMENT__"
 						state = :message
 					elsif line =~ /^AuthorEmail: (.+)$/
