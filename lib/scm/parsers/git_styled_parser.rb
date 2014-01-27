@@ -43,7 +43,7 @@ module Scm::Parsers
 						e.author_name = $1
 					elsif line =~ /^Date: (.*)$/
             # MUST be RFC2822 format to parse properly, else defaults to epoch time
-            e.author_date = parse_commit_date($1)
+            e.author_date = parse_date($1)
 					elsif line == "__BEGIN_COMMENT__"
 						state = :message
 					elsif line =~ /^AuthorEmail: (.+)$/
@@ -81,7 +81,7 @@ module Scm::Parsers
 			yield e if e
 		end
 
-    def self.parse_commit_date(date)
+    def self.parse_date(date)
       t = Time.rfc2822(date) rescue Time.at(0)
       t.utc
     end
