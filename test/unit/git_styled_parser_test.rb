@@ -7,13 +7,31 @@ module Scm::Parsers
 			assert_equal([], GitStyledParser.parse(''))
 		end
 
-    def test_log_parser_no_date
+    def test_log_parser_nil_date
 sample_log = <<-SAMPLE
 __BEGIN_COMMIT__
 Commit: 1df547800dcd168e589bb9b26b4039bff3a7f7e4
 Author: Jason Allen
 AuthorEmail: jason@ohloh.net
 Date:   
+__BEGIN_COMMENT__
+    moving COPYING
+
+__END_COMMENT__
+SAMPLE
+      
+			commits = GitStyledParser.parse(sample_log)
+			assert_equal 1, commits.size
+			assert_equal Time.utc(1970,1,1,0,0,0), commits[0].author_date
+    end
+
+    def test_log_parser_bogus_date
+sample_log = <<-SAMPLE
+__BEGIN_COMMIT__
+Commit: 1df547800dcd168e589bb9b26b4039bff3a7f7e4
+Author: Jason Allen
+AuthorEmail: jason@ohloh.net
+Date: Mon, Jan 01 2012 05:00:00 -0500
 __BEGIN_COMMENT__
     moving COPYING
 
