@@ -15,8 +15,10 @@ module Scm::Adapters
 			self
 		end
 
-    # Given a Github read-write URL, return a read-only URL.
-    # Otherwise, return the original URL.
+    # Given a Github read-write URL, return a git protocol read-only URL
+    # Given a Github web URL, return a git protocol read-only URL
+    # Given a Git read-write protocol URL, return a git protocol read-only URL
+    # Else, return the URL
     def normalize_url
       case @url
       when /^https?:\/\/\w+@github.com\/(.+)\.git$/
