@@ -12,7 +12,7 @@ module Scm::Adapters
 			super
 			@url = path_to_file_url(@url)
 			@url = force_https_if_sourceforge(@url)
-			@branch_name = @branch_name[0..-2] if @branch_name && @branch_name[-1..-1] == '/'
+      @branch_name = recalc_branch_name
 			self
 		end
 
@@ -32,7 +32,7 @@ module Scm::Adapters
 
 		def force_https_if_sourceforge(url)
 			# SourceForge requires https for svnsync
-			url =~ /http(:\/\/.*svn\.sourceforge\.net.*)/ ? "https#{$1}" : url
+      url =~ /http(:\/\/.*svn\.(sourceforge|code\.sf)\.net.*)/ ? "https#{$1}" : url
 		end
 
 		def validate_server_connection
@@ -54,7 +54,12 @@ module Scm::Adapters
 		# From the given URL, determine which part of it is the root and which part of it is the branch_name.
 		# The current branch_name is overwritten.
 		def recalc_branch_name
-			@branch_name = @url ? @url[root.length..-1] : @branch_name
+      begin
+        @branch_name = @url ? @url[root.length..-1] : @branch_name
+      rescue RuntimeError => exception
+        exception.message =~ /svn:*is not a working copy/ # we have a file system
+        @branch_name = ''
+      end
 			@branch_name = @branch_name[0..-2] if @branch_name[-1..-1] == '/'
 			@branch_name
 		end

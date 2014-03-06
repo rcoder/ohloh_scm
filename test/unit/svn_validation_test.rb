@@ -95,6 +95,9 @@ module Scm::Adapters
 			svn = SvnAdapter.new(:url => 'https://vegastrike.svn.sourceforge.net/svnroot/vegastrike/trunk')
 			assert_equal 'sourceforge.net', svn.guess_forge
 
+      svn = SvnAdapter.new(:url => 'https://svn.code.sf.net/p/gallery/code/trunk/gallery2')
+      assert_equal 'code.sf.net', svn.guess_forge
+
 			svn = SvnAdapter.new(:url => 'https://appfuse.dev.java.net/svn/appfuse/trunk')
 			assert_equal 'java.net', svn.guess_forge
 
@@ -106,14 +109,13 @@ module Scm::Adapters
 		end
 
 		def test_sourceforge_requires_https
-			assert_equal 'https://gallery.svn.sourceforge.net/svnroot/gallery/trunk/gallery2',
-				SvnAdapter.new(:url => 'http://gallery.svn.sourceforge.net/svnroot/gallery/trunk/gallery2').normalize.url
+      url = '://svn.code.sf.net/p/gallery/code/trunk/gallery2'
+      assert_equal "https#{url}", SvnAdapter.new(:url => "http#{url}").normalize.url
 
-			assert_equal 'https://gallery.svn.sourceforge.net/svnroot/gallery/trunk/gallery2',
-				SvnAdapter.new(:url => 'https://gallery.svn.sourceforge.net/svnroot/gallery/trunk/gallery2').normalize.url
+			assert_equal "https#{url}", SvnAdapter.new(:url => "https#{url}").normalize.url
 
-			assert_equal 'http://pianosa.googlecode.com/svn/trunk',
-				SvnAdapter.new(:url => 'http://pianosa.googlecode.com/svn/trunk').normalize.url
+      url = 'https://github.com/blackducksw/ohloh_scm/trunk'
+			assert_equal url,  SvnAdapter.new(:url => url).normalize.url
 		end
 
 		def test_validate_server_connection
@@ -145,6 +147,16 @@ module Scm::Adapters
 				assert !svn_trunk_with_whack.branch_name
 				assert_equal '/trunk', svn_trunk_with_whack.recalc_branch_name
 				assert_equal '/trunk', svn_trunk_with_whack.branch_name
+
+				svn_trunk = SvnAdapter.new(:url => svn.root + '/trunk')
+				assert !svn_trunk.branch_name
+        svn_trunk.normalize # only normalize to ensure branch_name is populated correctly
+				assert_equal '/trunk', svn_trunk.branch_name
+
+        svn_trunk = SvnAdapter.new(:url => svn.root)
+				assert !svn_trunk.branch_name
+        svn_trunk.normalize
+				assert_equal '', svn_trunk.branch_name
 			end
 		end
 	end
