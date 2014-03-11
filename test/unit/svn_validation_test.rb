@@ -159,9 +159,18 @@ module Scm::Adapters
 				assert_equal '', svn_trunk.branch_name
 			end
 		end
-	end
 
-	def test_strip_trailing_whack_from_branch_name
-		assert_equal '/trunk', SvnAdapter.new(:branch_name => "/trunk/").normalize.branch_name
+    def test_strip_trailing_whack_from_branch_name
+      with_svn_repository('svn') do |svn|
+        assert_equal '/trunk', SvnAdapter.new(:url => svn.root, :branch_name => "/trunk/").normalize.branch_name
+      end
+    end
+
+    def test_empty_branch_name_with_file_system
+      Scm::ScratchDir.new do |dir|
+        svn = SvnAdapter.new(:url => dir).normalize
+        assert_equal '', svn.branch_name
+      end
+    end
 	end
 end

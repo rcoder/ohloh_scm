@@ -12,7 +12,11 @@ module Scm::Adapters
 			super
 			@url = path_to_file_url(@url)
 			@url = force_https_if_sourceforge(@url)
-      @branch_name = recalc_branch_name
+      if @branch_name
+        clean_branch_name
+      else
+        @branch_name = recalc_branch_name
+      end
 			self
 		end
 
@@ -57,11 +61,10 @@ module Scm::Adapters
       begin
         @branch_name = @url ? @url[root.length..-1] : @branch_name
       rescue RuntimeError => exception
-        exception.message =~ /svn:*is not a working copy/ # we have a file system
-        @branch_name = ''
+        @branch_name = '' if exception.message =~ /(svn:*is not a working copy|Unable to open an ra_local session to URL)/ # we have a file system
       end
-			@branch_name = @branch_name[0..-2] if @branch_name[-1..-1] == '/'
-			@branch_name
+      clean_branch_name
+      @branch_name
 		end
 
 		def guess_forge
@@ -74,5 +77,11 @@ module Scm::Adapters
 				u
 			end
 		end
+
+    private
+    def clean_branch_name
+      return unless @branch_name
+      @branch_name.chop! if @branch_name.end_with?('/')
+    end
 	end
 end
