@@ -35,10 +35,10 @@ module Scm::Adapters
 
 			if list.include? 'trunk/'
 				self.url = File.join(self.url, 'trunk')
-				self.branch_name = File.join(self.branch_name, 'trunk') if self.branch_name
+				self.branch_name = File.join(self.branch_name, 'trunk')
 			elsif list.size == 1 and list.first[-1..-1] == '/'
 				self.url = File.join(self.url, list.first[0..-2])
-				self.branch_name = File.join(self.branch_name, list.first[0..-2]) if self.branch_name
+				self.branch_name = File.join(self.branch_name, list.first[0..-2])
 				return restrict_url_to_trunk
 			end
 			self.url
