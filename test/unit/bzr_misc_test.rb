@@ -1,4 +1,4 @@
-#encoding: utf-8
+# encoding: utf-8
 require_relative '../test_helper'
 
 module Scm::Adapters
