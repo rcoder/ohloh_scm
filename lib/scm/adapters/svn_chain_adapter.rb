@@ -39,6 +39,6 @@ module Scm::Adapters
 	end
 end
 
-require 'lib/scm/adapters/svn_chain/chain'
-require 'lib/scm/adapters/svn_chain/commits'
-require 'lib/scm/adapters/svn_chain/cat_file'
+require_relative 'svn_chain/chain'
+require_relative 'svn_chain/commits'
+require_relative 'svn_chain/cat_file'

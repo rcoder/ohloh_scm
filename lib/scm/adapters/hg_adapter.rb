@@ -6,11 +6,11 @@ module Scm::Adapters
 	end
 end
 
-require 'lib/scm/adapters/hg/validation'
-require 'lib/scm/adapters/hg/cat_file'
-require 'lib/scm/adapters/hg/commits'
-require 'lib/scm/adapters/hg/misc'
-require 'lib/scm/adapters/hg/pull'
-require 'lib/scm/adapters/hg/push'
-require 'lib/scm/adapters/hg/head'
-require 'lib/scm/adapters/hg/patch'
+require_relative 'hg/validation'
+require_relative 'hg/cat_file'
+require_relative 'hg/commits'
+require_relative 'hg/misc'
+require_relative 'hg/pull'
+require_relative 'hg/push'
+require_relative 'hg/head'
+require_relative 'hg/patch'

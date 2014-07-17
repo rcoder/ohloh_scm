@@ -6,12 +6,12 @@ module Scm::Adapters
 	end
 end
 
-require 'lib/scm/adapters/svn/validation'
-require 'lib/scm/adapters/svn/cat_file'
-require 'lib/scm/adapters/svn/commits'
-require 'lib/scm/adapters/svn/push'
-require 'lib/scm/adapters/svn/pull'
-require 'lib/scm/adapters/svn/head'
-require 'lib/scm/adapters/svn/misc'
-require 'lib/scm/adapters/svn/patch'
+require_relative 'svn/validation'
+require_relative 'svn/cat_file'
+require_relative 'svn/commits'
+require_relative 'svn/push'
+require_relative 'svn/pull'
+require_relative 'svn/head'
+require_relative 'svn/misc'
+require_relative 'svn/patch'
 

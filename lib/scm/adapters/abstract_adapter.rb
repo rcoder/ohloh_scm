@@ -16,7 +16,7 @@ module Scm::Adapters
 	end
 end
 
-require 'lib/scm/adapters/abstract/system'
-require 'lib/scm/adapters/abstract/validation'
-require 'lib/scm/adapters/abstract/sha1'
-require 'lib/scm/adapters/abstract/misc'
+require_relative 'abstract/system'
+require_relative 'abstract/validation'
+require_relative 'abstract/sha1'
+require_relative 'abstract/misc'

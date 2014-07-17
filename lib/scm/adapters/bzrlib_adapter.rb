@@ -1,6 +1,6 @@
 require 'rubygems'
 
-require 'lib/scm/adapters/bzrlib/bzrlib_pipe_client'
+require_relative 'bzrlib/bzrlib_pipe_client'
 module Scm::Adapters
 	class BzrlibAdapter < BzrAdapter
 
@@ -21,5 +21,5 @@ module Scm::Adapters
 	end
 end
 
-require 'lib/scm/adapters/bzrlib/head'
-require 'lib/scm/adapters/bzrlib/cat_file'
+require_relative 'bzrlib/head'
+require_relative 'bzrlib/cat_file'

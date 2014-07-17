@@ -5,7 +5,7 @@ require 'find'
 unless defined?(TEST_DIR)
 	TEST_DIR = File.dirname(__FILE__)
 end
-require TEST_DIR + '/../lib/scm'
+require_relative '../lib/scm'
 
 Scm::Adapters::AbstractAdapter.logger = Logger.new(File.open('log/test.log','a'))
 

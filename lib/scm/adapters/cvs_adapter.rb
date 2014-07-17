@@ -13,6 +13,6 @@ module Scm::Adapters
 	end
 end
 
-require 'lib/scm/adapters/cvs/validation'
-require 'lib/scm/adapters/cvs/commits'
-require 'lib/scm/adapters/cvs/misc'
+require_relative 'cvs/validation'
+require_relative 'cvs/commits'
+require_relative 'cvs/misc'

@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require_relative '../test_helper'
 
 module Scm::Adapters
 	# Repository git_walk has the following structure:

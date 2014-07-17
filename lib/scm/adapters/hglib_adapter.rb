@@ -1,5 +1,5 @@
 require 'rubygems'
-require 'lib/scm/adapters/hglib/client'
+require_relative 'hglib/client'
 
 module Scm::Adapters
 	class HglibAdapter < HgAdapter
@@ -21,5 +21,5 @@ module Scm::Adapters
 	end
 end
 
-require 'lib/scm/adapters/hglib/cat_file'
-require 'lib/scm/adapters/hglib/head'
+require_relative 'hglib/cat_file'
+require_relative 'hglib/head'
