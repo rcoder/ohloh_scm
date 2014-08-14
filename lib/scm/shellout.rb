@@ -1,6 +1,6 @@
 require 'rubygems'
 require 'stringio'
-require 'open4'
+require 'open3'
 
 class Shellout
 
@@ -9,17 +9,19 @@ class Shellout
   end 
 
   def self.execute(cmd)
-    outbuf = StringIO.new
-    errbuf = StringIO.new
-    status = Open4::popen4("sh") do | pid, stdin, stdout, stderr |
-      stdin.puts cmd
-      stdin.close
-      to = Thread.new { relay stdout, outbuf }
-      te = Thread.new { relay stderr, errbuf }
-      to.join
-      te.join
-    end
-    return status, outbuf.string, errbuf.string
+    out = ''
+    err = ''
+    exit_status = nil
+    Open3.popen3(cmd) { |stdin, stdout, stderr, wait_thread|
+      while line = stdout.gets
+        out << line
+      end
+      while line = stderr.gets
+        err << line
+      end
+      exit_status = wait_thread.value
+    }
+    return exit_status, out, err
   end
 
   def run(cmd)

@@ -12,7 +12,7 @@ module Scm::Adapters
 			begin
 				run "svn cat --trust-server-cert --non-interactive -r #{revision} '#{SvnAdapter.uri_encode(File.join(self.root, self.branch_name.to_s, path.to_s))}@#{revision}'"
 			rescue
-				raise unless $!.message =~ /svn: (File not found|.* is not a directory in filesystem)/
+				raise unless $!.message =~ /svn:.*Could not cat all targets because some targets don't exist/
 			end
 		end
 	end

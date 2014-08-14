@@ -98,14 +98,14 @@ module Scm::Adapters
 		end
 
 		def node_kind(path=nil, revision=final_token || 'HEAD')
-			$1 if self.info(path, revision) =~ /^Node Kind: (.+)$/
+			$1 if self.info(path, revision) =~ /Node Kind: (\w+)\W/
 		end
 
 		def is_directory?(path=nil, revision=final_token || 'HEAD')
 			begin
 				return node_kind(path, revision) == 'directory'
-			rescue
-				if $!.message =~ /svn: .* is not a directory in filesystem/ || $!.message =~ /.*Not a valid URL.*/
+			rescue Exception
+				if $!.message =~ /svn: E200009: Could not display info for all targets because some targets don't exist/
 					return false
 				else
 					raise

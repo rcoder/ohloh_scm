@@ -14,8 +14,9 @@ module Scm::Adapters
 				assert svn.exist?
 
 				# Ensure that revision properties are settable
-				svn.propset('foo','bar')
-				assert_equal 'bar', svn.propget('foo')
+        # Note that only valid properties can be set
+				svn.propset('log','bar')
+				assert_equal 'bar', svn.propget('log')
 			end
 		end
 

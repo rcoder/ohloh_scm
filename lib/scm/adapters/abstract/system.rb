@@ -17,7 +17,7 @@ module Scm::Adapters
 		# Raises an exception if the shell returns non-zero exit code.
 		def self.run(cmd)
 			logger.debug { cmd }
-			status, out, err = Shellout.new.run(cmd)
+			status, out, err = Shellout.execute(cmd)
 			raise RuntimeError.new("#{cmd} failed: #{out}\n#{err}") if status.exitstatus != 0
 			out
 		end
