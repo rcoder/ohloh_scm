@@ -27,5 +27,14 @@ module Scm::Adapters
 			end
 		end
 
+    def test_ls_tree_encoding
+      with_hg_repository('hg_with_invalid_encoding') do |hg|
+        filenames = hg.ls_tree('51ea5277ca27')
+
+        filenames.each do |filename|
+          assert_equal true, filename.valid_encoding?
+        end
+      end
+    end
 	end
 end

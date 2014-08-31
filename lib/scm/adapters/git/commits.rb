@@ -80,7 +80,7 @@ module Scm::Adapters
 				if opts[:after] && opts[:after]==self.head_token
 					'' # Nothing new.
 				else
-					run "#{rev_list_command(opts)} | xargs -n 1 #{Scm::Parsers::GitStyledParser.whatchanged}"
+					run "#{rev_list_command(opts)} | xargs -n 1 #{Scm::Parsers::GitStyledParser.whatchanged} | #{ string_encoder }"
 				end
 			else
 				''
@@ -96,7 +96,7 @@ module Scm::Adapters
 					'' # Nothing new.
 				else
           begin
-					  run "#{rev_list_command(opts)} | xargs -n 1 #{Scm::Parsers::GitStyledParser.whatchanged} > #{log_filename}"
+					  run "#{rev_list_command(opts)} | xargs -n 1 #{Scm::Parsers::GitStyledParser.whatchanged} | #{ string_encoder } > #{log_filename}"
             File.open(log_filename, 'r') { |io| yield io } 
           ensure
             File.delete(log_filename) if FileTest.exist?(log_filename)

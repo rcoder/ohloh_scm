@@ -31,5 +31,18 @@ module Scm::Adapters
 				assert !git.is_merge_commit?(Scm::Commit.new(:token => 'd067161caae2eeedbd74976aeff5c4d8f1ccc946'))
 			end
 		end
+
+    def test_branches_encoding
+      with_git_repository('git_with_invalid_encoding') do |git|
+        assert_equal true, git.branches.all? { |branch| branch.valid_encoding? }
+      end
+    end
+
+    # `git ls-tree` returns filenames in valid utf8 regardless of their original form.
+    def test_ls_tree_encoding
+      with_git_repository('git_with_invalid_encoding') do |git|
+        assert_equal true, git.ls_tree.all? { |filename| filename.valid_encoding? }
+      end
+    end
 	end
 end
