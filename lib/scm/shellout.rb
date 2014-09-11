@@ -9,18 +9,8 @@ class Shellout
   end 
 
   def self.execute(cmd)
-    out = ''
-    err = ''
-    exit_status = nil
-    Open3.popen3(cmd) { |stdin, stdout, stderr, wait_thread|
-      while line = stdout.gets
-        out << line
-      end
-      while line = stderr.gets
-        err << line
-      end
-      exit_status = wait_thread.value
-    }
+    out, err, exit_status = Open3.capture3(cmd)
+
     return exit_status, out, err
   end
 
