@@ -67,7 +67,7 @@ module Scm::Adapters
 
 		def log(most_recent_token=nil)
       ensure_host_key
-			run "cvsnt -d #{self.url} rlog #{opt_branch} #{opt_time(most_recent_token)} '#{self.module_name}'"
+			run "cvsnt -d #{self.url} rlog #{opt_branch} #{opt_time(most_recent_token)} '#{self.module_name}' | #{ string_encoder }"
 		end
 
 		def checkout(r, local_directory)

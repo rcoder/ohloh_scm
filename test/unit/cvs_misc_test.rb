@@ -57,5 +57,10 @@ module Scm::Adapters
       assert_equal :pserver, CvsAdapter.new(:url => ':pserver:ext:@foo.com:/cvsroot/a', :module_name => 'b')
     end
 
+    def test_log_encoding
+      with_cvs_repository('cvs', 'invalid_utf8') do |cvs|
+        assert_equal true, cvs.log.valid_encoding?
+      end
+    end
 	end
 end

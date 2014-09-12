@@ -244,5 +244,15 @@ module Scm::Adapters
 			assert_equal '/trunk/COPYING', commits[4].diffs[1].path
 		end
 
+    # Invalid utf-8 characters in commit message or filename cause encoding errors.
+    # Svn converts invalid utf-8 characters into valid format before commit.
+    # So no utf-8 encoding issues are seen in ruby when dealing with Svn.
+    def test_commits_encoding
+      with_svn_repository('svn_with_invalid_encoding') do |svn|
+        assert_nothing_raised do
+          svn.commits
+        end
+      end
+    end
 	end
 end
