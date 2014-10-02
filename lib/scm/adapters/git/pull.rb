@@ -93,6 +93,13 @@ module Scm::Adapters
 						r.scm.checkout(r, url)
 					end
 
+          # Sometimes svn conflicts occur leading to a silent `svn checkout` failure.
+          if source_scm.is_a?(SvnAdapter) && SvnAdapter.has_conflicts?(url)
+            logger.info { "Working copy has svn conflicts. Cleaning and trying again..." }
+            clean_up_disk
+            r.scm.checkout(r, url)
+          end
+
 					logger.debug { "Committing revision #{r.token} (#{i+1} of #{commits.size})... " }
 					commit_all(r)
 				end

@@ -132,5 +132,11 @@ module Scm::Adapters
 			opt_password = "--username='#{self.username}' --password='#{self.password}'" if self.username && self.username != ''
 			" #{opt_password} --no-auth-cache "
 		end
+
+    class << self
+      def has_conflicts?(working_copy_url)
+        system("cd '#{ working_copy_url }' && svn status | grep 'Summary of conflicts'")
+      end
+    end
 	end
 end
