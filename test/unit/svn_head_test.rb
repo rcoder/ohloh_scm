@@ -14,6 +14,14 @@ module Scm::Adapters
 			end
 		end
 
+    def test_parents_encoding
+      with_invalid_encoded_svn_repository do |svn|
+        assert_nothing_raised do
+          commit = Struct.new(:token).new(:anything)
+          svn.parents(commit) rescue raise Exception
+        end
+      end
+    end
 	end
 end
 
