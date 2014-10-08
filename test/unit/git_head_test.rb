@@ -15,5 +15,12 @@ module Scm::Adapters
 			end
 		end
 
+    def test_head_token
+      with_git_repository('git_with_invalid_encoding') do |git|
+        assert_nothing_raised do
+          git.head_token
+        end
+      end
+    end
 	end
 end

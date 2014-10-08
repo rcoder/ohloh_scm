@@ -50,7 +50,7 @@ module Scm::Adapters
 
 		# Returns a single commit, including its diffs
 		def verbose_commit(token)
-			c = Scm::Parsers::GitStyledParser.parse(run("cd '#{url}' && #{Scm::Parsers::GitStyledParser.whatchanged} #{token}")).first
+			c = Scm::Parsers::GitStyledParser.parse(run("cd '#{url}' && #{Scm::Parsers::GitStyledParser.whatchanged} #{token} | #{ string_encoder }")).first
       fixup_null_merge(c)
 		end
 
