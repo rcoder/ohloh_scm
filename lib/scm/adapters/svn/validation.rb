@@ -1,7 +1,7 @@
 module Scm::Adapters
 	class SvnAdapter < AbstractAdapter
 		def self.url_regex
-			/^(file|http|https|svn):\/\/(\/)?[A-Za-z0-9_\-\.]+(:\d+)?(\/[A-Za-z0-9_\-\.\/\+%^~ ]*)?$/
+			/^(file|http|https|svn):\/\/(\/)?[A-Za-z0-9_\-\.]+(:\d+)?(\/[A-Za-z0-9_@\-\.\/\+%^~ ]*)?$/
 		end
 
 		def self.public_url_regex

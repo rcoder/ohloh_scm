@@ -1,7 +1,7 @@
 module Scm::Adapters
 	class BzrAdapter < AbstractAdapter
 		def self.url_regex
-			/^((((http|https|bzr|bzr\+ssh|file):\/\/((\w+@)?[A-Za-z0-9_\-\.]+(:\d+)?\/)?)|(lp:[A-Za-z0-9_\-\.\~])))?[A-Za-z0-9_\-\.\/\~\+]*$/
+			/^((((http|https|bzr|bzr\+ssh|file):\/\/((\w+@)?[A-Za-z0-9_\-\.]+(:\d+)?\/)?)|(lp:[A-Za-z0-9_\-\.\~])))?[A-Za-z0-9_@\-\.\/\~\+]*$/
 		end
 
 		def self.public_url_regex
