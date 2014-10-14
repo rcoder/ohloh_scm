@@ -1,7 +1,7 @@
 module Scm::Adapters
 	class HgAdapter < AbstractAdapter
 		def self.url_regex
-			/^((http|https|ssh|file):\/\/((\w+@)?[A-Za-z0-9_\-\.]+(:\d+)?\/)?)?[A-Za-z0-9_\-\.\/\~\+]*$/
+			/^((http|https|ssh|file):\/\/((\w+@)?[A-Za-z0-9_\-\.]+(:\d+)?\/)?)?[A-Za-z0-9_@\-\.\/\~\+]*$/
 		end
 
 		def self.public_url_regex

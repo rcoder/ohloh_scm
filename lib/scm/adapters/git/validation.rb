@@ -1,7 +1,7 @@
 module Scm::Adapters
 	class GitAdapter < AbstractAdapter
 		def self.url_regex
-			/^(http|https|rsync|git|ssh):\/\/(\w+@)?[A-Za-z0-9_\-\.]+(:\d+)?\/[A-Za-z0-9_\-\.\/\~\+]*$/
+			/^(http|https|rsync|git|ssh):\/\/(\w+@)?[A-Za-z0-9_\-\.]+(:\d+)?\/[A-Za-z0-9_@\-\.\/\~\+]*$/
 		end
 
 		def self.public_url_regex
