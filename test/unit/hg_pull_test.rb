@@ -1,6 +1,6 @@
 require_relative '../test_helper'
 
-module Scm::Adapters
+module OhlohScm::Adapters
 	class HgPullTest < Scm::Test
 
 		def test_pull

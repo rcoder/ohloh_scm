@@ -1,6 +1,6 @@
 require_relative '../test_helper'
 
-module Scm::Adapters
+module OhlohScm::Adapters
 	# Repository hg_walk has the following structure:
 	#
 	#      G -> H -> I

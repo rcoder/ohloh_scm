@@ -1,6 +1,6 @@
 require_relative '../test_helper'
 
-module Scm::Adapters
+module OhlohScm::Adapters
 	class GitTokenTest < Scm::Test
 
 		def test_no_token_returns_nil

@@ -1,6 +1,6 @@
 require_relative '../test_helper'
 
-module Scm::Adapters
+module OhlohScm::Adapters
 	class GitCommitAllTest < Scm::Test
 
 		def test_commit_all

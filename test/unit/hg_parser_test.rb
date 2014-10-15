@@ -1,6 +1,6 @@
 require_relative '../test_helper'
 
-module Scm::Parsers
+module OhlohScm::Parsers
 	class HgParserTest < Scm::Test
 
 		def test_empty_array
@@ -137,13 +137,13 @@ SAMPLE
 		def test_styled_parser
 			with_hg_repository('hg') do |hg|
 				assert FileTest.exist?(HgStyledParser.style_path)
-				log = hg.run("cd #{hg.url} && hg log --style #{Scm::Parsers::HgStyledParser.style_path}")
-				commits = Scm::Parsers::HgStyledParser.parse(log)
+				log = hg.run("cd #{hg.url} && hg log --style #{OhlohScm::Parsers::HgStyledParser.style_path}")
+				commits = OhlohScm::Parsers::HgStyledParser.parse(log)
 				assert_styled_commits(commits, false)
 
 				assert FileTest.exist?(HgStyledParser.verbose_style_path)
-				log = hg.run("cd #{hg.url} && hg log --style #{Scm::Parsers::HgStyledParser.verbose_style_path}")
-				commits = Scm::Parsers::HgStyledParser.parse(log)
+				log = hg.run("cd #{hg.url} && hg log --style #{OhlohScm::Parsers::HgStyledParser.verbose_style_path}")
+				commits = OhlohScm::Parsers::HgStyledParser.parse(log)
 				assert_styled_commits(commits, true)
 			end
 		end

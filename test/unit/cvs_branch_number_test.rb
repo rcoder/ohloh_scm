@@ -1,6 +1,6 @@
 require_relative '../test_helper'
 
-module Scm::Parsers
+module OhlohScm::Parsers
 	class CvsBranchNumberTest < Scm::Test
 		def test_basic
 			assert_equal [1,1], BranchNumber.new('1.1').to_a

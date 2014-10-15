@@ -1,6 +1,6 @@
 require_relative '../test_helper'
 
-module Scm::Adapters
+module OhlohScm::Adapters
 	class CvsCommitsTest < Scm::Test
 
 		def test_commits

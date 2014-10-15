@@ -1,6 +1,6 @@
 require_relative '../test_helper'
 
-module Scm::Adapters
+module OhlohScm::Adapters
 	class CvsConvertTest < Scm::Test
 
 		def test_basic_convert

@@ -1,7 +1,7 @@
 require_relative '../test_helper'
 require 'date'
 
-module Scm::Parsers
+module OhlohScm::Parsers
 	class GitStyledParserTest < Scm::Test
 
 		def test_basic

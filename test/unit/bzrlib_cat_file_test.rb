@@ -1,7 +1,7 @@
 # encoding: utf-8
 require_relative '../test_helper'
 
-module Scm::Adapters
+module OhlohScm::Adapters
 	class BzrlibCatFileTest < Scm::Test
 
 		def test_cat_file

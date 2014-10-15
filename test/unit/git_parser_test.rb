@@ -1,6 +1,6 @@
 require_relative '../test_helper'
 
-module Scm::Parsers
+module OhlohScm::Parsers
 	class GitParserTest < Scm::Test
 
 		def test_empty_array

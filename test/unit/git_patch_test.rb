@@ -1,6 +1,6 @@
 require_relative '../test_helper'
 
-module Scm::Adapters
+module OhlohScm::Adapters
   class GitPatchTest < Scm::Test
     def test_patch_for_commit
       with_git_repository('git') do |repo|

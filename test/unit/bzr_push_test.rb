@@ -1,6 +1,6 @@
 require_relative '../test_helper'
 
-module Scm::Adapters
+module OhlohScm::Adapters
 	class BzrPushTest < Scm::Test
 
 		def test_hostname

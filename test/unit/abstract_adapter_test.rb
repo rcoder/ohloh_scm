@@ -1,6 +1,6 @@
 require_relative '../test_helper'
 
-module Scm::Adapters
+module OhlohScm::Adapters
 	class AbstractAdapterTest < Scm::Test
 		def test_simple_validation
 			scm = AbstractAdapter.new()

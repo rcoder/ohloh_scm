@@ -1,6 +1,6 @@
 require_relative '../test_helper'
 
-module Scm::Adapters
+module OhlohScm::Adapters
 	class GitPullTest < Scm::Test
 
 		def test_basic_pull

@@ -1,6 +1,6 @@
 require_relative '../test_helper'
 
-module Scm::Adapters
+module OhlohScm::Adapters
 	class FactoryTest < Scm::Test
 
 		def test_factory_hg

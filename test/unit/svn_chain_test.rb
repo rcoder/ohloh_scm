@@ -1,6 +1,6 @@
 require_relative '../test_helper'
 
-module Scm::Parsers
+module OhlohScm::Parsers
 	class SvnChainTest < Scm::Test
 
 		def test_chain
@@ -52,7 +52,7 @@ module Scm::Parsers
 		end
 
 		def test_parent_branch_name
-			svn = Scm::Adapters::SvnChainAdapter.new(:branch_name => "/trunk")
+			svn = OhlohScm::Adapters::SvnChainAdapter.new(:branch_name => "/trunk")
 
 			assert_equal "/branches/b", svn.parent_branch_name(Scm::Diff.new(:action => 'A',
 					:path => "/trunk", :from_revision => 1, :from_path => "/branches/b"))

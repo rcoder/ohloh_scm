@@ -1,6 +1,6 @@
 require_relative '../test_helper'
 
-module Scm::Parsers
+module OhlohScm::Parsers
 	class SvnChainTest < Scm::Test
 
 		def test_chained_commit_tokens

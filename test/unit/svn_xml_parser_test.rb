@@ -1,6 +1,6 @@
 require_relative '../test_helper'
 
-module Scm::Parsers
+module OhlohScm::Parsers
 	class SvnXmlParserTest < Scm::Test
 
 		def test_basic

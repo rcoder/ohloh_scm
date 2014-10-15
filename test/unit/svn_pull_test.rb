@@ -1,7 +1,7 @@
 require_relative '../test_helper'
 require 'socket'
 
-module Scm::Adapters
+module OhlohScm::Adapters
 	class SvnPullTest < Scm::Test
 
 		def test_svnadmin_create

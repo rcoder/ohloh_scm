@@ -88,7 +88,7 @@ Then you can run the unit tests:
 
     $ rake
 
-You can load the library into your own Ruby application by requiring lib/scm.rb.
+You can load the library into your own Ruby application by requiring lib/ohloh_scm.rb.
 
 # Functionality
 

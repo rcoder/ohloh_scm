@@ -1,6 +1,6 @@
 require_relative '../test_helper'
 
-module Scm::Adapters
+module OhlohScm::Adapters
 	class HglibCatFileTest < Scm::Test
 
 		def test_cat_file

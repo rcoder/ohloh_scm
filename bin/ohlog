@@ -1,12 +1,12 @@
 #!/usr/bin/env ruby
-require File.dirname(__FILE__) + '/../lib/scm'
+require File.dirname(__FILE__) + '/../lib/ohloh_scm'
 
 # This is a simple command line tool which parses CVS and Subversion logs.
 # It is not used by the main Ohloh system.
 #
 # I use it primarily to help debug Ohloh behavior. It's a convenient way
 # to turn an enormously long CVS log into something readable.
-module Scm::Parsers
+module OhlohScm::Parsers
 	class CommandLine
 		attr_accessor :paths, :writer
 

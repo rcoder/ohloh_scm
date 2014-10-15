@@ -1,6 +1,6 @@
 require_relative '../test_helper'
 
-module Scm::Adapters
+module OhlohScm::Adapters
 	class HgHeadTest < Scm::Test
 
 		def test_head_and_parents

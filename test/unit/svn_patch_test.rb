@@ -1,6 +1,6 @@
 require_relative '../test_helper'
 
-module Scm::Adapters
+module OhlohScm::Adapters
   class SvnPatchTest < Scm::Test
     def test_patch_for_commit
       with_svn_repository('svn') do |repo|

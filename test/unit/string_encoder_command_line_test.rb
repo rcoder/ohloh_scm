@@ -1,6 +1,6 @@
 require_relative '../test_helper'
 
-module Scm::Parsers
+module OhlohScm::Parsers
   class StringEncoderCommandLineTest < Scm::Test
     def test_length_of_content_unchanged
       file_path = File.expand_path('../../data/sample-content', __FILE__)
@@ -8,7 +8,7 @@ module Scm::Parsers
       original_content_lines = File.readlines(file_path).size
 
       output = %x[cat #{ file_path } \
-        | #{ Scm::Adapters::AbstractAdapter.new.string_encoder } ]
+        | #{ OhlohScm::Adapters::AbstractAdapter.new.string_encoder } ]
 
       assert_equal original_content_length, output.length
       assert_equal original_content_lines, output.split("\n").length
@@ -19,7 +19,7 @@ module Scm::Parsers
         File.expand_path('../../data/invalid-utf-word', __FILE__)
 
       string = %x[cat #{ invalid_utf8_word_path } \
-        | #{ Scm::Adapters::AbstractAdapter.new.string_encoder } ]
+        | #{ OhlohScm::Adapters::AbstractAdapter.new.string_encoder } ]
 
       assert_equal true, string.valid_encoding?
     end

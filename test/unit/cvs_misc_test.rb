@@ -1,6 +1,6 @@
 require_relative '../test_helper'
 
-module Scm::Adapters
+module OhlohScm::Adapters
 	class CvsMiscTest < Scm::Test
 		def test_local_directory_trim
 			r = CvsAdapter.new(:url => "/Users/robin/cvs_repo/", :module_name => "simple")

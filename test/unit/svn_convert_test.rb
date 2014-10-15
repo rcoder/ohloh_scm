@@ -1,6 +1,6 @@
 require_relative '../test_helper'
 
-module Scm::Adapters
+module OhlohScm::Adapters
 	class SvnConvertTest < Scm::Test
 		def test_basic_convert
 			with_svn_repository('svn') do |src|

@@ -1,4 +1,4 @@
-module Scm::Parsers
+module OhlohScm::Parsers
 	class CommandLineTest < Scm::Test
 		def test_cvs_from_file
 			result = `#{File.dirname(__FILE__) + '/../../bin/ohlog'} --xml --cvs #{DATA_DIR + '/basic.rlog'}`

@@ -1,6 +1,6 @@
 require_relative '../test_helper'
 
-module Scm::Adapters
+module OhlohScm::Adapters
 	class CvsValidationTest < Scm::Test
 		def test_rejected_urls
 			[	nil, "", "foo", "http:/", "http:://", "http://", "http://a",
