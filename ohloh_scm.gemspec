@@ -6,7 +6,7 @@ Gem::Specification.new do |gem|
   gem.name          = 'ohloh_scm'
   gem.version       = Scm::Version::STRING
   gem.authors       = ["BlackDuck Software"]
-  gem.email         = ["info@blackducksoftware.com"]
+  gem.email         = ["info@openhub.net"]
   gem.summary       = %[Source Control Management]
   gem.description   = %[The Ohloh source control management library]
   gem.homepage      = %[https://github.com/blackducksw/ohloh_scm/]
