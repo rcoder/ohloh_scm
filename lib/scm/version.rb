@@ -1,5 +1,5 @@
 module Scm
   module Version
-    STRING = '0.0.1'
+    STRING = '2.0.0'
   end
 end
