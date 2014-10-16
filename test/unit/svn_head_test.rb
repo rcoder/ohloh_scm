@@ -1,7 +1,7 @@
 require_relative '../test_helper'
 
 module OhlohScm::Adapters
-	class SvnHeadTest < Scm::Test
+	class SvnHeadTest < OhlohScm::Test
 
 		def test_head_and_parents
 			with_svn_repository('svn') do |svn|

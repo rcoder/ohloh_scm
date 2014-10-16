@@ -1,7 +1,7 @@
 require_relative '../test_helper'
 
 module OhlohScm::Parsers
-	class SvnChainTest < Scm::Test
+	class SvnChainTest < OhlohScm::Test
 
 		def test_chained_commit_tokens
 			with_svn_chain_repository('svn_with_branching', '/trunk') do |svn|

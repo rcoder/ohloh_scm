@@ -1,7 +1,7 @@
 require_relative '../test_helper'
 
 module OhlohScm::Adapters
-	class BzrHeadTest < Scm::Test
+	class BzrHeadTest < OhlohScm::Test
 
 		def test_head_and_parents
 			with_bzr_repository('bzr') do |bzr|

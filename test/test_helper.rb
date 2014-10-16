@@ -17,7 +17,7 @@ unless defined?(DATA_DIR)
 	DATA_DIR = File.expand_path(File.join(TEST_DIR, 'data'))
 end
 
-class Scm::Test < Test::Unit::TestCase
+class OhlohScm::Test < Test::Unit::TestCase
 	# For reasons unknown, the base class defines a default_test method to throw a failure.
 	# We override it with a no-op to prevent this 'helpful' feature.
 	def default_test
@@ -48,7 +48,7 @@ class Scm::Test < Test::Unit::TestCase
 	end
 
 	def with_repository(type, name)
-		Scm::ScratchDir.new do |dir|
+		OhlohScm::ScratchDir.new do |dir|
 			if Dir.entries(REPO_DIR).include?(name)
 				`cp -R #{File.join(REPO_DIR, name)} #{dir}`
 			elsif Dir.entries(REPO_DIR).include?(name + '.tgz')

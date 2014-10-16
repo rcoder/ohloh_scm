@@ -1,11 +1,11 @@
 require_relative '../test_helper'
 
 module OhlohScm::Adapters
-	class CvsConvertTest < Scm::Test
+	class CvsConvertTest < OhlohScm::Test
 
 		def test_basic_convert
 			with_cvs_repository('cvs', 'simple') do |src|
-				Scm::ScratchDir.new do |dest_dir|
+				OhlohScm::ScratchDir.new do |dest_dir|
 					dest = GitAdapter.new(:url => dest_dir).normalize
 					assert !dest.exist?
 

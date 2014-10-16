@@ -1,7 +1,7 @@
 require_relative '../test_helper'
 
 module OhlohScm::Adapters
-	class HgCommitsTest < Scm::Test
+	class HgCommitsTest < OhlohScm::Test
 
 		def test_commit_count
 			with_hg_repository('hg') do |hg|

@@ -2,7 +2,7 @@
 require_relative '../test_helper'
 
 module OhlohScm::Adapters
-	class BzrlibCatFileTest < Scm::Test
+	class BzrlibCatFileTest < OhlohScm::Test
 
 		def test_cat_file
 			with_bzrlib_repository('bzr') do |bzr|
@@ -11,12 +11,12 @@ first file
 second line
 EXPECTED
 				assert_equal expected,
-					bzr.cat_file(Scm::Commit::new(:token => 6),
-						     Scm::Diff.new(:path => "file1.txt"))
+					bzr.cat_file(OhlohScm::Commit::new(:token => 6),
+						     OhlohScm::Diff.new(:path => "file1.txt"))
 
 				# file2.txt has been removed in commit #5
 				assert_equal nil, bzr.cat_file(bzr.head,
-							       Scm::Diff.new(:path => "file2.txt"))
+							       OhlohScm::Diff.new(:path => "file2.txt"))
 			end
 		end
 
@@ -27,8 +27,8 @@ first file
 second line
 EXPECTED
 				assert_equal expected,
-					bzr.cat_file(Scm::Commit::new(:token => 7),
-						     Scm::Diff.new(:path => "Cédric.txt"))
+					bzr.cat_file(OhlohScm::Commit::new(:token => 7),
+						     OhlohScm::Diff.new(:path => "Cédric.txt"))
 			end
 		end
 
@@ -39,16 +39,16 @@ first file
 second line
 EXPECTED
 				assert_equal expected,
-					bzr.cat_file_parent(Scm::Commit::new(:token => 6),
-							    Scm::Diff.new(:path => "file1.txt"))
+					bzr.cat_file_parent(OhlohScm::Commit::new(:token => 6),
+							    OhlohScm::Diff.new(:path => "file1.txt"))
 
 				# file2.txt has been removed in commit #5
 				expected = <<-EXPECTED
 another file
 EXPECTED
 				assert_equal expected,
-					bzr.cat_file_parent(Scm::Commit.new(:token => 5),
-							    Scm::Diff.new(:path => "file2.txt"))
+					bzr.cat_file_parent(OhlohScm::Commit.new(:token => 5),
+							    OhlohScm::Diff.new(:path => "file2.txt"))
 			end
 		end
 

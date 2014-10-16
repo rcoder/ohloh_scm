@@ -1,7 +1,7 @@
 require_relative '../test_helper'
 
 module OhlohScm::Adapters
-	class GitCommitsTest < Scm::Test
+	class GitCommitsTest < OhlohScm::Test
 
 		def test_commit_count
 			with_git_repository('git') do |git|

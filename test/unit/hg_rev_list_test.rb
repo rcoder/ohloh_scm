@@ -7,7 +7,7 @@ module OhlohScm::Adapters
 	#     /      \    \
 	#    A -> B -> C -> D -> tip
 	#
-	class HgRevListTest < Scm::Test
+	class HgRevListTest < OhlohScm::Test
 
 		def test_rev_list
 			with_hg_repository('hg_walk') do |hg|

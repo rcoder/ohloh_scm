@@ -1,7 +1,7 @@
 require_relative '../test_helper'
 
 module OhlohScm::Adapters
-	class HgHeadTest < Scm::Test
+	class HgHeadTest < OhlohScm::Test
 
 		def test_head_and_parents
 			with_hg_repository('hg') do |hg|

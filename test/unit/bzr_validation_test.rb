@@ -1,7 +1,7 @@
 require_relative '../test_helper'
 
 module OhlohScm::Adapters
-	class BzrValidationTest < Scm::Test
+	class BzrValidationTest < OhlohScm::Test
 		def test_rejected_urls
 			[	nil, "", "foo", "http:/", "http:://", "http://", "http://a",
 				"www.selenic.com/repo/hello", # missing a protool prefix
@@ -21,8 +21,8 @@ module OhlohScm::Adapters
 				"http://www.selenic.com:80/repo/hello",
 				"https://www.selenic.com/repo/hello",
 				"bzr://www.selenic.com/repo/hello",
-				"lp:foobar", 
-				"lp:~foobar/bar", 
+				"lp:foobar",
+				"lp:~foobar/bar",
 			].each do |url|
 				bzr = BzrAdapter.new(:url => url, :public_urls_only => true)
 				assert !bzr.validate_url

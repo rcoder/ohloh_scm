@@ -1,6 +1,6 @@
 require_relative '../test_helper'
 
-class ShelloutTest < Scm::Test
+class ShelloutTest < OhlohScm::Test
   def test_execute_must_pipe_the_results_accurately
     status, out, err = Shellout.execute("ruby -e 'puts %[hello world]; STDERR.puts(%[some error])'")
 

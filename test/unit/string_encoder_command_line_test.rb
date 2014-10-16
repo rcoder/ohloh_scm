@@ -1,7 +1,7 @@
 require_relative '../test_helper'
 
 module OhlohScm::Parsers
-  class StringEncoderCommandLineTest < Scm::Test
+  class StringEncoderCommandLineTest < OhlohScm::Test
     def test_length_of_content_unchanged
       file_path = File.expand_path('../../data/sample-content', __FILE__)
       original_content_length = File.size(file_path)

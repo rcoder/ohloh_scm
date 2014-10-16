@@ -1,7 +1,7 @@
 require_relative '../test_helper'
 
 module OhlohScm::Adapters
-	class HgPushTest < Scm::Test
+	class HgPushTest < OhlohScm::Test
 
 		def test_hostname
 			assert !HgAdapter.new.hostname
@@ -36,7 +36,7 @@ module OhlohScm::Adapters
 
 		def test_push
 			with_hg_repository('hg') do |src|
-				Scm::ScratchDir.new do |dest_dir|
+				OhlohScm::ScratchDir.new do |dest_dir|
 
 					dest = HgAdapter.new(:url => dest_dir).normalize
 					assert !dest.exist?
