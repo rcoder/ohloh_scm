@@ -1,7 +1,7 @@
 require_relative '../test_helper'
 
 module OhlohScm::Adapters
-	class CvsCommitsTest < Scm::Test
+	class CvsCommitsTest < OhlohScm::Test
 
 		def test_commits
 			with_cvs_repository('cvs', 'simple') do |cvs|

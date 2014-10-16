@@ -4,7 +4,7 @@ require 'ohloh_scm/version'
 
 Gem::Specification.new do |gem|
   gem.name          = 'ohloh_scm'
-  gem.version       = Scm::Version::STRING
+  gem.version       = OhlohScm::Version::STRING
   gem.authors       = ["BlackDuck Software"]
   gem.email         = ["info@openhub.net"]
   gem.summary       = %[Source Control Management]

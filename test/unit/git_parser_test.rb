@@ -1,7 +1,7 @@
 require_relative '../test_helper'
 
 module OhlohScm::Parsers
-	class GitParserTest < Scm::Test
+	class GitParserTest < OhlohScm::Test
 
 		def test_empty_array
 			assert_equal([], GitParser.parse(''))

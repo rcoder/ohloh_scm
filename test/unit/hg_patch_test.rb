@@ -1,7 +1,7 @@
 require_relative '../test_helper'
 
 module OhlohScm::Adapters
-  class HgPatchTest < Scm::Test
+  class HgPatchTest < OhlohScm::Test
     def test_patch_for_commit
       with_hg_repository('hg') do |repo|
         commit = repo.verbose_commit(1)

@@ -1,7 +1,7 @@
 require_relative '../test_helper'
 
 module OhlohScm::Parsers
-	class SvnXmlParserTest < Scm::Test
+	class SvnXmlParserTest < OhlohScm::Test
 
 		def test_basic
 			assert_convert(SvnXmlParser, DATA_DIR + '/simple.svn_xml_log', DATA_DIR + '/simple.ohlog')
@@ -14,7 +14,7 @@ module OhlohScm::Parsers
 		def test_empty_xml
 			assert_equal("<?xml version=\"1.0\"?>\n<ohloh_log scm=\"svn\">\n</ohloh_log>\n", SvnXmlParser.parse('', :writer => XmlWriter.new))
 		end
-		
+
 		def test_copy_from
 			xml = <<-XML
 <?xml version="1.0"?>

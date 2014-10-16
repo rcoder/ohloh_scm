@@ -1,7 +1,7 @@
 require_relative '../test_helper'
 
 module OhlohScm::Adapters
-	class HgMiscTest < Scm::Test
+	class HgMiscTest < OhlohScm::Test
 
 		def test_exist
 			save_hg = nil
@@ -20,7 +20,7 @@ module OhlohScm::Adapters
 
 		def test_export
 			with_hg_repository('hg') do |hg|
-				Scm::ScratchDir.new do |dir|
+				OhlohScm::ScratchDir.new do |dir|
 					hg.export(dir)
 					assert_equal ['.', '..', 'README', 'makefile'], Dir.entries(dir).sort
 				end

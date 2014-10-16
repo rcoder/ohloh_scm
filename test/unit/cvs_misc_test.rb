@@ -1,7 +1,7 @@
 require_relative '../test_helper'
 
 module OhlohScm::Adapters
-	class CvsMiscTest < Scm::Test
+	class CvsMiscTest < OhlohScm::Test
 		def test_local_directory_trim
 			r = CvsAdapter.new(:url => "/Users/robin/cvs_repo/", :module_name => "simple")
 			assert_equal "/Users/robin/cvs_repo/simple/foo.rb", r.trim_directory('/Users/robin/cvs_repo/simple/foo.rb')

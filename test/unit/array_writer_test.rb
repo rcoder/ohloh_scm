@@ -1,7 +1,7 @@
 require_relative '../test_helper'
 
 module OhlohScm::Parsers
-	class ArrayWriterTest < Scm::Test
+	class ArrayWriterTest < OhlohScm::Test
 
 		def test_basic
 

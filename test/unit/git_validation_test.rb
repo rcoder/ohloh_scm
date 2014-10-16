@@ -1,7 +1,7 @@
 require_relative '../test_helper'
 
 module OhlohScm::Adapters
-	class GitValidationTest < Scm::Test
+	class GitValidationTest < OhlohScm::Test
 		def test_rejected_urls
 			[	nil, "", "foo", "http:/", "http:://", "http://", "http://a",
 			"kernel.org/linux/linux.git", # missing a protocol prefix

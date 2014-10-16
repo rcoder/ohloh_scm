@@ -7,7 +7,7 @@ module OhlohScm::Adapters
 	#     /      \    \
 	#    A -> B -> C -> D -> master
 	#
-	class GitRevListTest < Scm::Test
+	class GitRevListTest < OhlohScm::Test
 
 		def test_rev_list
 			with_git_repository('git_walk') do |git|

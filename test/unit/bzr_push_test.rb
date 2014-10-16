@@ -1,7 +1,7 @@
 require_relative '../test_helper'
 
 module OhlohScm::Adapters
-	class BzrPushTest < Scm::Test
+	class BzrPushTest < OhlohScm::Test
 
 		def test_hostname
 			assert !BzrAdapter.new.hostname
@@ -36,7 +36,7 @@ module OhlohScm::Adapters
 
 		def test_push
 			with_bzr_repository('bzr') do |src|
-				Scm::ScratchDir.new do |dest_dir|
+				OhlohScm::ScratchDir.new do |dest_dir|
 
 					dest = BzrAdapter.new(:url => dest_dir).normalize
 					assert !dest.exist?

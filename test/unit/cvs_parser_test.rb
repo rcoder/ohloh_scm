@@ -1,7 +1,7 @@
 require_relative '../test_helper'
 
 module OhlohScm::Parsers
-	class CvsParserTest < Scm::Test
+	class CvsParserTest < OhlohScm::Test
 
 		def test_basic
 			assert_convert(CvsParser, DATA_DIR + '/basic.rlog', DATA_DIR + '/basic.ohlog')

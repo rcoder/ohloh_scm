@@ -1,7 +1,7 @@
 require_relative '../test_helper'
 
 module OhlohScm::Adapters
-	class GitPushTest < Scm::Test
+	class GitPushTest < OhlohScm::Test
 
 		def test_hostname
 			assert_equal "foo", GitAdapter.new(:url => 'foo:/bar').hostname
@@ -23,7 +23,7 @@ module OhlohScm::Adapters
 
 		def test_basic_push
 			with_git_repository('git') do |src|
-				Scm::ScratchDir.new do |dest_dir|
+				OhlohScm::ScratchDir.new do |dest_dir|
 
 					dest = GitAdapter.new(:url => dest_dir).normalize
 					assert !dest.exist?
@@ -34,7 +34,7 @@ module OhlohScm::Adapters
 
 					# Now push again. This tests a different code path!
 					File.open(File.join(src.url, 'foo'), 'w') { }
-					src.commit_all(Scm::Commit.new)
+					src.commit_all(OhlohScm::Commit.new)
 
 					src.push(dest)
 					assert dest.exist?
