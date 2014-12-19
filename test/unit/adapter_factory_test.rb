@@ -1,10 +1,10 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require_relative '../test_helper'
 
-module Scm::Adapters
-	class FactoryTest < Scm::Test
+module OhlohScm::Adapters
+	class FactoryTest < OhlohScm::Test
 
 		def test_factory_hg
-			Scm::ScratchDir.new do |path|
+			OhlohScm::ScratchDir.new do |path|
 				`cd #{path} && hg init`
 				hg = Factory.from_path(path)
 				assert hg.is_a?(HgAdapter)
@@ -13,7 +13,7 @@ module Scm::Adapters
 		end
 
 		def test_factory_bzr
-			Scm::ScratchDir.new do |path|
+			OhlohScm::ScratchDir.new do |path|
 				`cd #{path} && bzr init`
 				bzr = Factory.from_path(path)
 				assert bzr.is_a?(BzrAdapter)
@@ -22,7 +22,7 @@ module Scm::Adapters
 		end
 
 		def test_factory_git
-			Scm::ScratchDir.new do |path|
+			OhlohScm::ScratchDir.new do |path|
 				`cd #{path} && git init`
 				git = Factory.from_path(path)
 				assert git.is_a?(GitAdapter)
@@ -31,7 +31,7 @@ module Scm::Adapters
 		end
 
 		def test_factory_svn
-			Scm::ScratchDir.new do |path|
+			OhlohScm::ScratchDir.new do |path|
 				`cd #{path} && svnadmin create foo`
 				svn = Factory.from_path(File.join(path, 'foo'))
 				assert svn.is_a?(SvnAdapter)
@@ -40,7 +40,7 @@ module Scm::Adapters
 		end
 
 		def test_factory_svn_checkout
-			Scm::ScratchDir.new do |path|
+			OhlohScm::ScratchDir.new do |path|
 				`cd #{path} && svnadmin create foo`
 				`cd #{path} && svn co file://#{File.expand_path(File.join(path, 'foo'))} bar`
 				svn = Factory.from_path(File.join(path, 'bar'))
@@ -52,8 +52,8 @@ module Scm::Adapters
 		end
 
 		def test_factory_from_cvs_checkout
-			with_cvs_repository('cvs') do |cvs|
-				Scm::ScratchDir.new do |path|
+			with_cvs_repository('cvs', 'simple') do |cvs|
+				OhlohScm::ScratchDir.new do |path|
 					`cd #{path} && cvsnt -d #{File.expand_path(cvs.url)} co simple 2> /dev/null`
 					factory_response = Factory.from_path(File.join(path, 'simple'))
 					assert factory_response.is_a?(CvsAdapter)

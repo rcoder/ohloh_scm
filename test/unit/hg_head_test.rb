@@ -1,7 +1,7 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require_relative '../test_helper'
 
-module Scm::Adapters
-	class HgHeadTest < Scm::Test
+module OhlohScm::Adapters
+	class HgHeadTest < OhlohScm::Test
 
 		def test_head_and_parents
 			with_hg_repository('hg') do |hg|

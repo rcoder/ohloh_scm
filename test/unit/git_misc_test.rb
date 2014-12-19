@@ -1,11 +1,11 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require_relative '../test_helper'
 
-module Scm::Adapters
-	class GitMiscTest < Scm::Test
+module OhlohScm::Adapters
+	class GitMiscTest < OhlohScm::Test
 
 		def test_export
 			with_git_repository('git') do |git|
-				Scm::ScratchDir.new do |dir|
+				OhlohScm::ScratchDir.new do |dir|
 					git.export(dir)
 					assert_equal ['.','..','.gitignore','COPYING','README','helloworld.c','makefile','ohloh_token'], Dir.entries(dir).sort
 				end
@@ -27,9 +27,22 @@ module Scm::Adapters
 
 		def test_is_merge_commit
 			with_git_repository('git_walk') do |git|
-				assert git.is_merge_commit?(Scm::Commit.new(:token => 'f264fb40c340a415b305ac1f0b8f12502aa2788f'))
-				assert !git.is_merge_commit?(Scm::Commit.new(:token => 'd067161caae2eeedbd74976aeff5c4d8f1ccc946'))
+				assert git.is_merge_commit?(OhlohScm::Commit.new(:token => 'f264fb40c340a415b305ac1f0b8f12502aa2788f'))
+				assert !git.is_merge_commit?(OhlohScm::Commit.new(:token => 'd067161caae2eeedbd74976aeff5c4d8f1ccc946'))
 			end
 		end
+
+    def test_branches_encoding
+      with_git_repository('git_with_invalid_encoding') do |git|
+        assert_equal true, git.branches.all? { |branch| branch.valid_encoding? }
+      end
+    end
+
+    # `git ls-tree` returns filenames in valid utf8 regardless of their original form.
+    def test_ls_tree_encoding
+      with_git_repository('git_with_invalid_encoding') do |git|
+        assert_equal true, git.ls_tree.all? { |filename| filename.valid_encoding? }
+      end
+    end
 	end
 end

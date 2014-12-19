@@ -1,7 +1,7 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require_relative '../test_helper'
 
-module Scm::Adapters
-	class SvnHeadTest < Scm::Test
+module OhlohScm::Adapters
+	class SvnHeadTest < OhlohScm::Test
 
 		def test_head_and_parents
 			with_svn_repository('svn') do |svn|
@@ -14,6 +14,14 @@ module Scm::Adapters
 			end
 		end
 
+    def test_parents_encoding
+      with_invalid_encoded_svn_repository do |svn|
+        assert_nothing_raised do
+          commit = Struct.new(:token).new(:anything)
+          svn.parents(commit) rescue raise Exception
+        end
+      end
+    end
 	end
 end
 

@@ -1,7 +1,7 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require_relative '../test_helper'
 
-module Scm::Adapters
-	class CvsMiscTest < Scm::Test
+module OhlohScm::Adapters
+	class CvsMiscTest < OhlohScm::Test
 		def test_local_directory_trim
 			r = CvsAdapter.new(:url => "/Users/robin/cvs_repo/", :module_name => "simple")
 			assert_equal "/Users/robin/cvs_repo/simple/foo.rb", r.trim_directory('/Users/robin/cvs_repo/simple/foo.rb')
@@ -45,5 +45,22 @@ module Scm::Adapters
 			assert_equal "hello", l[2]
 			assert_equal "foo/bar", l[3]
 		end
+
+    def host
+			r = CvsAdapter.new(:url => ':ext:anonymous:@moodle.cvs.sourceforge.net:/cvsroot/moodle', :module_name => 'contrib')
+      assert_equal 'moodle.cvs.sourceforge.net', r.host
+    end
+
+    def protocol
+      assert_equal :pserver, CvsAdapter.new(:url => ':pserver:foo:@foo.com:/cvsroot/a', :module_name => 'b')
+      assert_equal :ext, CvsAdapter.new(:url => ':ext:foo:@foo.com:/cvsroot/a', :module_name => 'b')
+      assert_equal :pserver, CvsAdapter.new(:url => ':pserver:ext:@foo.com:/cvsroot/a', :module_name => 'b')
+    end
+
+    def test_log_encoding
+      with_cvs_repository('cvs', 'invalid_utf8') do |cvs|
+        assert_equal true, cvs.log.valid_encoding?
+      end
+    end
 	end
 end

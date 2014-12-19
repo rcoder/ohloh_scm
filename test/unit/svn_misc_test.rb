@@ -1,11 +1,11 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require_relative '../test_helper'
 
-module Scm::Adapters
-	class SvnMiscTest < Scm::Test
+module OhlohScm::Adapters
+	class SvnMiscTest < OhlohScm::Test
 
 		def test_export
 			with_svn_repository('svn') do |svn|
-				Scm::ScratchDir.new do |dir|
+				OhlohScm::ScratchDir.new do |dir|
 					svn.export(dir)
 					assert_equal ['.','..','branches','tags','trunk'], Dir.entries(dir).sort
 				end
@@ -58,6 +58,31 @@ module Scm::Adapters
 			with_svn_repository('svn') do |svn|
 				assert svn.is_directory?('trunk')
 				assert !svn.is_directory?('trunk/helloworld.c')
+				assert !svn.is_directory?('invalid/path')
+			end
+		end
+
+		def test_restrict_url_to_trunk_descend_no_further
+			with_svn_repository('deep_svn') do |svn|
+				assert_equal svn.root, svn.url
+				assert_equal '', svn.branch_name
+
+				svn.restrict_url_to_trunk
+
+				assert_equal svn.root + '/trunk', svn.url
+				assert_equal "/trunk", svn.branch_name
+			end
+		end
+
+		def test_restrict_url_to_trunk
+			with_svn_repository('svn') do |svn|
+				assert_equal svn.root, svn.url
+				assert_equal '', svn.branch_name
+
+				svn.restrict_url_to_trunk
+
+				assert_equal svn.root + '/trunk', svn.url
+				assert_equal "/trunk", svn.branch_name
 			end
 		end
 	end
