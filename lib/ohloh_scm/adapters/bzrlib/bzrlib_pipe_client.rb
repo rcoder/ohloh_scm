@@ -1,5 +1,5 @@
 require 'rubygems'
-require 'open4'
+require 'posix/spawn'
 
 class BzrPipeClient
   def initialize(repository_url)
@@ -8,7 +8,7 @@ class BzrPipeClient
   end
   
   def start
-    @pid, @stdin, @stdout, @stderr = Open4::popen4 "python #{@py_script}"
+    @pid, @stdin, @stdout, @stderr = POSIX::Spawn::popen4 "python #{@py_script}"
     open_repository
   end
 
