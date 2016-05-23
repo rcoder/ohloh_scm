@@ -6,7 +6,7 @@ class BzrPipeClient
     @repository_url = repository_url
     @py_script = File.dirname(__FILE__) + '/bzrlib_pipe_server.py'
   end
-  
+
   def start
     @pid, @stdin, @stdout, @stderr = POSIX::Spawn::popen4 "python #{@py_script}"
     open_repository
@@ -27,8 +27,9 @@ class BzrPipeClient
     # send the command
     @stdin.puts cmd
     @stdin.flush
+    return if cmd == "QUIT"
 
-    # get status on stderr, first letter indicates state, 
+    # get status on stderr, first letter indicates state,
     # remaing value indicates length of the file content
     status = @stderr.read(10)
     flag = status[0,1]
@@ -46,6 +47,7 @@ class BzrPipeClient
 
   def shutdown
     send_command("QUIT")
+    [@stdout, @stdin, @stderr].each { |io| io.close unless io.closed? }
     Process.waitpid(@pid, Process::WNOHANG)
   end
 end
