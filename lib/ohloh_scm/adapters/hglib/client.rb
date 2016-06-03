@@ -36,6 +36,7 @@ class HglibClient
     # send the command
     @stdin.puts cmd
     @stdin.flush
+    return if cmd == "QUIT"
 
     # get status on stderr, first letter indicates state,
     # remaing value indicates length of the file content
@@ -55,6 +56,7 @@ class HglibClient
 
   def shutdown
     send_command("QUIT")
+    [@stdout, @stdin, @stderr].each { |io| io.close unless io.closed? }
     Process.waitpid(@pid, Process::WNOHANG)
   end
 end
