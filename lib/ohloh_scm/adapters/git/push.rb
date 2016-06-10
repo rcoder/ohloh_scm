@@ -10,7 +10,9 @@ module OhlohScm::Adapters
 
 			if to.exist?
 				ENV['GIT_COMMITTER_NAME'] = COMMITTER_NAME
+				run "cd '#{to.url}' && git checkout -b tmp"
 				run "cd '#{self.url}' && git push '#{to.url}' #{self.branch_name}:#{to.branch_name}"
+				run "cd '#{to.url}' && git checkout master && git branch -d tmp"
 			else
 				if to.local?
 					# Create a new repo on the same local machine. Just use existing pull code in reverse.
