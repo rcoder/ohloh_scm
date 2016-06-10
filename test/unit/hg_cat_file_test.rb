@@ -35,7 +35,7 @@ EXPECTED
 				File.open(File.join(dir, funny_name), 'w') { |f| f.write "contents" }
 
 				# Add it to an hg repository
-				`cd #{dir} && hg init && hg add * && hg commit -m test`
+				`cd #{dir} && hg init && hg add * && hg commit -u tester -m test`
 
 				# Confirm that we can read the file back
 				hg = HgAdapter.new(:url => dir).normalize

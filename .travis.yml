@@ -1,4 +1,8 @@
 language: ruby
+before_install:
+  - sudo apt-get install -y cvs
+  - sudo ln -s /usr/bin/cvs /usr/bin/cvsnt
+  - sudo apt-get install -y subversion
 install:
   - gem install posix-spawn
   - sh .install_dependencies.sh

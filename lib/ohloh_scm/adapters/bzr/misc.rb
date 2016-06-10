@@ -10,7 +10,9 @@ module OhlohScm::Adapters
 		end
 
 		def ls_tree(token)
-			run("cd #{path} && bzr ls -V -r #{to_rev_param(token)}").split("\n")
+			run("cd #{path} && bzr ls -V -r #{to_rev_param(token)}").split("\n").map!{ |file_name|
+				file_name.force_encoding(Encoding::UTF_8)
+			}
 		end
 
 		def to_rev_param(r=nil)
