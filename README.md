@@ -1,4 +1,4 @@
-[![Ohloh SCM on Ohloh](https://www.ohloh.net/p/ohloh_scm/widgets/project_partner_badge.gif)](https://www.ohloh.net/p/ohloh_scm)
+[![Ohloh SCM on Ohloh](https://www.ohloh.net/p/ohloh_scm/widgets/project_partner_badge.gif)](https://www.ohloh.net/p/ohloh_scm) [![Build Status](https://travis-ci.org/blackducksoftware/ohloh_scm.svg?branch=master)](https://travis-ci.org/blackducksoftware/ohloh_scm)
 
 # Ohloh SCM
 
