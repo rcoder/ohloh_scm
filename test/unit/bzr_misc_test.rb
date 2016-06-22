@@ -20,7 +20,8 @@ module OhlohScm::Adapters
 					      'file3.txt',
 					      'file4.txt',
 					      'file5.txt'],
-					     bzr.ls_tree(bzr.head_token).sort
+              bzr.ls_tree(bzr.head_token).sort.map { |filename|
+                filename.force_encoding(Encoding::UTF_8) }
 			end
 		end
 
