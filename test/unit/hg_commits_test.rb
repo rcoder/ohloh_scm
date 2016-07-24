@@ -5,9 +5,9 @@ module OhlohScm::Adapters
 
 		def test_commit_count
 			with_hg_repository('hg') do |hg|
-				assert_equal 4, hg.commit_count
-				assert_equal 2, hg.commit_count(:after => 'b14fa4692f949940bd1e28da6fb4617de2615484')
-				assert_equal 0, hg.commit_count(:after => '75532c1e1f1de55c2271f6fd29d98efbe35397c4')
+				assert_equal 5, hg.commit_count
+				assert_equal 3, hg.commit_count(:after => 'b14fa4692f949940bd1e28da6fb4617de2615484')
+				assert_equal 0, hg.commit_count(:after => '655f04cf6ad708ab58c7b941672dce09dd369a18')
 			end
 		end
 
@@ -16,12 +16,13 @@ module OhlohScm::Adapters
 				assert_equal ['01101d8ef3cea7da9ac6e9a226d645f4418f05c9',
 											'b14fa4692f949940bd1e28da6fb4617de2615484',
 											'468336c6671cbc58237a259d1b7326866afc2817',
-											'75532c1e1f1de55c2271f6fd29d98efbe35397c4'], hg.commit_tokens
+                      '75532c1e1f1de55c2271f6fd29d98efbe35397c4',
+											'655f04cf6ad708ab58c7b941672dce09dd369a18'], hg.commit_tokens
 
-				assert_equal ['75532c1e1f1de55c2271f6fd29d98efbe35397c4'],
-					hg.commit_tokens(:after => '468336c6671cbc58237a259d1b7326866afc2817')
+				assert_equal ['655f04cf6ad708ab58c7b941672dce09dd369a18'],
+					hg.commit_tokens(:after => '75532c1e1f1de55c2271f6fd29d98efbe35397c4')
 
-				assert_equal [], hg.commit_tokens(:after => '75532c1e1f1de55c2271f6fd29d98efbe35397c4')
+				assert_equal [], hg.commit_tokens(:after => '655f04cf6ad708ab58c7b941672dce09dd369a18')
 			end
 		end
 
@@ -30,15 +31,34 @@ module OhlohScm::Adapters
 				assert_equal ['01101d8ef3cea7da9ac6e9a226d645f4418f05c9',
 											'b14fa4692f949940bd1e28da6fb4617de2615484',
 											'468336c6671cbc58237a259d1b7326866afc2817',
-											'75532c1e1f1de55c2271f6fd29d98efbe35397c4'], hg.commits.collect { |c| c.token }
+                      '75532c1e1f1de55c2271f6fd29d98efbe35397c4',
+											'655f04cf6ad708ab58c7b941672dce09dd369a18'], hg.commits.collect { |c| c.token }
 
-				assert_equal ['75532c1e1f1de55c2271f6fd29d98efbe35397c4'],
-					hg.commits(:after => '468336c6671cbc58237a259d1b7326866afc2817').collect { |c| c.token }
+				assert_equal ['655f04cf6ad708ab58c7b941672dce09dd369a18'],
+					hg.commits(:after => '75532c1e1f1de55c2271f6fd29d98efbe35397c4').collect { |c| c.token }
 
 				# Check that the diffs are not populated
-				assert_equal [], hg.commits(:after => '468336c6671cbc58237a259d1b7326866afc2817').first.diffs
+				assert_equal [], hg.commits(:after => '75532c1e1f1de55c2271f6fd29d98efbe35397c4').first.diffs
 
-				assert_equal [], hg.commits(:after => '75532c1e1f1de55c2271f6fd29d98efbe35397c4')
+				assert_equal [], hg.commits(:after => '655f04cf6ad708ab58c7b941672dce09dd369a18')
+			end
+		end
+
+		def test_commits_with_branch
+			with_hg_repository('hg', 'develop') do |hg|
+				assert_equal ['01101d8ef3cea7da9ac6e9a226d645f4418f05c9',
+											'b14fa4692f949940bd1e28da6fb4617de2615484',
+											'468336c6671cbc58237a259d1b7326866afc2817',
+                      '75532c1e1f1de55c2271f6fd29d98efbe35397c4',
+											'4d54c3f0526a1ec89214a70615a6b1c6129c665c'], hg.commits.collect { |c| c.token }
+
+				assert_equal ['4d54c3f0526a1ec89214a70615a6b1c6129c665c'],
+					hg.commits(:after => '75532c1e1f1de55c2271f6fd29d98efbe35397c4').collect { |c| c.token }
+
+				# Check that the diffs are not populated
+				assert_equal [], hg.commits(:after => '75532c1e1f1de55c2271f6fd29d98efbe35397c4').first.diffs
+
+				assert_equal [], hg.commits(:after => '4d54c3f0526a1ec89214a70615a6b1c6129c665c')
 			end
 		end
 
@@ -129,18 +149,34 @@ module OhlohScm::Adapters
 				assert_equal ['01101d8ef3cea7da9ac6e9a226d645f4418f05c9',
 											'b14fa4692f949940bd1e28da6fb4617de2615484',
 											'468336c6671cbc58237a259d1b7326866afc2817',
-											'75532c1e1f1de55c2271f6fd29d98efbe35397c4'], commits.collect { |c| c.token }
+											'75532c1e1f1de55c2271f6fd29d98efbe35397c4',
+                      '655f04cf6ad708ab58c7b941672dce09dd369a18'], commits.collect { |c| c.token }
 			end
 		end
+
+    def test_each_commit_for_branch
+      commits = []
+
+			with_hg_repository('hg', 'develop') do |hg|
+        commits = hg.each_commit
+      end
+
+      assert_equal ['01101d8ef3cea7da9ac6e9a226d645f4418f05c9',
+                    'b14fa4692f949940bd1e28da6fb4617de2615484',
+                    '468336c6671cbc58237a259d1b7326866afc2817',
+                    '75532c1e1f1de55c2271f6fd29d98efbe35397c4',
+                    '4d54c3f0526a1ec89214a70615a6b1c6129c665c'], commits.collect { |c| c.token }
+    end
+
 
 		def test_each_commit_after
 			commits = []
 			with_hg_repository('hg') do |hg|
-				hg.each_commit(:after => 'b14fa4692f949940bd1e28da6fb4617de2615484') do |c|
+				hg.each_commit(:after => '468336c6671cbc58237a259d1b7326866afc2817') do |c|
 					commits << c
 				end
-				assert_equal ['468336c6671cbc58237a259d1b7326866afc2817',
-											'75532c1e1f1de55c2271f6fd29d98efbe35397c4'], commits.collect { |c| c.token }
+				assert_equal ['75532c1e1f1de55c2271f6fd29d98efbe35397c4',
+											'655f04cf6ad708ab58c7b941672dce09dd369a18'], commits.collect { |c| c.token }
 			end
 		end
 

@@ -39,6 +39,20 @@ module OhlohScm::Adapters
 			end
 		end
 
+    def test_commits_with_branch
+      with_git_repository('git', 'develop') do |git|
+        assert_equal ['089c527c61235bd0793c49109b5bd34d439848c6',
+                      'b6e9220c3cabe53a4ed7f32952aeaeb8a822603d',
+                      '2e9366dd7a786fdb35f211fff1c8ea05c51968b1',
+                      'b4046b9a80fead62fa949232f2b87b0cb78fffcc'], git.commits.map(&:token)
+
+        assert_equal ['b4046b9a80fead62fa949232f2b87b0cb78fffcc'],
+          git.commits(:after => '2e9366dd7a786fdb35f211fff1c8ea05c51968b1').map(&:token)
+
+        assert_equal [], git.commits(:after => 'b4046b9a80fead62fa949232f2b87b0cb78fffcc')
+      end
+    end
+
     def test_trunk_only_commit_count
 			with_git_repository('git_dupe_delete') do |git|
 				assert_equal 4, git.commit_count(:trunk_only => false)

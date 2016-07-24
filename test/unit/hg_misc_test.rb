@@ -14,7 +14,7 @@ module OhlohScm::Adapters
 
 		def test_ls_tree
 			with_hg_repository('hg') do |hg|
-				assert_equal ['README','makefile'], hg.ls_tree(hg.head_token).sort
+				assert_equal ['README','makefile', 'two'], hg.ls_tree(hg.head_token).sort
 			end
 		end
 
@@ -22,7 +22,7 @@ module OhlohScm::Adapters
 			with_hg_repository('hg') do |hg|
 				OhlohScm::ScratchDir.new do |dir|
 					hg.export(dir)
-					assert_equal ['.', '..', 'README', 'makefile'], Dir.entries(dir).sort
+					assert_equal ['.', '..', 'README', 'makefile', 'two'], Dir.entries(dir).sort
 				end
 			end
 		end

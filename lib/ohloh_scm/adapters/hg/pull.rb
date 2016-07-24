@@ -12,7 +12,8 @@ module OhlohScm::Adapters
 				run "rm -rf '#{self.url}'"
 				run "hg clone -U '#{from.url}' '#{self.url}'"
 			else
-				run "cd '#{self.url}' && hg revert --all && hg pull -u -y '#{from.url}'"
+        branch_opts = "-r #{ from.branch_name }" if branch_name
+				run "cd '#{self.url}' && hg revert --all && hg pull #{ branch_opts } -u -y '#{from.url}'"
 			end
 
 			yield(1,1) if block_given? # Progress bar callback
