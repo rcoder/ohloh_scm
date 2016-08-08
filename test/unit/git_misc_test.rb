@@ -14,7 +14,7 @@ module OhlohScm::Adapters
 
 		def test_branches
 			with_git_repository('git') do |git|
-				assert_equal ['master'], git.branches
+				assert_equal ['develop', 'master'], git.branches
 				assert git.has_branch?('master')
 			end
 		end

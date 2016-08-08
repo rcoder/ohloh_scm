@@ -47,7 +47,7 @@ class OhlohScm::Test < Test::Unit::TestCase
 		assert_equal expected_lines, actual_lines
 	end
 
-	def with_repository(type, name)
+	def with_repository(type, name, branch_name = nil)
 		OhlohScm::ScratchDir.new do |dir|
 			if Dir.entries(REPO_DIR).include?(name)
 				`cp -R #{File.join(REPO_DIR, name)} #{dir}`
@@ -56,7 +56,7 @@ class OhlohScm::Test < Test::Unit::TestCase
 			else
 				raise RuntimeError.new("Repository archive #{File.join(REPO_DIR, name)} not found.")
 			end
-			yield type.new(:url => File.join(dir, name)).normalize
+			yield type.new(:url => File.join(dir, name), branch_name: branch_name).normalize
 		end
 	end
 
@@ -101,13 +101,13 @@ class OhlohScm::Test < Test::Unit::TestCase
 		end
 	end
 
-	def with_git_repository(name)
-		with_repository(OhlohScm::Adapters::GitAdapter, name) { |git| yield git }
-	end
+  def with_git_repository(name, branch_name = nil)
+    with_repository(OhlohScm::Adapters::GitAdapter, name, branch_name) { |git| yield git }
+  end
 
-	def with_hg_repository(name)
-		with_repository(OhlohScm::Adapters::HgAdapter, name) { |hg| yield hg }
-	end
+  def with_hg_repository(name, branch_name = nil)
+    with_repository(OhlohScm::Adapters::HgAdapter, name, branch_name) { |hg| yield hg }
+  end
 
 	def with_hglib_repository(name)
 		with_repository(OhlohScm::Adapters::HglibAdapter, name) { |hg| yield hg }
