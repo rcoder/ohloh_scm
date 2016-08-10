@@ -123,6 +123,11 @@ module OhlohScm::Adapters
 			run "svn export --trust-server-cert --non-interactive --ignore-externals --force -r #{commit_id} '#{SvnAdapter.uri_encode(File.join(root, branch_name.to_s))}' '#{dest_dir}'"
 		end
 
+    def export_tag(dest_dir, tag_name)
+      tag_url = "#{base_path}/tags/#{tag_name}"
+      run "svn export --trust-server-cert --non-interactive --ignore-externals --force '#{tag_url}' '#{dest_dir}'"
+    end
+
 		def ls_tree(token)
 			run("svn ls --trust-server-cert --non-interactive -R -r #{token} '#{SvnAdapter.uri_encode(File.join(root, branch_name.to_s))}@#{token}'").split("\n")
 		end
@@ -139,8 +144,7 @@ module OhlohScm::Adapters
     #      http://svn.apache.org/repos/asf/maven/plugin-testing/trunk
     #      all have the same root value(https://svn.apache.org/repos/asf)
     def tags
-      base_url = url.sub(/(.*)(branches|trunk|tags)(.*)/, '\1').chomp('/')
-      tag_strings = `svn log -v #{ base_url }/tags | grep 'tags.\\+(from.\\+:[0-9]\\+)$'`.split(/\n/)
+      tag_strings = `svn log -v #{ base_path}/tags | grep 'tags.\\+(from.\\+:[0-9]\\+)$'`.split(/\n/)
       tag_strings.map do |tag_string|
         tag_string.match(/\/tags\/(.+) \(from .+:(\d+)\)\Z/)[1..2]
       end
@@ -151,5 +155,12 @@ module OhlohScm::Adapters
         system("cd '#{ working_copy_url }' && svn status | grep 'Summary of conflicts'")
       end
     end
+
+    private
+
+    def base_path
+      url.sub(/(.*)(branches|trunk|tags)(.*)/, '\1').chomp('/')
+    end
+
 	end
 end

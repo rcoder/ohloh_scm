@@ -70,6 +70,10 @@ module OhlohScm::Adapters
 			run "cvsnt -d #{self.url} rlog #{opt_branch} #{opt_time(most_recent_token)} '#{self.module_name}' | #{ string_encoder }"
 		end
 
+    def export_tag(dest_dir, tag_name = 'HEAD')
+      run "cvsnt -d #{self.url} export -d'#{dest_dir}' -r #{tag_name} '#{self.module_name}'"
+    end
+
 		def checkout(r, local_directory)
 			opt_D = r.token ? "-D'#{r.token}Z'" : ""
 
