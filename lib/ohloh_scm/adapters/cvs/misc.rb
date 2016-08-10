@@ -187,5 +187,13 @@ module OhlohScm::Adapters
 			  stdout, stderr = run_with_err(cmd)
       end
     end
+
+    def tags
+      tag_strings = run("cvs -Q -d #{ url } rlog -h #{ module_name } | awk -F\"[.:]\" '/^\\t/&&$(NF-1)!=0'").split(/\n/)
+      tag_strings.map do |tag_string|
+        tag_name, version = tag_string.split(':')
+        [tag_name.gsub(/\t/, ''), version.strip]
+      end
+    end
 	end
 end
