@@ -12,6 +12,23 @@ module OhlohScm::Adapters
 			end
 		end
 
+    def test_export_tag
+      with_svn_repository('svn', 'trunk') do |source_scm|
+        OhlohScm::ScratchDir.new do |svn_working_folder|
+          OhlohScm::ScratchDir.new do |dir|
+            folder_name = source_scm.root.slice(/[^\/]+\/?\Z/)
+            system "cd #{ svn_working_folder } && svn co #{ source_scm.root } && cd #{ folder_name } &&
+                    mkdir -p #{ source_scm.root.gsub(/^file:../, '') }/db/transactions
+                    svn copy trunk tags/2.0 && svn commit -m 'v2.0' && svn update"
+
+            source_scm.export_tag(dir, '2.0')
+
+            assert_equal ['.','..','COPYING','README','helloworld.c', 'makefile'], Dir.entries(dir).sort
+          end
+        end
+      end
+    end
+
 		def test_ls_tree
 			with_svn_repository('svn') do |svn|
 				assert_equal ['branches/','tags/','trunk/','trunk/helloworld.c','trunk/makefile'], svn.ls_tree(2).sort
