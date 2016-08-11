@@ -68,5 +68,15 @@ module OhlohScm::Adapters
         assert_equal([['simple_release_tag', '1.1.1.1'], ['simple_vendor_tag', '1.1.1']], cvs.tags)
       end
     end
+
+    def test_export_tag
+      with_cvs_repository('cvs', 'simple') do |cvs|
+        OhlohScm::ScratchDir.new do |dir|
+          cvs.export_tag(dir, 'simple_release_tag')
+
+          assert_equal ['.','..','foo.rb'], Dir.entries(dir).sort
+        end
+      end
+    end
 	end
 end
