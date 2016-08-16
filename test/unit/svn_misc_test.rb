@@ -111,7 +111,7 @@ module OhlohScm::Adapters
                   mkdir -p #{ source_scm.root.gsub(/^file:../, '') }/db/transactions
                   svn copy trunk tags/2.0 && svn commit -m 'v2.0' && svn update"
 
-          assert_equal([['2.0', source_scm.head_token.to_s]], source_scm.tags)
+          assert_equal([['2.0', '6']], source_scm.tags)
         end
       end
     end
