@@ -144,10 +144,10 @@ module OhlohScm::Adapters
     #      http://svn.apache.org/repos/asf/maven/plugin-testing/trunk
     #      all have the same root value(https://svn.apache.org/repos/asf)
     def tags
-      tag_strings = `svn log -v #{ base_path}/tags | grep 'tags.\\+(from.\\+:[0-9]\\+)$'`.split(/\n/)
+      tag_strings = `svn ls -v #{ base_path}/tags`.split(/\n/)
       tag_strings.map do |tag_string|
-        tag_string.match(/\/tags\/(.+) \(from .+:(\d+)\)\Z/)[1..2]
-      end
+        tag_string.split(' ').values_at(-1, 0).map { |v| v.chomp('/') }
+      end[1..-1]
     end
 
     class << self
