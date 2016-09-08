@@ -70,7 +70,12 @@ module OhlohScm::Adapters
 			parent_tokens(commit).size > 1
 		end
 
+    def no_tags?
+      run("cd #{ url } && git tag | head -1").empty?
+    end
+
     def tags
+      return [] if no_tags?
       tag_strings = run("cd #{url} && git show-ref --tags").split(/\n/)
       tag_strings.map do |tag_string|
         commit_hash, tag_path = tag_string.split(/\s/)
