@@ -51,5 +51,11 @@ module OhlohScm::Adapters
                                 ['v2.1.0', '1df547800dcd168e589bb9b26b4039bff3a7f7e4']]
       end
     end
+
+    def test_tags_with_non_tagged_repository
+      with_git_repository('git_walk') do |git|
+        assert_equal git.tags, []
+      end
+    end
 	end
 end
