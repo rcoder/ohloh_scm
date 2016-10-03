@@ -1,6 +1,7 @@
 module OhlohScm::Adapters
 	class AbstractAdapter
 		attr_accessor :url, :branch_name, :username, :password, :errors, :public_urls_only
+    attr_writer :temp_folder
 
 		def initialize(params={})
 			params.each { |k,v| send(k.to_s + '=', v) if respond_to?(k.to_s + '=') }
@@ -19,6 +20,9 @@ module OhlohScm::Adapters
       File.expand_path('../../../../bin/string_encoder', __FILE__)
     end
 
+    def temp_folder
+      @temp_folder || '/tmp'
+    end
 	end
 end
 

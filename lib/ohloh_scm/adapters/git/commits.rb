@@ -108,7 +108,7 @@ module OhlohScm::Adapters
 		end
 
     def log_filename
-      File.join('/tmp', (self.url).gsub(/\W/,'') + '.log')
+      File.join(temp_folder, (self.url).gsub(/\W/,'') + '.log')
     end 
 
 		def rev_list_command(opts={})

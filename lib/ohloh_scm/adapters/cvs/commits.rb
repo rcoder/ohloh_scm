@@ -82,7 +82,7 @@ module OhlohScm::Adapters
 		end
 
 		def rlog_filename
-		  File.join('/tmp', (self.url + self.module_name.to_s + self.branch_name.to_s).gsub(/\W/,'') + '.rlog')
+		  File.join(temp_folder, (self.url + self.module_name.to_s + self.branch_name.to_s).gsub(/\W/,'') + '.rlog')
 		end
 
 		# Converts a CVS time string to a Ruby Time object
