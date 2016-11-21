@@ -271,5 +271,20 @@ module OhlohScm::Adapters
         assert_equal true, svn.single_revision_xml(:anything).valid_encoding?
       end
     end
+
+		def test_replace_commits_history
+			with_svn_repository('svn_with_replace_commits', '/trunk') do |svn|
+				assert_equal 5, svn.commit_count
+				c = svn.verbose_commit(10)
+				assert_equal 'Reverted to revision 9', c.message.strip
+				assert_equal [''], c.diffs.collect(&:path)
+				c = svn.verbose_commit(8)
+				assert_equal 'Reverted to revision 5', c.message.strip
+				assert_equal [''], c.diffs.collect(&:path)
+				c = svn.verbose_commit(2)
+				assert_equal 'Added user model', c.message
+				assert_equal ['/app/models/user.rb'], c.diffs.collect(&:path)
+			end
+		end
 	end
 end

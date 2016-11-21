@@ -1,0 +1,35 @@
+id: 3-1.0-8.r8/0
+type: dir
+pred: 3-1.0.r2/635
+count: 2
+text: 2 588 34 0 e4599d3531bac703c02e4092c249f951
+cpath: /trunk
+copyfrom: 5 /trunk
+
+PLAIN
+K 8
+branches
+V 17
+dir 0-1.0.r5/1050
+K 4
+tags
+V 15
+dir 2-1.0.r1/66
+K 5
+trunk
+V 16
+dir 3-1.0-8.r8/0
+END
+ENDREP
+id: 0.0.r8/254
+type: dir
+pred: 0.0.r7/1000
+count: 8
+text: 8 139 102 0 6c69300dbb5a128b9d39dbfdc47a43f2
+cpath: /
+copyroot: 0 /
+
+3-1._0.t7-7 replace-dir false false /trunk
+5 /trunk
+
+254 381

@@ -23,14 +23,14 @@ module OhlohScm::Adapters
 		def commit_count(opts={})
 			after = (opts[:after] || 0).to_i
 			return 0 if final_token && after >= final_token
-			run("svn log --trust-server-cert --non-interactive -q -r #{after.to_i + 1}:#{final_token || 'HEAD'} --stop-on-copy '#{SvnAdapter.uri_encode(File.join(root, branch_name.to_s))}@#{final_token || 'HEAD'}' | grep -E -e '^r[0-9]+ ' | wc -l").strip.to_i
+			run("svn log --trust-server-cert --non-interactive -q -r #{after.to_i + 1}:#{final_token || 'HEAD'} '#{SvnAdapter.uri_encode(File.join(root, branch_name.to_s))}@#{final_token || 'HEAD'}' | grep -E -e '^r[0-9]+ ' | wc -l").strip.to_i
 		end
 
 		# Returns an array of revision numbers for all commits following revision number 'after'.
 		def commit_tokens(opts={})
 			after = (opts[:after] || 0).to_i
 			return [] if final_token && after >= final_token
-			cmd = "svn log --trust-server-cert --non-interactive -q -r #{after + 1}:#{final_token || 'HEAD'} --stop-on-copy '#{SvnAdapter.uri_encode(File.join(root, branch_name.to_s))}@#{final_token || 'HEAD'}' | grep -E -e '^r[0-9]+ ' | cut -f 1 -d '|' | cut -c 2-"
+			cmd = "svn log --trust-server-cert --non-interactive -q -r #{after + 1}:#{final_token || 'HEAD'} '#{SvnAdapter.uri_encode(File.join(root, branch_name.to_s))}@#{final_token || 'HEAD'}' | grep -E -e '^r[0-9]+ ' | cut -f 1 -d '|' | cut -c 2-"
 			run(cmd).split.collect { |r| r.to_i }
 		end
 
@@ -144,7 +144,7 @@ module OhlohScm::Adapters
 
 		def log(opts={})
 			after = (opts[:after] || 0).to_i
-			run "svn log --trust-server-cert --non-interactive --xml --stop-on-copy -r #{after.to_i + 1}:#{final_token || 'HEAD'} '#{SvnAdapter.uri_encode(File.join(self.root, self.branch_name.to_s))}@#{final_token || 'HEAD'}' #{opt_auth} | #{ string_encoder }"
+			run "svn log --trust-server-cert --non-interactive --xml -r #{after.to_i + 1}:#{final_token || 'HEAD'} '#{SvnAdapter.uri_encode(File.join(self.root, self.branch_name.to_s))}@#{final_token || 'HEAD'}' #{opt_auth} | #{ string_encoder }"
 		end
 
 		def open_log_file(opts={})
@@ -154,7 +154,7 @@ module OhlohScm::Adapters
 					# As a time optimization, just create an empty file rather than fetch a log we know will be empty.
 					File.open(log_filename, 'w') { |f| f.puts '<?xml version="1.0"?>' }
 				else
-					run "svn log --trust-server-cert --non-interactive --xml --stop-on-copy -r #{after + 1}:#{final_token || 'HEAD'} '#{SvnAdapter.uri_encode(File.join(self.root, self.branch_name))}@#{final_token || 'HEAD'}' #{opt_auth} | #{ string_encoder } > #{log_filename}"
+					run "svn log --trust-server-cert --non-interactive --xml -r #{after + 1}:#{final_token || 'HEAD'} '#{SvnAdapter.uri_encode(File.join(self.root, self.branch_name))}@#{final_token || 'HEAD'}' #{opt_auth} | #{ string_encoder } > #{log_filename}"
 				end
 				File.open(log_filename, 'r') { |io| yield io }
 			ensure
@@ -168,7 +168,7 @@ module OhlohScm::Adapters
 
 		# Returns one commit with the exact revision number provided
 		def single_revision_xml(revision)
-			run "svn log --trust-server-cert --non-interactive --verbose --xml --stop-on-copy -r #{revision} --limit 1 #{opt_auth} '#{SvnAdapter.uri_encode(File.join(self.root, self.branch_name))}@#{revision}' | #{ string_encoder }"
+			run "svn log --trust-server-cert --non-interactive --verbose --xml -r #{revision} --limit 1 #{opt_auth} '#{SvnAdapter.uri_encode(File.join(self.root, self.branch_name))}@#{revision}' | #{ string_encoder }"
 		end
 
 		# Recurses the entire repository and returns an array of file names.
