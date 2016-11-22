@@ -1,13 +1,13 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require_relative '../test_helper'
 
-module Scm::Adapters
+module OhlohScm::Adapters
 	# Repository hg_walk has the following structure:
 	#
 	#      G -> H -> I
 	#     /      \    \
 	#    A -> B -> C -> D -> tip
 	#
-	class HgRevListTest < Scm::Test
+	class HgRevListTest < OhlohScm::Test
 
 		def test_rev_list
 			with_hg_repository('hg_walk') do |hg|
@@ -33,7 +33,7 @@ module Scm::Adapters
 		protected
 
 		def rev_list_helper(hg, from, to)
-			to_labels(hg.commit_tokens(from_label(from), from_label(to)))
+			to_labels(hg.commit_tokens(:after => from_label(from), :up_to => from_label(to)))
 		end
 
 		def commit_labels

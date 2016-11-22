@@ -1,7 +1,7 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require_relative '../test_helper'
 
-module Scm::Adapters
-  class SvnPatchTest < Scm::Test
+module OhlohScm::Adapters
+  class SvnPatchTest < OhlohScm::Test
     def test_patch_for_commit
       with_svn_repository('svn') do |repo|
         commit = repo.verbose_commit(2)

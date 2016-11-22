@@ -1,0 +1,35 @@
+id: 3-1.0-6.r6/0
+type: dir
+pred: 3-1.0-3.r5/838
+count: 5
+text: 5 749 76 0 f354600678d913ea83861392f60494da
+cpath: /trunk
+copyfrom: 5 /branches/rel-1
+
+PLAIN
+K 8
+branches
+V 17
+dir 0-1.0.r5/1050
+K 4
+tags
+V 15
+dir 2-1.0.r1/66
+K 5
+trunk
+V 16
+dir 3-1.0-6.r6/0
+END
+ENDREP
+id: 0.0.r6/265
+type: dir
+pred: 0.0.r5/1303
+count: 6
+text: 6 150 102 0 8362f6fabb4e8f33a37eea08b024ee3d
+cpath: /
+copyroot: 0 /
+
+3-1._0.t5-5 replace-dir false false /trunk
+5 /branches/rel-1
+
+265 392

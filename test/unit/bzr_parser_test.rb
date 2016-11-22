@@ -1,7 +1,7 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require_relative '../test_helper'
 
-module Scm::Parsers
-	class BzrParserTest < Scm::Test
+module OhlohScm::Parsers
+	class BzrParserTest < OhlohScm::Test
 
 		def test_empty_array
 			assert_equal([], BzrParser.parse(''))
@@ -263,6 +263,221 @@ SAMPLE
 			assert_equal 1, commits[3].diffs.size
 			assert_equal 'hello_world.c', commits[3].diffs[0].path
 			assert_equal 'M', commits[3].diffs[0].action
+		end
+
+		def test_parse_diffs
+			assert_equal 'A', BzrParser.parse_diffs('A', "helloworld.c").first.action
+			assert_equal 'helloworld.c', BzrParser.parse_diffs('A', "helloworld.c").first.path
+		end
+
+		def test_parse_diffs_rename
+			diffs = BzrParser.parse_diffs(:rename, "helloworld.c => goodbyeworld.c")
+			assert_equal 2, diffs.size
+			assert_equal 'D', diffs.first.action
+			assert_equal 'helloworld.c', diffs.first.path
+			assert_equal 'A', diffs.last.action
+			assert_equal 'goodbyeworld.c', diffs.last.path
+		end
+
+		def test_rename
+			log = <<-SAMPLE
+------------------------------------------------------------
+revno: 2
+committer: info <info@ohloh.net>
+timestamp: Wed 2005-09-14 21:27:20 +1000
+message:
+  rename a file
+renamed:
+  helloworld.c => goodbyeworld.c
+			SAMPLE
+
+			commits = BzrParser.parse(log)
+
+			assert commits
+			assert_equal 1, commits.size
+			assert_equal 2, commits.first.diffs.size
+
+			assert_equal 'D', commits.first.diffs.first.action
+			assert_equal 'helloworld.c', commits.first.diffs.first.path
+
+			assert_equal 'A', commits.first.diffs.last.action
+			assert_equal 'goodbyeworld.c', commits.first.diffs.last.path
+		end
+
+		def test_remove_dupes_add_remove
+			diffs = BzrParser.remove_dupes([ OhlohScm::Diff.new(:action => "A", :path => "foo"),
+																				OhlohScm::Diff.new(:action => "D", :path => "foo") ])
+			assert_equal 1, diffs.size
+			assert_equal 'M', diffs.first.action
+			assert_equal 'foo', diffs.first.path
+		end
+
+		# A somewhat tricky case. A file is deleted, and another
+		# file is renamed to take its place. That file is then modified!
+		#
+		# This is what Ohloh expects to see:
+		#
+		#   D  goodbyeworld.c
+		#   M  helloworld.c
+		#
+		def test_complex_rename
+			log = <<-SAMPLE
+------------------------------------------------------------
+revno: 147.1.24
+committer: info <info@ohloh.net>
+timestamp: Wed 2005-09-14 21:27:20 +1000
+message:
+  rename a file to replace an existing one, then modify it!
+removed:
+  helloworld.c
+renamed:
+  goodbyeworld.c => helloworld.c
+modified:
+  helloworld.c
+			SAMPLE
+
+			diffs = BzrParser.parse(log).first.diffs
+			diffs.sort! { |a,b| a.path <=> b.path }
+
+			assert_equal 2, diffs.size
+			assert_equal 'D', diffs.first.action
+			assert_equal 'goodbyeworld.c', diffs.first.path
+			assert_equal 'M', diffs.last.action
+			assert_equal 'helloworld.c', diffs.last.path
+		end
+
+		def test_strip_trailing_asterisk_from_executables
+			log = <<-SAMPLE
+------------------------------------------------------------
+revno: 1
+committer: info <info@ohloh.net>
+timestamp: Wed 2005-09-14 21:27:20 +1000
+message:
+  added an executable, also renamed an executable
+added:
+  script*
+renamed:
+  helloworld* => goodbyeworld*
+			SAMPLE
+
+			diffs = BzrParser.parse(log).first.diffs
+			diffs.sort! { |a,b| a.path <=> b.path }
+
+			assert_equal 'goodbyeworld', diffs[0].path
+			assert_equal 'helloworld', diffs[1].path
+			assert_equal 'script', diffs[2].path
+		end
+
+		def test_comment_that_contains_dashes
+			log = <<-SAMPLE
+------------------------------------------------------------
+revno: 2
+committer: info <info@ohloh.net>
+timestamp: Wed 2005-09-14 21:27:20 +1000
+message:
+  This is a tricky commit message to confirm fix
+  to Ticket 5. We're including a line of dashes in
+  the message that resembles a log delimiter.
+
+  ------------------------------------------------------------
+
+	Happy parsing!
+added:
+  goodbyeworld.c
+------------------------------------------------------------
+revno: 1
+committer: info <info@ohloh.net>
+timestamp: Wed 2005-09-14 21:27:20 +1000
+message:
+  Initial Revision
+added:
+  helloworld.c
+			SAMPLE
+
+			commits = BzrParser.parse(log)
+
+			assert_equal 2, commits.size
+			assert_equal '2', commits.first.token
+			assert_equal 1, commits.first.diffs.size
+			assert_equal "goodbyeworld.c", commits.first.diffs.first.path
+
+			assert_equal '1', commits.last.token
+			assert_equal 1, commits.last.diffs.size
+			assert_equal "helloworld.c", commits.last.diffs.first.path
+		end
+
+		# In this example, directory "test/" is renamed to "/".
+		# This shows in the log as being renamed to an empty string.
+		def test_directory_renamed_to_root
+			log = <<-SAMPLE
+        ------------------------------------------------------------
+        revno: 220.90.1
+        revision-id: info@ohloh.net-20081002201109-j4z0r2c8nsgbm2vk
+        parent: info@ohloh.net-20081002200737-pjao1idjcrxpk4n4
+        committer: Ohloh <info@ohloh.net>
+        branch nick: subvertpy
+        timestamp: Thu 2008-10-02 22:11:09 +0200
+        message:
+          Promote the test directory to the root.
+        renamed:
+          test =>  test-20081002184530-hz9mrr3wqq4l8qdx-1
+			SAMPLE
+
+			commits = BzrParser.parse(log)
+
+			assert_equal 1, commits.size
+			assert_equal 'info@ohloh.net-20081002201109-j4z0r2c8nsgbm2vk', commits.first.token
+			assert_equal 2, commits.first.diffs.size
+			assert_equal "D", commits.first.diffs.first.action
+			assert_equal "test", commits.first.diffs.first.path
+			assert_equal "A", commits.first.diffs.last.action
+			assert_equal "", commits.first.diffs.last.path
+		end
+
+		# It is possible for Bzr to report a file as both renamed and modified
+		# in the same commit. We should treat this as only a rename -- that is, we
+		# should see a simple DELETE from the old location and an ADD to the new location.
+		def test_rename_and_modify_in_one_commit
+			log = <<-SAMPLE
+------------------------------------------------------------
+revno: 1
+message:
+  Changed the directory structure
+renamed:
+  oldname => newname
+modified:
+  newname
+			SAMPLE
+
+			commits = BzrParser.parse(log)
+
+			assert_equal 1, commits.size
+			assert_equal 2, commits.first.diffs.size
+			assert_equal "D", commits.first.diffs.first.action
+			assert_equal "oldname", commits.first.diffs.first.path
+			assert_equal "A", commits.first.diffs.last.action
+			assert_equal "newname", commits.first.diffs.last.path
+		end
+
+		def test_different_author_and_committer
+			log = <<-SAMPLE
+------------------------------------------------------------
+revno: 200
+author: Jason Allen <jason@ohloh.net>
+committer: Robin Luckey <robin@ohloh.net>
+branch nick: foo
+timestamp: Wed 2009-06-24 19:47:37 +0200
+message:
+	  Just a message
+			SAMPLE
+
+			commits = BzrParser.parse(log)
+
+			assert_equal 1, commits.size
+			assert_equal "Jason Allen", commits.first.author_name
+			assert_equal "jason@ohloh.net", commits.first.author_email
+			assert_equal "Robin Luckey", commits.first.committer_name
+			assert_equal "robin@ohloh.net", commits.first.committer_email
 		end
 	end
 end
