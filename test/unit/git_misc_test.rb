@@ -47,8 +47,8 @@ module OhlohScm::Adapters
 
     def test_tags
       with_git_repository('git') do |git|
-        assert_equal git.tags, [['v1.0.0', 'f6e5a894ac4173f8f2a200f2c36df38a1e61121a'],
-                                ['v2.1.0', '1df547800dcd168e589bb9b26b4039bff3a7f7e4']]
+        assert_equal git.tags, [['v1.0.0', 'f6e5a894ac4173f8f2a200f2c36df38a1e61121a', Time.parse('2016-07-31T07:58:30+05:30')],
+                                ['v2.1.0', '1df547800dcd168e589bb9b26b4039bff3a7f7e4', Time.parse('2006-07-14T16:07:15-07:00')]]
       end
     end
 

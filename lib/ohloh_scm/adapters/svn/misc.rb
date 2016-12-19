@@ -146,7 +146,9 @@ module OhlohScm::Adapters
     def tags
       tag_strings = `svn ls -v #{ base_path}/tags`.split(/\n/)
       tag_strings.map do |tag_string|
-        tag_string.split(' ').values_at(-1, 0).map { |v| v.chomp('/') }
+        date_string = tag_string.split(' ').values_at(-4, -3, -2).join(' ')
+        folder_and_rev = tag_string.split(' ').values_at(-1, 0).map { |v| v.chomp('/') }
+        folder_and_rev << Time.parse(date_string)
       end[1..-1]
     end
 

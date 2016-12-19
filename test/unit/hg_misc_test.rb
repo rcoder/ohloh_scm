@@ -39,7 +39,8 @@ module OhlohScm::Adapters
 
     def test_tags
       with_hg_repository('hg') do |hg|
-        assert_equal hg.tags, [['tip', '5']]
+        time = Time.parse('Fri Jul 22 18:00:18 2016 +0530')
+        assert_equal  [['tip', '5', time]], hg.tags
       end
     end
 	end

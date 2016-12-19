@@ -111,7 +111,9 @@ module OhlohScm::Adapters
                   mkdir -p #{ source_scm.root.gsub(/^file:../, '') }/db/transactions
                   svn copy trunk tags/2.0 && svn commit -m 'v2.0' && svn update"
 
-          assert_equal([['2.0', '6']], source_scm.tags)
+          assert_equal(['2.0', '6'], source_scm.tags.first[0..1])
+          # Avoid millisecond comparision.
+          assert_equal(Time.now.strftime('%F %R'), source_scm.tags.first[-1].strftime('%F %R'))
         end
       end
     end
