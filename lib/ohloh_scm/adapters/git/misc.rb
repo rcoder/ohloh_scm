@@ -76,11 +76,12 @@ module OhlohScm::Adapters
 
     def tags
       return [] if no_tags?
-      tag_strings = run("cd #{url} && git show-ref --tags").split(/\n/)
+      tag_strings = run("cd #{url} && git tag --format='%(creatordate:iso-strict) %(objectname) %(refname)'").split(/\n/)
       tag_strings.map do |tag_string|
-        commit_hash, tag_path = tag_string.split(/\s/)
+        timestamp_string, commit_hash, tag_path = tag_string.split(/\s/)
+        timestamp = Time.parse(timestamp_string)
         tag_name = tag_path.gsub('refs/tags/', '')
-        [tag_name, commit_hash]
+        [tag_name, commit_hash, timestamp]
       end
     end
 	end
