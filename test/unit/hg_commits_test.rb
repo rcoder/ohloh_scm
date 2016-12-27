@@ -11,6 +11,16 @@ module OhlohScm::Adapters
 			end
 		end
 
+		def test_commit_count_with_empty_branch
+          	with_hg_repository('hg', '') do |hg|
+        		assert_equal nil, hg.branch_name
+        		assert_equal 5, hg.commit_count
+        		assert_equal 3, hg.commit_count(:after => 'b14fa4692f949940bd1e28da6fb4617de2615484')
+        		assert_equal 0, hg.commit_count(:after => '655f04cf6ad708ab58c7b941672dce09dd369a18')
+      		end
+    	end
+
+
 		def test_commit_tokens
 			with_hg_repository('hg') do |hg|
 				assert_equal ['01101d8ef3cea7da9ac6e9a226d645f4418f05c9',
