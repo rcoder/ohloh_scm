@@ -1,9 +1,14 @@
 module OhlohScm::Adapters
-	class HgAdapter < AbstractAdapter
-		def english_name
-			"Mercurial"
-		end
-	end
+  class HgAdapter < AbstractAdapter
+    def english_name
+      "Mercurial"
+    end
+
+    def branch_name=(branch_name)
+      branch_name = nil if branch_name.to_s.empty?
+      super
+    end
+  end
 end
 
 require_relative 'hg/validation'
