@@ -1,9 +1,13 @@
 module OhlohScm::Adapters
-	class AbstractAdapter
+  class AbstractAdapter
 
-		def is_merge_commit?(commit)
-			false
-		end
+    def is_merge_commit?(commit)
+      false
+    end
 
-	end
+    def tags
+      []
+    end
+
+  end
 end
