@@ -117,5 +117,11 @@ module OhlohScm::Adapters
         end
       end
     end
-	end
+
+    def test_tags_with_non_tagged_repository
+      with_svn_repository('svn') do |svn|
+        assert_equal svn.tags, []
+      end
+    end
+  end
 end
