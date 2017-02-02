@@ -1,0 +1,35 @@
+id: 3.4.r8/0
+type: dir
+pred: 3.2.r5/342
+count: 4
+text: 5 247 82 82 c485e5f340786ada064a13ca1c86ea5c
+cpath: /trunk
+copyfrom: 7 /branches/development
+
+PLAIN
+K 8
+branches
+V 14
+dir 1.0.r5/545
+K 4
+tags
+V 14
+dir 2.0.r1/126
+K 5
+trunk
+V 12
+dir 3.4.r8/0
+END
+ENDREP
+id: 0.0.r8/256
+type: dir
+pred: 0.0.r7/79
+count: 8
+text: 8 149 94 94 a404e0a35955f83c7cf610ed21dc7e2b
+cpath: /
+copyroot: 0 /
+
+3._0.t7-1 add false false /trunk
+7 /branches/development
+
+256 381

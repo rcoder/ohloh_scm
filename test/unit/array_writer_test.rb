@@ -1,7 +1,7 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require_relative '../test_helper'
 
-module Scm::Parsers
-	class ArrayWriterTest < Scm::Test
+module OhlohScm::Parsers
+	class ArrayWriterTest < OhlohScm::Test
 
 		def test_basic
 

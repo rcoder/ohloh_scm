@@ -1,7 +1,7 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require_relative '../test_helper'
 
-module Scm::Adapters
-	class GitValidationTest < Scm::Test
+module OhlohScm::Adapters
+	class GitValidationTest < OhlohScm::Test
 		def test_rejected_urls
 			[	nil, "", "foo", "http:/", "http:://", "http://", "http://a",
 			"kernel.org/linux/linux.git", # missing a protocol prefix
@@ -23,7 +23,11 @@ module Scm::Adapters
 			"https://kernel.org/pub/scm/git/git.git",
 			"https://kernel.org:8080/pub/scm/git/git.git",
 			"git://kernel.org/~foo/git.git",
-			"http://git.onerussian.com/pub/deb/impose+.git"
+			"http://git.onerussian.com/pub/deb/impose+.git",
+      "https://Person@github.com/Person/some_repo.git",
+      "http://Person@github.com/Person/some_repo.git",
+      "https://github.com/Person/some_repo",
+      "http://github.com/Person/some_repo"
 			].each do |url|
 				git = GitAdapter.new(:url => url)
 				assert !git.validate_url
@@ -34,8 +38,56 @@ module Scm::Adapters
 			git = GitAdapter.new(:url => nil)
 			assert_equal nil, git.guess_forge
 
+			git = GitAdapter.new(:url => 'git://methabot.git.sourceforge.net/gitroot/methabot')
+			assert_equal 'sourceforge.net', git.guess_forge
+
 			git = GitAdapter.new( :url => 'http://kernel.org/pub/scm/linux/kernel/git/stable/linux-2.6.17.y.git')
 			assert_equal 'kernel.org', git.guess_forge
 		end
+
+    def test_normalize_url
+      assert_equal nil, GitAdapter.new(:url => nil).normalize_url
+      assert_equal '', GitAdapter.new(:url => '').normalize_url
+      assert_equal 'foo', GitAdapter.new(:url => 'foo').normalize_url
+
+      # A non-Github URL: no change
+			assert_equal 'git://kernel.org/pub/scm/git/git.git',
+        GitAdapter.new(:url => 'git://kernel.org/pub/scm/git/git.git').normalize_url
+
+      # A Github read-write URL: converted to read-only
+      assert_equal 'git://github.com/robinluckey/ohcount.git',
+        GitAdapter.new(:url => 'https://robinluckey@github.com/robinluckey/ohcount.git').normalize_url
+
+      # A Github read-write URL: converted to read-only
+      assert_equal 'git://github.com/robinluckey/ohcount.git',
+        GitAdapter.new(:url => 'git@github.com:robinluckey/ohcount.git').normalize_url
+
+      # A Github read-only URL: no change
+      assert_equal 'git://github.com/robinluckey/ohcount.git',
+        GitAdapter.new(:url => 'git@github.com:robinluckey/ohcount.git').normalize_url
+    end
+
+    def test_normalize_converts_to_read_only
+      normalize_url_test('https://robinluckey@github.com/robinluckey/ohcount.git', 'git://github.com/robinluckey/ohcount.git')
+    end
+
+    def test_normalize_handles_https_with_user_at_github_format
+      normalize_url_test('http://Person@github.com/Person/something.git', 'git://github.com/Person/something.git')
+    end
+
+    def test_normalize_handles_https_web_url
+      normalize_url_test('https://github.com/Person/something', 'git://github.com/Person/something')
+    end
+
+    def test_normalize_handles_http_web_url
+      normalize_url_test('http://github.com/Person/something', 'git://github.com/Person/something')
+    end
+
+  private
+    def normalize_url_test(url, result_url)
+      git = GitAdapter.new(:url => url)
+      git.normalize
+      assert_equal result_url, git.url
+     end
 	end
 end

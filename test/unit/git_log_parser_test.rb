@@ -1,8 +1,8 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require_relative '../test_helper'
 require 'date'
 
-module Scm::Parsers
-	class GitStyledParserTest < Scm::Test
+module OhlohScm::Parsers
+	class GitStyledParserTest < OhlohScm::Test
 
 		def test_basic
 			commits = []
@@ -187,7 +187,7 @@ __END_COMMENT__
 
 __BEGIN_COMMIT__
 Commit: fa3ee9d4cefc2db81adadf36da9cacbe92ce96f1
-Author: 
+Author:
 AuthorEmail: mickeyl@openembedded.org
 Date: Wed, 11 Jun 2008 00:37:06 +0000
 __BEGIN_COMMENT__
@@ -209,5 +209,16 @@ __END_COMMENT__
 			assert_equal 'mickeyl', commits.first.author_name # Use name when present
 			assert_equal 'mickeyl@openembedded.org', commits.last.author_name # Else use email
 		end
+
+    # Verifies OTWO-443
+    def test_empty_merge
+      with_git_repository('git_with_empty_merge') do |git|
+        assert_equal 5, git.commit_count
+        assert_equal 5, git.commits.size
+        c = git.verbose_commit('ff13970b54e5bc373abf932f0708b89e75c842b4')
+        assert_equal "Merge branch 'feature'\n", c.message
+        assert_equal 0, c.diffs.size
+      end
+    end
 	end
 end

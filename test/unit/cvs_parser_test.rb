@@ -1,7 +1,7 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require_relative '../test_helper'
 
-module Scm::Parsers
-	class CvsParserTest < Scm::Test
+module OhlohScm::Parsers
+	class CvsParserTest < OhlohScm::Test
 
 		def test_basic
 			assert_convert(CvsParser, DATA_DIR + '/basic.rlog', DATA_DIR + '/basic.ohlog')

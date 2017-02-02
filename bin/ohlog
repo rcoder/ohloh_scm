@@ -1,12 +1,12 @@
 #!/usr/bin/env ruby
-require File.dirname(__FILE__) + '/../lib/scm'
+require File.dirname(__FILE__) + '/../lib/ohloh_scm'
 
 # This is a simple command line tool which parses CVS and Subversion logs.
 # It is not used by the main Ohloh system.
 #
 # I use it primarily to help debug Ohloh behavior. It's a convenient way
 # to turn an enormously long CVS log into something readable.
-module Scm::Parsers
+module OhlohScm::Parsers
 	class CommandLine
 		attr_accessor :paths, :writer
 
@@ -26,10 +26,12 @@ Ohloh source control log parser
 [option] can be one of the following:
 
   --cvs             Parse a CVS rlog
+  --git             Parse a Git log (generated with or without --name-status option)
   --svn             Parse a Subversion log
   --svn-xml         Parse a Subversion XML log
   --hg              Parse a Mercurial log
   --bzr             Parse a Bazaar log
+  --bzr-xml         Parse a Bazaar XML log
 
   -h, --human       Output result as a human-readable log (default)
   -x, --xml         Output result as an XML log
@@ -49,11 +51,17 @@ Examples:
 
    bzr log -v | ohlog --bzr
 
+   bzr xmllog -v | ohlog --bzr
+
 HELP
 		end
 
 		def cvs
 			parse CvsParser
+		end
+
+		def git
+			parse GitParser
 		end
 
 		def svn
@@ -71,6 +79,10 @@ HELP
 		def bzr
 			parse BzrParser
 		end
+
+    def bzr_xml
+      parse BzrXmlParser
+    end
 
 		def parse(parser)
 			self.writer ||= HumanWriter.new(STDOUT)
@@ -101,6 +113,8 @@ HELP
 			case option
 			when '--cvs'
 				self.subcommand = :cvs
+			when '--git'
+				self.subcommand = :git
 			when '--svn'
 				self.subcommand = :svn
 			when '--svn-xml'
@@ -109,6 +123,8 @@ HELP
 				self.subcommand = :hg
 			when '--bzr'
 				self.subcommand = :bzr
+			when '--bzr-xml'
+				self.subcommand = :bzr_xml
 			when '-h', '--human'
 				self.writer = HumanWriter.new(STDOUT)
 			when '-x', '--xml'

@@ -1,12 +1,12 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require_relative '../test_helper'
 require 'socket'
 
-module Scm::Adapters
-	class SvnPushTest < Scm::Test
+module OhlohScm::Adapters
+	class SvnPushTest < OhlohScm::Test
 
 		def test_basic_push_using_svnsync
 			with_svn_repository('svn') do |src|
-				Scm::ScratchDir.new do |dest_dir|
+				OhlohScm::ScratchDir.new do |dest_dir|
 
 					dest = SvnAdapter.new(:url => dest_dir).normalize
 					assert !dest.exist?
@@ -23,7 +23,7 @@ module Scm::Adapters
 		# Simulates pushing to another server in our cluster.
 		def test_ssh_push_using_svnsync
 			with_svn_repository('svn') do |src|
-				Scm::ScratchDir.new do |dest_dir|
+				OhlohScm::ScratchDir.new do |dest_dir|
 
 					dest = SvnAdapter.new(:url => "svn+ssh://#{Socket.gethostname}#{File.expand_path(dest_dir)}").normalize
 					assert !dest.exist?
