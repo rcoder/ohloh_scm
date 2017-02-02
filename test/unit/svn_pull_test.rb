@@ -1,11 +1,11 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require_relative '../test_helper'
 require 'socket'
 
-module Scm::Adapters
-	class SvnPullTest < Scm::Test
+module OhlohScm::Adapters
+	class SvnPullTest < OhlohScm::Test
 
 		def test_svnadmin_create
-			Scm::ScratchDir.new do |dir|
+			OhlohScm::ScratchDir.new do |dir|
 				url = File.join(dir, "my_svn_repo")
 				svn = SvnAdapter.new(:url => url).normalize
 
@@ -14,14 +14,15 @@ module Scm::Adapters
 				assert svn.exist?
 
 				# Ensure that revision properties are settable
-				svn.propset('foo','bar')
-				assert_equal 'bar', svn.propget('foo')
+        # Note that only valid properties can be set
+				svn.propset('log','bar')
+				assert_equal 'bar', svn.propget('log')
 			end
 		end
 
 		def test_basic_pull_using_svnsync
 			with_svn_repository('svn') do |src|
-				Scm::ScratchDir.new do |dest_dir|
+				OhlohScm::ScratchDir.new do |dest_dir|
 
 					dest = SvnAdapter.new(:url => dest_dir).normalize
 					assert !dest.exist?
@@ -35,7 +36,7 @@ module Scm::Adapters
 		end
 
 		def test_svnadmin_create_local
-			Scm::ScratchDir.new do |dir|
+			OhlohScm::ScratchDir.new do |dir|
 				svn = SvnAdapter.new(:url => "file://#{dir}")
 				svn.svnadmin_create_local
 				assert svn.exist?
@@ -46,7 +47,7 @@ module Scm::Adapters
 		end
 
 		def test_svnadmin_create_remote
-			Scm::ScratchDir.new do |dir|
+			OhlohScm::ScratchDir.new do |dir|
 				svn = SvnAdapter.new(:url => "svn+ssh://#{Socket.gethostname}#{dir}")
 				svn.svnadmin_create_remote
 				assert svn.exist?

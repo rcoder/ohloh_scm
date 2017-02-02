@@ -1,21 +1,21 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require_relative '../test_helper'
 
-module Scm::Adapters
-	class SvnCommitsTest < Scm::Test
+module OhlohScm::Adapters
+	class SvnCommitsTest < OhlohScm::Test
 
 		def test_commits
 			with_svn_repository('svn') do |svn|
 				assert_equal 5, svn.commit_count
-				assert_equal 3, svn.commit_count(2)
-				assert_equal 0, svn.commit_count(1000)
+				assert_equal 3, svn.commit_count(:after => 2)
+				assert_equal 0, svn.commit_count(:after => 1000)
 
 				assert_equal [1,2,3,4,5], svn.commit_tokens
-				assert_equal [3,4,5], svn.commit_tokens(2)
-				assert_equal [], svn.commit_tokens(1000)
+				assert_equal [3,4,5], svn.commit_tokens(:after => 2)
+				assert_equal [], svn.commit_tokens(:after => 1000)
 
 				assert_equal [1,2,3,4,5], svn.commits.collect { |c| c.token }
-				assert_equal [3,4,5], svn.commits(2).collect { |c| c.token }
-				assert_equal [], svn.commits(1000)
+				assert_equal [3,4,5], svn.commits(:after => 2).collect { |c| c.token }
+				assert_equal [], svn.commits(:after => 1000)
 				assert !FileTest.exist?(svn.log_filename)
 			end
 		end
@@ -32,8 +32,8 @@ module Scm::Adapters
 		# Given a commit with diffs, fill in all of the SHA1 values.
 		def test_populate_sha1
 			with_svn_repository('svn') do |svn|
-				c = Scm::Commit.new(:token => 3)
-				c.diffs = [Scm::Diff.new(:path => "/trunk/helloworld.c", :action => "M")]
+				c = OhlohScm::Commit.new(:token => 3)
+				c.diffs = [OhlohScm::Diff.new(:path => "/trunk/helloworld.c", :action => "M")]
 				svn.populate_commit_sha1s!(c)
 				assert_equal 'f6adcae4447809b651c787c078d255b2b4e963c5', c.diffs.first.sha1
 				assert_equal '4c734ad53b272c9b3d719f214372ac497ff6c068', c.diffs.first.parent_sha1
@@ -42,7 +42,7 @@ module Scm::Adapters
 
 		def test_strip_commit_branch
 			svn = SvnAdapter.new(:branch_name => "/trunk")
-			commit = Scm::Commit.new
+			commit = OhlohScm::Commit.new
 
 			# nil diffs before => nil diffs after
 			assert !svn.strip_commit_branch(commit).diffs
@@ -52,19 +52,19 @@ module Scm::Adapters
 			assert_equal [], svn.strip_commit_branch(commit).diffs
 
 			commit.diffs = [
-				Scm::Diff.new(:path => "/trunk"),
-				Scm::Diff.new(:path => "/trunk/helloworld.c"),
-				Scm::Diff.new(:path => "/branches/a")
+				OhlohScm::Diff.new(:path => "/trunk"),
+				OhlohScm::Diff.new(:path => "/trunk/helloworld.c"),
+				OhlohScm::Diff.new(:path => "/branches/a")
 			]
 			assert_equal ['', '/helloworld.c'], svn.strip_commit_branch(commit).diffs.collect { |d| d.path }.sort
 		end
 
 		def test_strip_diff_branch
 			svn = SvnAdapter.new(:branch_name => "/trunk")
-			assert !svn.strip_diff_branch(Scm::Diff.new)
-			assert !svn.strip_diff_branch(Scm::Diff.new(:path => "/branches/b"))
-			assert_equal '', svn.strip_diff_branch(Scm::Diff.new(:path => "/trunk")).path
-			assert_equal '/helloworld.c', svn.strip_diff_branch(Scm::Diff.new(:path => "/trunk/helloworld.c")).path
+			assert !svn.strip_diff_branch(OhlohScm::Diff.new)
+			assert !svn.strip_diff_branch(OhlohScm::Diff.new(:path => "/branches/b"))
+			assert_equal '', svn.strip_diff_branch(OhlohScm::Diff.new(:path => "/trunk")).path
+			assert_equal '/helloworld.c', svn.strip_diff_branch(OhlohScm::Diff.new(:path => "/trunk/helloworld.c")).path
 		end
 
 		def test_strip_path_branch
@@ -88,8 +88,8 @@ module Scm::Adapters
 
 		def test_remove_dupes_add_modify
 			svn = SvnAdapter.new
-			c = Scm::Commit.new(:diffs => [ Scm::Diff.new(:action => "A", :path => "foo"),
-																			Scm::Diff.new(:action => "M", :path => "foo") ])
+			c = OhlohScm::Commit.new(:diffs => [ OhlohScm::Diff.new(:action => "A", :path => "foo"),
+																			OhlohScm::Diff.new(:action => "M", :path => "foo") ])
 
 			svn.remove_dupes(c)
 			assert_equal 1, c.diffs.size
@@ -98,13 +98,23 @@ module Scm::Adapters
 
 		def test_remove_dupes_add_replace
 			svn = SvnAdapter.new
-			c = Scm::Commit.new(:diffs => [ Scm::Diff.new(:action => "R", :path => "foo"),
-																			Scm::Diff.new(:action => "A", :path => "foo") ])
+			c = OhlohScm::Commit.new(:diffs => [ OhlohScm::Diff.new(:action => "R", :path => "foo"),
+																			OhlohScm::Diff.new(:action => "A", :path => "foo") ])
 
 			svn.remove_dupes(c)
 			assert_equal 1, c.diffs.size
 			assert_equal 'A', c.diffs.first.action
 		end
+
+        def test_remove_dupes_with_sql_acii_encoding
+          #Note: If there are two files that are identical except for the encoding, ohloh_scm should only keep one.
+          svn = SvnAdapter.new
+          c = OhlohScm::Commit.new(:diffs => [OhlohScm::Diff.new(:action => "A", :path => "foo"),
+                                              OhlohScm::Diff.new(:action => "A", :path => "foo".force_encoding(Encoding::US-ASCII)  ])
+          svn.remove_dupes(c)
+          assert_equal 1, c.diffs.size
+          assert_equal 'A', c.diffs.first.action
+        end
 
 		# Had so many bugs around this case that a test was required
 		def test_deepen_commit_with_nil_diffs
@@ -147,7 +157,7 @@ module Scm::Adapters
 				# Also, our commits do not include diffs for the actual directories;
 				# only the files within those directories.
 				#
-				# Also, since we are only tracking the /trunk and not /branches/b, then
+				# Also, after we are only tracking the /trunk and not /branches/b, then
 				# there should not be anything referring to activity in /branches/b.
 
 				assert_equal 3, deep_commits.first.token # Make sure this is the right revision
@@ -207,11 +217,11 @@ module Scm::Adapters
 			assert_equal [1, 2, 3, 4, 5], commits.collect { |c| c.token }
 			assert_equal ['robin','robin','robin','jason','jason'], commits.collect { |c| c.committer_name }
 
-			assert commits[0].committer_date - Time.utc(2006,6,11,18,28,0) < 1 # commits include milliseconds
-			assert commits[1].committer_date - Time.utc(2006,6,11,18,32,13) < 1
-			assert commits[2].committer_date - Time.utc(2006,6,11,18,34,17) < 1
-			assert commits[3].committer_date - Time.utc(2006,7,14,22,17,8) < 1
-			assert commits[4].committer_date - Time.utc(2006,7,14,23,7,15) < 1
+			assert_equal Time.utc(2006,6,11,18,28, 0), commits[0].committer_date
+			assert_equal Time.utc(2006,6,11,18,32,14), commits[1].committer_date
+			assert_equal Time.utc(2006,6,11,18,34,18), commits[2].committer_date
+			assert_equal Time.utc(2006,7,14,22,17, 9), commits[3].committer_date
+			assert_equal Time.utc(2006,7,14,23, 7,16), commits[4].committer_date
 
 			assert_equal "Initial Checkin\n", commits[0].message
 			assert_equal "added makefile", commits[1].message
@@ -244,5 +254,32 @@ module Scm::Adapters
 			assert_equal '/trunk/COPYING', commits[4].diffs[1].path
 		end
 
+    def test_log_valid_encoding
+      with_invalid_encoded_svn_repository do |svn|
+        assert_equal true, svn.log.valid_encoding?
+      end
+    end
+
+    def test_commits_encoding
+      with_invalid_encoded_svn_repository do |svn|
+        assert_nothing_raised do
+          svn.commits rescue raise Exception
+        end
+      end
+    end
+
+    def test_open_log_file_encoding
+      with_invalid_encoded_svn_repository do |svn|
+        svn.open_log_file do |io|
+          assert_equal true, io.read.valid_encoding?
+        end
+      end
+    end
+
+    def test_single_revision_xml_valid_encoding
+      with_invalid_encoded_svn_repository do |svn|
+        assert_equal true, svn.single_revision_xml(:anything).valid_encoding?
+      end
+    end
 	end
 end

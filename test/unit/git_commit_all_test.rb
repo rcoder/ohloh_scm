@@ -1,10 +1,10 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require_relative '../test_helper'
 
-module Scm::Adapters
-	class GitCommitAllTest < Scm::Test
+module OhlohScm::Adapters
+	class GitCommitAllTest < OhlohScm::Test
 
 		def test_commit_all
-			Scm::ScratchDir.new do |dir|
+			OhlohScm::ScratchDir.new do |dir|
 				git = GitAdapter.new(:url => dir).normalize
 
 				git.init_db
@@ -13,7 +13,7 @@ module Scm::Adapters
 				File.open(File.join(dir, 'README'), 'w') {}
 				assert git.anything_to_commit?
 
-				c = Scm::Commit.new
+				c = OhlohScm::Commit.new
 				c.author_name = "John Q. Developer"
 				c.message = "Initial checkin."
 				git.commit_all(c)

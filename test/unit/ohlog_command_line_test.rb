@@ -1,5 +1,5 @@
-module Scm::Parsers
-	class CommandLineTest < Scm::Test
+module OhlohScm::Parsers
+	class CommandLineTest < OhlohScm::Test
 		def test_cvs_from_file
 			result = `#{File.dirname(__FILE__) + '/../../bin/ohlog'} --xml --cvs #{DATA_DIR + '/basic.rlog'}`
 			assert_equal 0, $?
