@@ -186,7 +186,7 @@ module OhlohScm::Adapters
 
 			files = []
 			stdout.each_line do |s|
-				s.chomp!
+				s.chomp!.force_encoding('UTF-8')
 				files << s if s.length > 0 and s !~ /CVSROOT\// and s[-1..-1] != '/'
 			end
 			files.sort
