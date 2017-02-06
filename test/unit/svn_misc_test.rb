@@ -1,16 +1,33 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require_relative '../test_helper'
 
-module Scm::Adapters
-	class SvnMiscTest < Scm::Test
+module OhlohScm::Adapters
+	class SvnMiscTest < OhlohScm::Test
 
 		def test_export
 			with_svn_repository('svn') do |svn|
-				Scm::ScratchDir.new do |dir|
+				OhlohScm::ScratchDir.new do |dir|
 					svn.export(dir)
 					assert_equal ['.','..','branches','tags','trunk'], Dir.entries(dir).sort
 				end
 			end
 		end
+
+    def test_export_tag
+      with_svn_repository('svn', 'trunk') do |source_scm|
+        OhlohScm::ScratchDir.new do |svn_working_folder|
+          OhlohScm::ScratchDir.new do |dir|
+            folder_name = source_scm.root.slice(/[^\/]+\/?\Z/)
+            system "cd #{ svn_working_folder } && svn co #{ source_scm.root } && cd #{ folder_name } &&
+                    mkdir -p #{ source_scm.root.gsub(/^file:../, '') }/db/transactions
+                    svn copy trunk tags/2.0 && svn commit -m 'v2.0' && svn update"
+
+            source_scm.export_tag(dir, '2.0')
+
+            assert_equal ['.','..','COPYING','README','helloworld.c', 'makefile'], Dir.entries(dir).sort
+          end
+        end
+      end
+    end
 
 		def test_ls_tree
 			with_svn_repository('svn') do |svn|
@@ -58,7 +75,53 @@ module Scm::Adapters
 			with_svn_repository('svn') do |svn|
 				assert svn.is_directory?('trunk')
 				assert !svn.is_directory?('trunk/helloworld.c')
+				assert !svn.is_directory?('invalid/path')
 			end
 		end
-	end
+
+		def test_restrict_url_to_trunk_descend_no_further
+			with_svn_repository('deep_svn') do |svn|
+				assert_equal svn.root, svn.url
+				assert_equal '', svn.branch_name
+
+				svn.restrict_url_to_trunk
+
+				assert_equal svn.root + '/trunk', svn.url
+				assert_equal "/trunk", svn.branch_name
+			end
+		end
+
+		def test_restrict_url_to_trunk
+			with_svn_repository('svn') do |svn|
+				assert_equal svn.root, svn.url
+				assert_equal '', svn.branch_name
+
+				svn.restrict_url_to_trunk
+
+				assert_equal svn.root + '/trunk', svn.url
+				assert_equal "/trunk", svn.branch_name
+			end
+		end
+
+    def test_tags
+      with_svn_repository('svn', 'trunk') do |source_scm|
+        OhlohScm::ScratchDir.new do |svn_working_folder|
+          folder_name = source_scm.root.slice(/[^\/]+\/?\Z/)
+          system "cd #{ svn_working_folder } && svn co #{ source_scm.root } && cd #{ folder_name } &&
+                  mkdir -p #{ source_scm.root.gsub(/^file:../, '') }/db/transactions
+                  svn copy trunk tags/2.0 && svn commit -m 'v2.0' && svn update"
+
+          assert_equal(['2.0', '6'], source_scm.tags.first[0..1])
+          # Avoid millisecond comparision.
+          assert_equal(Time.now.strftime('%F %R'), source_scm.tags.first[-1].strftime('%F %R'))
+        end
+      end
+    end
+
+    def test_tags_with_non_tagged_repository
+      with_svn_repository('svn') do |svn|
+        assert_equal svn.tags, []
+      end
+    end
+  end
 end

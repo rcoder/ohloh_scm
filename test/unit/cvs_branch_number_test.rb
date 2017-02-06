@@ -1,7 +1,7 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require_relative '../test_helper'
 
-module Scm::Parsers
-	class CvsBranchNumberTest < Scm::Test
+module OhlohScm::Parsers
+	class CvsBranchNumberTest < OhlohScm::Test
 		def test_basic
 			assert_equal [1,1], BranchNumber.new('1.1').to_a
 			assert_equal [1234,1234], BranchNumber.new('1234.1234').to_a

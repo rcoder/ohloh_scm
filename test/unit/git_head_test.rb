@@ -1,7 +1,7 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require_relative '../test_helper'
 
-module Scm::Adapters
-	class GitHeadTest < Scm::Test
+module OhlohScm::Adapters
+	class GitHeadTest < OhlohScm::Test
 
 		def test_head_and_parents
 			with_git_repository('git') do |git|
@@ -15,5 +15,12 @@ module Scm::Adapters
 			end
 		end
 
+    def test_head_token
+      with_git_repository('git_with_invalid_encoding') do |git|
+        assert_nothing_raised do
+          git.head_token
+        end
+      end
+    end
 	end
 end
