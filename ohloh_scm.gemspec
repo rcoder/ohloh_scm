@@ -18,5 +18,5 @@ Gem::Specification.new do |gem|
   gem.require_paths = %w(lib)
 
   gem.add_runtime_dependency 'posix-spawn', '~> 0.3'
-  gem.add_runtime_dependency 'nokogiri', '~> 1.6.8'
+  gem.add_runtime_dependency 'nokogiri', '~> 1.6', '>= 1.6.8'
 end
