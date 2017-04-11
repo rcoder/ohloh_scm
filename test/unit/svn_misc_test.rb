@@ -118,6 +118,21 @@ module OhlohScm::Adapters
       end
     end
 
+    def test_tags_with_whitespaces
+      with_svn_repository('svn', 'trunk') do |source_scm|
+        OhlohScm::ScratchDir.new do |svn_working_folder|
+          folder_name = source_scm.root.slice(/[^\/]+\/?\Z/)
+          system "cd #{ svn_working_folder } && svn co #{ source_scm.root } && cd #{ folder_name } &&
+                  mkdir -p #{ source_scm.root.gsub(/^file:../, '') }/db/transactions
+                  svn copy trunk tags/'HL7 engine' && svn commit -m 'v2.0' && svn update && svn propset svn:date --revprop -r 'HEAD' 2016-02-12T00:44:04.921324Z"
+
+          assert_equal(['HL7 engine', '6'], source_scm.tags.first[0..1])
+          # Avoid millisecond comparision.
+          assert_equal('2016-02-12', source_scm.tags.first[-1].strftime('%F'))
+        end
+      end
+    end
+
     def test_tags_with_non_tagged_repository
       with_svn_repository('svn') do |svn|
         assert_equal svn.tags, []

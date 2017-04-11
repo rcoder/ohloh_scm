@@ -1,4 +1,5 @@
 require 'open-uri'
+require 'nokogiri'
 
 module OhlohScm::Adapters
 	class SvnAdapter < AbstractAdapter
@@ -144,12 +145,13 @@ module OhlohScm::Adapters
     #      http://svn.apache.org/repos/asf/maven/plugin-testing/trunk
     #      all have the same root value(https://svn.apache.org/repos/asf)
     def tags
-      tag_strings = `svn ls -v #{ base_path}/tags`.split(/\n/)
-      tag_strings.map do |tag_string|
-        date_string = tag_string.split(' ').values_at(-4, -3, -2).join(' ')
-        folder_and_rev = tag_string.split(' ').values_at(-1, 0).map { |v| v.chomp('/') }
-        folder_and_rev << Time.parse(date_string)
-      end.drop(1)
+      doc = Nokogiri::XML(`svn ls --xml #{ base_path}/tags`)
+      doc.xpath('//lists/list/entry').map do |entry|
+        tag_name = entry.xpath('name').text
+        revision = entry.xpath('commit').attr('revision').text
+        date_string = Time.parse(entry.xpath("commit/date").text)
+        [tag_name, revision, date_string]
+      end
     end
 
     class << self

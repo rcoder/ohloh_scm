@@ -61,6 +61,7 @@ PROPNAME="$4"
 ACTION="$5"
 
 if [ "$ACTION" = "M" -a "$PROPNAME" = "svn:log" ]; then exit 0; fi
+if [ "$ACTION" = "M" -a "$PROPNAME" = "svn:date" ]; then exit 0; fi
 
-echo "Changing revision properties other than svn:log is prohibited" >&2
+echo "Only svn:log and svn:date revision properties can be changed" >&2
 exit 1
