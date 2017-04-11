@@ -30,6 +30,10 @@ module OhlohScm::Adapters
 			parent_tokens(commit).size > 1
 		end
 
+    def export_tag(dest_dir, tag_name)
+      run "cd '#{path}' && bzr export -r tag:#{tag_name} #{dest_dir}"
+    end
+
 		def export(dest_dir, token=head_token)
 			# Unlike other SCMs, Bzr doesn't simply place the contents into dest_dir.
 			# It actually *creates* dest_dir. Since it should already exist at this point,
