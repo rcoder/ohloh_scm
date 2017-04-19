@@ -5,47 +5,49 @@ module OhlohScm::Parsers
 
 		def test_chained_commit_tokens
 			with_svn_chain_repository('svn_with_branching', '/trunk') do |svn|
-				assert_equal [1,2,4,5,8,9], svn.commit_tokens
-				assert_equal [2,4,5,8,9], svn.commit_tokens(:after => 1)
-				assert_equal [4,5,8,9], svn.commit_tokens(:after => 2)
-				assert_equal [4,5,8,9], svn.commit_tokens(:after => 3)
-				assert_equal [5,8,9], svn.commit_tokens(:after => 4)
-				assert_equal [8,9], svn.commit_tokens(:after => 5)
-				assert_equal [8,9], svn.commit_tokens(:after => 6)
-				assert_equal [8,9], svn.commit_tokens(:after => 7)
-				assert_equal [9], svn.commit_tokens(:after => 8)
-				assert_equal [], svn.commit_tokens(:after => 9)
-				assert_equal [], svn.commit_tokens(:after => 10)
+				assert_equal [1,2,4,5,8,9,11], svn.commit_tokens
+				assert_equal [2,4,5,8,9,11], svn.commit_tokens(:after => 1)
+				assert_equal [4,5,8,9,11], svn.commit_tokens(:after => 2)
+				assert_equal [4,5,8,9,11], svn.commit_tokens(:after => 3)
+				assert_equal [5,8,9,11], svn.commit_tokens(:after => 4)
+				assert_equal [8,9,11], svn.commit_tokens(:after => 5)
+				assert_equal [8,9,11], svn.commit_tokens(:after => 6)
+				assert_equal [8,9,11], svn.commit_tokens(:after => 7)
+				assert_equal [9,11], svn.commit_tokens(:after => 8)
+				assert_equal [11], svn.commit_tokens(:after => 9)
+				assert_equal [], svn.commit_tokens(:after => 11)
 			end
 		end
 
 		def test_chained_commit_count
 			with_svn_chain_repository('svn_with_branching', '/trunk') do |svn|
-				assert_equal 6, svn.commit_count
-				assert_equal 5, svn.commit_count(:after => 1)
-				assert_equal 4, svn.commit_count(:after => 2)
-				assert_equal 4, svn.commit_count(:after => 3)
-				assert_equal 3, svn.commit_count(:after => 4)
-				assert_equal 2, svn.commit_count(:after => 5)
-				assert_equal 2, svn.commit_count(:after => 6)
-				assert_equal 2, svn.commit_count(:after => 7)
-				assert_equal 1, svn.commit_count(:after => 8)
-				assert_equal 0, svn.commit_count(:after => 9)
+				assert_equal 7, svn.commit_count
+				assert_equal 6, svn.commit_count(:after => 1)
+				assert_equal 5, svn.commit_count(:after => 2)
+				assert_equal 5, svn.commit_count(:after => 3)
+				assert_equal 4, svn.commit_count(:after => 4)
+				assert_equal 3, svn.commit_count(:after => 5)
+				assert_equal 3, svn.commit_count(:after => 6)
+				assert_equal 3, svn.commit_count(:after => 7)
+				assert_equal 2, svn.commit_count(:after => 8)
+				assert_equal 1, svn.commit_count(:after => 9)
+				assert_equal 0, svn.commit_count(:after => 11)
 			end
 		end
 
 		def test_chained_commits
 			with_svn_chain_repository('svn_with_branching', '/trunk') do |svn|
-				assert_equal [1,2,4,5,8,9], svn.commits.collect { |c| c.token }
-				assert_equal [2,4,5,8,9], svn.commits(:after => 1).collect { |c| c.token }
-				assert_equal [4,5,8,9], svn.commits(:after => 2).collect { |c| c.token }
-				assert_equal [4,5,8,9], svn.commits(:after => 3).collect { |c| c.token }
-				assert_equal [5,8,9], svn.commits(:after => 4).collect { |c| c.token }
-				assert_equal [8,9], svn.commits(:after => 5).collect { |c| c.token }
-				assert_equal [8,9], svn.commits(:after => 6).collect { |c| c.token }
-				assert_equal [8,9], svn.commits(:after => 7).collect { |c| c.token }
-				assert_equal [9], svn.commits(:after => 8).collect { |c| c.token }
-				assert_equal [], svn.commits(:after => 9).collect { |c| c.token }
+				assert_equal [1,2,4,5,8,9,11], svn.commits.collect { |c| c.token }
+				assert_equal [2,4,5,8,9,11], svn.commits(:after => 1).collect { |c| c.token }
+				assert_equal [4,5,8,9,11], svn.commits(:after => 2).collect { |c| c.token }
+				assert_equal [4,5,8,9,11], svn.commits(:after => 3).collect { |c| c.token }
+				assert_equal [5,8,9,11], svn.commits(:after => 4).collect { |c| c.token }
+				assert_equal [8,9,11], svn.commits(:after => 5).collect { |c| c.token }
+				assert_equal [8,9,11], svn.commits(:after => 6).collect { |c| c.token }
+				assert_equal [8,9,11], svn.commits(:after => 7).collect { |c| c.token }
+				assert_equal [9,11], svn.commits(:after => 8).collect { |c| c.token }
+				assert_equal [11], svn.commits(:after => 9).collect { |c| c.token }
+				assert_equal [], svn.commits(:after => 11).collect { |c| c.token }
 			end
 		end
 
@@ -64,7 +66,7 @@ module OhlohScm::Parsers
 				end
 			end
 
-			assert_equal [1,2,4,5,8,9], commits.collect { |c| c.token }
+			assert_equal [1,2,4,5,8,9,11], commits.collect { |c| c.token }
 
 			# This repository spends a lot of energy moving directories around.
 			# File edits actually occur in just 3 commits.
@@ -105,6 +107,12 @@ module OhlohScm::Parsers
 			assert_equal 1, commits[5].diffs.size
 			assert_equal 'M', commits[5].diffs.first.action
 			assert_equal '/helloworld.c', commits[5].diffs.first.path
+
+      # Revision 10: /trunk/goodbyeworld.c & /trunk/helloworld.c are modified
+      # on branches/development, hence no commit reported.
+
+      # Revision 11: The trunk is reverted back to revision 9.
+			assert_equal 0, commits[6].diffs.size
 		end
 
 		# Specifically tests this case:

@@ -23,7 +23,7 @@ module OhlohScm::Adapters
 		# If the diff points to a file, simply returns the diff.
 		# If the diff points to a directory, returns an array of diffs for every file in the directory.
 		def deepen_diff(diff, rev)
-			if diff.action == 'A' && diff.path == '' && parent_svn && rev == first_token
+      if %w(A R).include?(diff.action) && diff.path == '' && parent_svn && rev == first_token
 				# A very special case that is important for chaining.
 				# This is the first commit, and the entire tree is being created by copying from parent_svn.
 				# In this case, there isn't actually any change, just

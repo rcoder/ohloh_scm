@@ -6,7 +6,7 @@ module OhlohScm::Parsers
 		def test_chain
 			with_svn_chain_repository('svn_with_branching', '/trunk') do |svn|
 				chain = svn.chain
-				assert_equal 4, chain.size
+				assert_equal 5, chain.size
 
 				# In revision 1, the trunk is created.
 				assert_equal '/trunk', chain[0].branch_name
@@ -25,19 +25,29 @@ module OhlohScm::Parsers
 				assert_equal 7, chain[2].final_token
 
 				# In revision 8, a new trunk is created by copying the branch.
-				# This trunk still lives on, so its final_token is nil.
+				# The next final_token will be 9.
 				assert_equal '/trunk', chain[3].branch_name
 				assert_equal 8, chain[3].first_token
-				assert_equal nil, chain[3].final_token
+				assert_equal 9, chain[3].final_token
+
+				# In revision 11, trunk is reverted back to rev 9
+				# This trunk still lives on, so its final_token is nil.
+				assert_equal '/trunk', chain[4].branch_name
+				assert_equal 11, chain[4].first_token
+				assert_nil chain[4].final_token
 			end
 		end
 
 		def test_parent_svn
 			with_svn_chain_repository('svn_with_branching', '/trunk') do |svn|
-				# In this repository, /branches/development becomes
+        # The first chain is the copy commit from trunk:9 into rev 11.
+				p0 = svn.parent_svn
+        assert_equal 9, p0.final_token
+
+        # In this repository, /branches/development becomes
 				# the /trunk in revision 8. So there should be a parent
 				# will final_token 7.
-				p1 = svn.parent_svn
+				p1 = p0.parent_svn
 				assert_equal p1.url, svn.root + '/branches/development'
 				assert_equal p1.branch_name, '/branches/development'
 				assert_equal p1.final_token, 7

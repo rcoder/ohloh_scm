@@ -86,7 +86,7 @@ module OhlohScm::Adapters
 		# code tree from one directory to another, this method returns the name
 		# of the previous directory.
 		def parent_branch_name(d)
-			if d.action == 'A' && branch_name[0, d.path.size] == d.path && d.from_path && d.from_revision
+			if %w(A R).include?(d.action) && branch_name[0, d.path.size] == d.path && d.from_path && d.from_revision
 				d.from_path + branch_name[d.path.size..-1]
 			end
 		end
