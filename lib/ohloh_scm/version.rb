@@ -1,5 +1,5 @@
 module OhlohScm
   module Version
-    STRING = '2.2.11'
+    STRING = '2.2.12'
   end
 end
