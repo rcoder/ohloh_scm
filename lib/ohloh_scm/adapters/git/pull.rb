@@ -3,6 +3,7 @@ module OhlohScm::Adapters
 
 		def pull(from, &block)
 			logger.info { "Pulling #{from.url}" }
+
 			case from
 			when GitAdapter
 				clone_or_fetch(from, &block)
@@ -104,6 +105,8 @@ module OhlohScm::Adapters
 					commit_all(r)
 				end
 				yield(commits.size, commits.size) if block_given?
+			elsif !read_token && commits.empty?
+				raise RuntimeError, "Empty repository"
 			else
 				logger.info { "Already up-to-date." }
 			end
