@@ -72,16 +72,6 @@ module OhlohScm::Adapters
 			end
 		end
 
-		def test_trunk_only_commits
-			with_hg_repository('hg_dupe_delete') do |hg|
-				assert_equal ['73e93f57224e3fd828cf014644db8eec5013cd6b',
-											'732345b1d5f4076498132fd4b965b1fec0108a50',
-											# '525de321d8085bc1d4a3c7608fda6b4020027985', # On branch
-											'72fe74d643bdcb30b00da3b58796c50f221017d0'],
-					hg.commits(:trunk_only => true).collect { |c| c.token }
-			end
-		end
-
 		def test_trunk_only_commit_count
 			with_hg_repository('hg_dupe_delete') do |hg|
 				assert_equal 4, hg.commit_count(:trunk_only => false)
