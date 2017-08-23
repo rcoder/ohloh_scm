@@ -4,7 +4,7 @@ module OhlohScm::Adapters
 			# This only returns first 12 characters.
 			# How can we make it return the entire hash?
       branch_opts = "--rev #{branch_name || :default}"
-			token = run("hg id -q #{url} #{branch_opts}").strip
+			token = run("hg id --debug -i -q #{url} #{branch_opts}").strip
 
 			# Recent versions of Hg now somtimes append a '+' char to the token.
 			# I believe this signifies pending changes... but we don't care.
