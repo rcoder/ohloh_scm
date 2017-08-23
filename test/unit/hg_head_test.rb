@@ -5,7 +5,7 @@ module OhlohScm::Adapters
 
 		def test_hg_head_and_parents
 			with_hg_repository('hg') do |hg|
-				assert_equal '655f04cf6ad7', hg.head_token
+				assert_equal '655f04cf6ad708ab58c7b941672dce09dd369a18', hg.head_token
 				assert_equal '655f04cf6ad708ab58c7b941672dce09dd369a18', hg.head.token
 				assert hg.head.diffs.any? # diffs should be populated
 
