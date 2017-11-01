@@ -4,3 +4,6 @@ sudo apt-add-repository -y ppa:git-core/ppa
 sudo apt-get update
 sudo apt-get install -y git subversion cvs bzr mercurial
 sudo ln -s /usr/bin/cvs /usr/bin/cvsnt
+sudo add-apt-repository ppa:mercurial-ppa/releases
+sudo apt-get update
+sudo apt-get install --only-upgrade mercurial
