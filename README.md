@@ -55,6 +55,14 @@ execute commands so ensure *posix-spawn* gem is installed
 ``gem install posix-spawn``
 
 
+## Expedited Installation
+
+The .travis file contains the necessary sh files to install the needed libraries. Simply execute the following commands:
+
+sh .travis/.install_multiple_scms.sh
+sh .travis/.install_dependencies.sh
+
+
 ## Usage with Bundler
 
 ```
