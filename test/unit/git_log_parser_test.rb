@@ -14,7 +14,7 @@ module OhlohScm::Parsers
 			end
 
 			assert commits
-			assert_equal 3, commits.size
+			assert_equal 4, commits.size
 
 			commits.each do |commit|
 				# puts commit.inspect
@@ -28,9 +28,6 @@ module OhlohScm::Parsers
 				commit.diffs.each do |d|
 					assert_equal 40, d.sha1.length
 					assert_equal 40, d.parent_sha1.length
-					# 00000000.... is ok for our parent's sha1 (if we have no parent), but not for us!
-					assert_not_equal "0000000000000000000000000000000000000000", d.sha1
-
 					assert d.path.length > 0
 					assert d.action =~ /[ACDMRTUXB]/
 				end
