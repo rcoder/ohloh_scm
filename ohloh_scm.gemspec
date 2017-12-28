@@ -19,4 +19,5 @@ Gem::Specification.new do |gem|
 
   gem.add_runtime_dependency 'posix-spawn', '~> 0.3'
   gem.add_runtime_dependency 'nokogiri', '~> 1.6', '>= 1.6.8'
+  gem.add_runtime_dependency 'test-unit'
 end
