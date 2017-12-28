@@ -71,6 +71,12 @@ module OhlohScm::Parsers
 						# Submodules have a file mode of '160000', which indicates a "gitlink"
 						# We ignore submodules completely.
 						e.diffs << OhlohScm::Diff.new( :action => $5, :path => $6, :sha1 => $4, :parent_sha1 => $3 ) unless $1=='160000' || $2=='160000'
+					elsif line =~ /:([0-9]+) ([0-9]+) ([a-z0-9]+) ([a-z0-9]+) (R[0-9]+)\t"?(.+[^"])"?$/
+                                                old_path, new_path = $6.split("\t")
+						unless $1=='160000' || $2=='160000'
+						  e.diffs << OhlohScm::Diff.new( :action => 'D', :path => old_path, :sha1 => NULL_SHA1, :parent_sha1 => $3 )
+						  e.diffs << OhlohScm::Diff.new( :action => 'A', :path => new_path, :sha1 => $4, :parent_sha1 => NULL_SHA1 )
+                                                end
 					end
 
 				else
