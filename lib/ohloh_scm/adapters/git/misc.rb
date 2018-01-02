@@ -76,14 +76,32 @@ module OhlohScm::Adapters
 
     def tags
       return [] if no_tags?
-      tag_strings = run("cd #{url} && git tag --format='%(creatordate:iso-strict) %(objectname) %(refname)'").split(/\n/)
+      tag_strings = run("cd #{url} && git tag --format='%(creatordate:iso-strict) %(objectname) %(refname)' | sed 's/refs\\/tags\\///'").split(/\n/)
       tag_strings.map do |tag_string|
-        timestamp_string, commit_hash, tag_path = tag_string.split(/\s/)
-        timestamp_string = '1970-01-01' if timestamp_string.strip.empty?
-        timestamp = Time.parse(timestamp_string)
-        tag_name = tag_path.gsub('refs/tags/', '')
-        [tag_name, commit_hash, timestamp]
+        timestamp_string, commit_hash, tag_name = tag_string.split(/\s/)
+        [tag_name, dereferenced_sha(tag_name) || commit_hash, time_object(timestamp_string)]
       end
     end
-	end
+
+    private
+
+    def dereferenced_sha(tag_name)
+      dtag_sha_and_name = dtag_sha_and_names.find { |sha_and_name| sha_and_name.last == tag_name }
+      dtag_sha_and_name.first if dtag_sha_and_name
+    end
+
+    def dtag_sha_and_names
+      @dtag_sha_and_names ||= dereferenced_tag_strings.map(&:split)
+    end
+
+    def dereferenced_tag_strings
+      # Pattern: b6e9220c3cabe53a4ed7f32952aeaeb8a822603d refs/tags/v1.0.0^{}
+      run("cd #{url} && git show-ref --tags -d | grep '\\^{}' | sed 's/\\^{}//' | sed 's/refs\\/tags\\///'").split(/\n/)
+    end
+
+    def time_object(timestamp_string)
+      timestamp_string = '1970-01-01' if timestamp_string.strip.empty?
+      timestamp = Time.parse(timestamp_string)
+    end
+  end
 end

@@ -45,10 +45,25 @@ module OhlohScm::Adapters
       end
     end
 
+    def test_fixture_repo_has_dereferenced_tags
+      with_git_repository('git') do |git|
+        tag_shas = git.run("cd #{git.url} && git tag --format='%(objectname)' | sed 's/refs\\/tags\\///'").split(/\n/)
+        assert_equal true, tag_shas.any? { |sha| not git.commit_tokens.include?(sha) }
+      end
+    end
+
     def test_tags
       with_git_repository('git') do |git|
-        assert_equal git.tags, [['v1.0.0', 'f6e5a894ac4173f8f2a200f2c36df38a1e61121a', Time.parse('2016-07-31T07:58:30+05:30')],
+        assert_equal git.tags, [['v1.0.0', 'b6e9220c3cabe53a4ed7f32952aeaeb8a822603d', Time.parse('2016-07-31T07:58:30+05:30')],
+                                ['v1.1.0-lw', '2e9366dd7a786fdb35f211fff1c8ea05c51968b1', Time.parse('2006-06-11T11:34:17-07:00')],
                                 ['v2.1.0', '1df547800dcd168e589bb9b26b4039bff3a7f7e4', Time.parse('2006-07-14T16:07:15-07:00')]]
+      end
+    end
+
+    def test_tags_reference_valid_commits
+      with_git_repository('git') do |git|
+        tag_shas = git.tags.map { |list| list[1] }
+        assert_equal true, tag_shas.all? { |sha| git.commit_tokens.include?(sha) }
       end
     end
 
