@@ -149,7 +149,8 @@ module OhlohScm::Adapters
       doc.xpath('//lists/list/entry').map do |entry|
         tag_name = entry.xpath('name').text
         revision = entry.xpath('commit').attr('revision').text
-        date_string = Time.parse(entry.xpath("commit/date").text)
+        commit_time = entry.xpath("commit/date").text
+        date_string = Time.parse(commit_time) unless commit_time.to_s.strip.empty?
         [tag_name, revision, date_string]
       end
     end

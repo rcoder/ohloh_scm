@@ -7,12 +7,16 @@ module OhlohScm::Parsers
 		def self.internal_parse(buffer, opts)
 			e = nil
 			state = :data
+      previous_state = nil
+      previous_line = nil
 
 			buffer.each_line do |l|
 				l.chomp!
 				next_state = state
 				if state == :data
 					if l =~ /^r(\d+) \| (.*) \| (\d+-\d+-\d+ .*) \(.*\) \| .*/
+						yield e if e && block_given?
+
 						e = OhlohScm::Commit.new
 						e.token = $1.to_i
 						e.committer_name = $2
@@ -21,6 +25,13 @@ module OhlohScm::Parsers
 						next_state = :diffs
 					elsif l.empty?
 						next_state = :comment
+          elsif previous_state == :comment
+						next_state = :comment
+            e.message ||= ''
+            e.message << "\n"
+            e.message << previous_line
+            e.message << "\n"
+            e.message << l
 					end
 
 				elsif state == :diffs
@@ -42,8 +53,6 @@ module OhlohScm::Parsers
 
 				elsif state == :comment
 					if l =~ /------------------------------------------------------------------------/
-						yield e if block_given?
-						e = nil
 						next_state = :data
 					elsif l =~ /============================ .* log start =+/
 						e.message << "\n"
@@ -58,7 +67,9 @@ module OhlohScm::Parsers
 						end
 					end
 				end
+        previous_state = state
 				state = next_state
+        previous_line = l
 			end
 			yield e if block_given?
 		end
