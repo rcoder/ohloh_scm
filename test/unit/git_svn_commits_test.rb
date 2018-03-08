@@ -24,5 +24,14 @@ module OhlohScm::Adapters
         assert_equal [1,2,3,5], git_svn.commits.map(&:token)
       end
     end
+
+    def test_source_scm_commit_count
+      with_svn_repository('svn', 'trunk') do |src|
+        OhlohScm::ScratchDir.new do |dest_dir|
+          git_svn = GitSvnAdapter.new(:url => dest_dir).normalize
+          assert_equal(git_svn.source_scm_commit_count(source_scm: src), 5)
+        end
+      end
+    end
   end
 end
