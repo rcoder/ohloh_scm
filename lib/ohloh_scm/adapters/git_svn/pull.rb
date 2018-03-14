@@ -28,7 +28,7 @@ module OhlohScm::Adapters
       prepare_dest_dir
       accept_certificate_if_prompted
 
-      max_step = @source_scm.commit_count(after: 0)
+      max_step = source_scm_commit_count(source_scm: @source_scm, after: 0)
       cmd = "#{password_prompt} git svn clone --quiet #{username_opts} '#{@source_scm.url}' '#{self.url}'"
       track_conversion(cmd, max_step, &block)
     end
@@ -44,21 +44,12 @@ module OhlohScm::Adapters
     def accept_certificate_if_prompted
       # git svn does not support non iteractive and serv-certificate options
       # Permanently accept svn certificate when it prompts
-      opts = "#{username_opts} #{password_opts}"
-      opts = '--xml' if opts.strip.empty?
-      run "#{accept_ssl_certificate_cmd} '#{opts}' '#{@source_scm.url}'"
-    end
-
-    def accept_ssl_certificate_cmd
-      File.expand_path('../../../../../bin/accept_svn_ssl_certificate', __FILE__)
+      opts = username_and_password_opts(@source_scm)
+      run "#{accept_ssl_certificate_cmd} svn info #{opts} '#{@source_scm.url}'"
     end
 
     def password_prompt
       @source_scm.password.to_s.empty? ? '' : "echo #{ @source_scm.password } |"
-    end
-
-    def password_opts
-      @source_scm.password.to_s.empty? ? '' : "--password='#{@source_scm.password}'"
     end
 
     def username_opts
@@ -71,7 +62,7 @@ module OhlohScm::Adapters
     end
 
     def fetch(&block)
-      max_step = @source_scm.commit_count(after: head_token)
+      max_step = source_scm_commit_count(source_scm: @source_scm, after: head_token)
       cmd = "cd #{self.url} && git svn fetch"
       track_conversion(cmd, max_step, &block)
     end
