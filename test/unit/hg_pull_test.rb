@@ -1,11 +1,11 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require_relative '../test_helper'
 
-module Scm::Adapters
-	class HgPullTest < Scm::Test
+module OhlohScm::Adapters
+	class HgPullTest < OhlohScm::Test
 
 		def test_pull
 			with_hg_repository('hg') do |src|
-				Scm::ScratchDir.new do |dest_dir|
+				OhlohScm::ScratchDir.new do |dest_dir|
 
 					dest = HgAdapter.new(:url => dest_dir).normalize
 					assert !dest.exist?

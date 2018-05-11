@@ -5,9 +5,9 @@ require 'find'
 unless defined?(TEST_DIR)
 	TEST_DIR = File.dirname(__FILE__)
 end
-require TEST_DIR + '/../lib/scm'
+require_relative '../lib/ohloh_scm'
 
-Scm::Adapters::AbstractAdapter.logger = Logger.new(File.open('log/test.log','a'))
+OhlohScm::Adapters::AbstractAdapter.logger = Logger.new(File.open('log/test.log','a'))
 
 unless defined?(REPO_DIR)
 	REPO_DIR = File.expand_path(File.join(TEST_DIR, 'repositories'))
@@ -17,7 +17,7 @@ unless defined?(DATA_DIR)
 	DATA_DIR = File.expand_path(File.join(TEST_DIR, 'data'))
 end
 
-class Scm::Test < Test::Unit::TestCase
+class OhlohScm::Test < Test::Unit::TestCase
 	# For reasons unknown, the base class defines a default_test method to throw a failure.
 	# We override it with a no-op to prevent this 'helpful' feature.
 	def default_test
@@ -25,7 +25,7 @@ class Scm::Test < Test::Unit::TestCase
 
 	def assert_convert(parser, log, expected)
 		result = ''
-		parser.parse File.new(log), :writer => Scm::Parsers::XmlWriter.new(result)
+		parser.parse File.new(log), :writer => OhlohScm::Parsers::XmlWriter.new(result)
 		assert_buffers_equal File.read(expected), result
 	end
 
@@ -47,8 +47,8 @@ class Scm::Test < Test::Unit::TestCase
 		assert_equal expected_lines, actual_lines
 	end
 
-	def with_repository(type, name, block)
-		Scm::ScratchDir.new do |dir|
+	def with_repository(type, name, branch_name = nil)
+		OhlohScm::ScratchDir.new do |dir|
 			if Dir.entries(REPO_DIR).include?(name)
 				`cp -R #{File.join(REPO_DIR, name)} #{dir}`
 			elsif Dir.entries(REPO_DIR).include?(name + '.tgz')
@@ -56,27 +56,68 @@ class Scm::Test < Test::Unit::TestCase
 			else
 				raise RuntimeError.new("Repository archive #{File.join(REPO_DIR, name)} not found.")
 			end
-			block.call(type.new(:url => File.join(dir, name)).normalize)
+			yield type.new(:url => File.join(dir, name), branch_name: branch_name).normalize
 		end
 	end
 
-	def with_svn_repository(name, &block)
-		with_repository(Scm::Adapters::SvnAdapter, name, block)
+  # We are unable to add a commit message with non utf8 characters using svn 1.6 & above.
+  # In order to emulate encoding issues, we use a custom svn executable that returns
+  #   an xml log with invalid characters in it.
+  # We prepend our custom svn's location to $PATH to make it available during our tests.
+  def with_invalid_encoded_svn_repository
+    with_repository(OhlohScm::Adapters::SvnChainAdapter, 'svn_with_invalid_encoding') do |svn|
+      original_env_path = ENV['PATH']
+      custom_svn_path = File.expand_path('../bin/', __FILE__)
+      ENV['PATH'] = custom_svn_path + ':' + ENV['PATH']
+
+      yield svn
+
+      ENV['PATH'] = original_env_path
+    end
+  end
+
+	def with_svn_repository(name, branch_name='')
+		with_repository(OhlohScm::Adapters::SvnAdapter, name) do |svn|
+			svn.branch_name = branch_name
+			svn.url = File.join(svn.root, svn.branch_name)
+			svn.url = svn.url[0..-2] if svn.url[-1..-1] == '/' # Strip trailing /
+			yield svn
+		end
 	end
 
-	def with_cvs_repository(name, &block)
-		with_repository(Scm::Adapters::CvsAdapter, name, block)
+	def with_svn_chain_repository(name, branch_name='')
+		with_repository(OhlohScm::Adapters::SvnChainAdapter, name) do |svn|
+			svn.branch_name = branch_name
+			svn.url = File.join(svn.root, svn.branch_name)
+			svn.url = svn.url[0..-2] if svn.url[-1..-1] == '/' # Strip trailing /
+			yield svn
+		end
 	end
 
-	def with_git_repository(name, &block)
-		with_repository(Scm::Adapters::GitAdapter, name, block)
+	def with_cvs_repository(name, module_name='')
+		with_repository(OhlohScm::Adapters::CvsAdapter, name) do |cvs|
+			cvs.module_name = module_name
+			yield cvs
+		end
 	end
 
-	def with_hg_repository(name, &block)
-		with_repository(Scm::Adapters::HgAdapter, name, block)
+  def with_git_repository(name, branch_name = nil)
+    with_repository(OhlohScm::Adapters::GitAdapter, name, branch_name) { |git| yield git }
+  end
+
+  def with_hg_repository(name, branch_name = nil)
+    with_repository(OhlohScm::Adapters::HgAdapter, name, branch_name) { |hg| yield hg }
+  end
+
+	def with_hglib_repository(name)
+		with_repository(OhlohScm::Adapters::HglibAdapter, name) { |hg| yield hg }
 	end
 
-	def with_bzr_repository(name, &block)
-		with_repository(Scm::Adapters::BzrAdapter, name, block)
+	def with_bzr_repository(name)
+		with_repository(OhlohScm::Adapters::BzrAdapter, name) { |bzr| yield bzr }
+	end
+
+	def with_bzrlib_repository(name)
+		with_repository(OhlohScm::Adapters::BzrlibAdapter, name) { |bzr| yield bzr }
 	end
 end

@@ -1,7 +1,7 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require_relative '../test_helper'
 
-module Scm::Adapters
-	class CvsValidationTest < Scm::Test
+module OhlohScm::Adapters
+	class CvsValidationTest < OhlohScm::Test
 		def test_rejected_urls
 			[	nil, "", "foo", "http:/", "http:://", "http://", "http://a",
 				":pserver", # that's not enough
@@ -19,7 +19,8 @@ module Scm::Adapters
 				"sourceforge.net/svn/project/trunk", # missing a protocol prefix
 				"file:///home/robin/cvs", # file protocol is not allowed
 				"http://svn.sourceforge.net", # http protocol is not allowed
-				"git://kernel.org/whatever/linux.git" # git protocol is not allowed
+				"git://kernel.org/whatever/linux.git", # git protocol is not allowed
+				"ext@kernel.org/whatever/linux.git" # ext protocol allowed, but starts with ':'
 			].each do |url|
 				# Rejected for both internal and public use
 				[true, false].each do |p|
@@ -42,7 +43,8 @@ module Scm::Adapters
 				":pserver:anonymous:@sc2.cvs.sourceforge.net:/cvsroot/sc2",
 				":pserver:cool-dev:@sc2.cvs.sourceforge.net:/cvsroot/sc2", # Hyphen should be OK in username
 				":pserver:cvs_anon:@cvs.scms.waikato.ac.nz:/usr/local/global-cvs/ml_cvs", # Underscores should be ok in path
-				":pserver:anonymous:freefem++@idared.ann.jussieu.fr:/Users/pubcvs/cvs" # Pluses should be OK
+				":pserver:anonymous:freefem++@idared.ann.jussieu.fr:/Users/pubcvs/cvs", # Pluses should be OK
+				":ext:anoncvs@opensource.conformal.com:/anoncvs/scrotwm" # scrotwm is a real life example
 			].each do |url|
 				# Valid for both internal and public use
 				[true, false].each do |p|
@@ -130,10 +132,16 @@ module Scm::Adapters
 			cvs = CvsAdapter.new(:url => "garbage_in_garbage_out")
 			assert_equal nil, cvs.guess_forge
 
+			cvs = CvsAdapter.new(:url => ':pserver:anonymous:@boost.cvs.sourceforge.net:/cvsroot/boost')
+			assert_equal 'sourceforge.net', cvs.guess_forge
+
 			cvs = CvsAdapter.new(:url => ':pserver:guest:@cvs.dev.java.net:/cvs')
 			assert_equal 'java.net', cvs.guess_forge
 
 			cvs = CvsAdapter.new(:url => ":PSERVER:ANONCVS:@CVS.DEV.JAVA.NET:/cvs")
+			assert_equal 'java.net', cvs.guess_forge
+
+			cvs = CvsAdapter.new(:url => ":pserver:guest:@colorchooser.dev.java.net:/cvs")
 			assert_equal 'java.net', cvs.guess_forge
 		end
 	end

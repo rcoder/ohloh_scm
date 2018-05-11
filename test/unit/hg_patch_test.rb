@@ -1,7 +1,7 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require_relative '../test_helper'
 
-module Scm::Adapters
-  class HgPatchTest < Scm::Test
+module OhlohScm::Adapters
+  class HgPatchTest < OhlohScm::Test
     def test_patch_for_commit
       with_hg_repository('hg') do |repo|
         commit = repo.verbose_commit(1)
