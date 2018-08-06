@@ -63,6 +63,7 @@ module OhlohScm::Adapters
 			after = opts[:after]
 			begin
         ensure_host_key
+        return if has_lock?
 				run "cvsnt -d #{self.url} rlog #{opt_branch} #{opt_time(after)} '#{self.module_name}' | #{ string_encoder } > #{rlog_filename}"
 				File.open(rlog_filename, 'r') do |file|
 					yield file

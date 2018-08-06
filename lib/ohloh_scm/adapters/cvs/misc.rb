@@ -192,6 +192,14 @@ module OhlohScm::Adapters
       end
     end
 
+    def has_lock?
+      begin
+        run "timeout 60 cvsnt -d -q #{self.url} rlog '#{self.module_name}' | grep -e \"waiting for.*lock in\" > #{rlog_filename}"
+      rescue => e
+        File.zero?(rlog_filename) ? false : true
+      end
+    end
+
     def tags
       tag_strings = run("cvs -Q -d #{ url } rlog -h #{ module_name } | awk -F\"[.:]\" '/^\\t/&&$(NF-1)!=0'").split(/\n/)
       tag_strings.map do |tag_string|
