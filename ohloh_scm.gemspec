@@ -1,4 +1,3 @@
-# -*- encoding: utf-8 -*-
 $:.push File.expand_path("../lib", __FILE__)
 require 'ohloh_scm/version'
 
@@ -12,7 +11,7 @@ Gem::Specification.new do |gem|
   gem.homepage      = %[https://github.com/blackducksw/ohloh_scm/]
   gem.license       = %[GPL v2.0]
 
-  gem.files         = `git ls-files -z`.split("\x0")
+  gem.files         = `git ls-files -z`.force_encoding('utf-8').split("\x0")
   gem.executables   = gem.files.grep(%r{^bin/}).map { |f| File.basename(f) }
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.require_paths = %w(lib)
