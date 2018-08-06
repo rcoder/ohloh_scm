@@ -1,7 +1,7 @@
 module OhlohScm::Adapters
   class GitSvnAdapter < AbstractAdapter
     def commit_count(opts={})
-      cmd = "#{after_revision(opts)} | grep -E e '^r[0-9]+.*lines$' | wc -l"
+      cmd = "#{after_revision(opts)} | grep -E -e '^r[0-9]+.*lines$' | wc -l"
       git_svn_log(cmd: cmd, oneline: false).to_i
     end
 
