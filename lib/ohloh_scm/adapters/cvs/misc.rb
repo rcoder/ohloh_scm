@@ -194,9 +194,10 @@ module OhlohScm::Adapters
 
     def has_lock?
       begin
-        run "timeout 60 cvsnt -d -q #{self.url} rlog '#{self.module_name}' | grep -e \"waiting for.*lock in\" > #{rlog_filename}"
+        run "timeout 30 cvsnt -q -d #{self.url} rlog '#{self.module_name}'"
+        false
       rescue => e
-        File.zero?(rlog_filename) ? false : true
+        e.message.match(/waiting for.*lock in/) ? true : false
       end
     end
 
