@@ -3,7 +3,6 @@ require 'stringio'
 require 'posix/spawn'
 
 class Shellout
-
   def self.relay src, dst
     while((buf = src.read(8192))); dst << buf; end 
   end 
@@ -17,7 +16,6 @@ class Shellout
   def run(cmd)
     Shellout::execute(cmd)
   end
-
 end
 
 if $0 == __FILE__
