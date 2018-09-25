@@ -192,12 +192,12 @@ module OhlohScm::Adapters
       end
     end
 
-    def has_lock?
+    def has_lock!
       begin
-        run "timeout 30 cvsnt -q -d #{self.url} rlog '#{self.module_name}'"
+        run "timeout 2m cvsnt -q -d #{self.url} rlog '#{self.module_name}'"
         false
       rescue => e
-        e.message.match(/waiting for.*lock in/) ? true : false
+        raise RuntimeError.new('CVS lock has been found') if e.message.match(/waiting for.*lock in/)
       end
     end
 
