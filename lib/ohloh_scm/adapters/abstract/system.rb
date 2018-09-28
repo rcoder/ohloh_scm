@@ -1,6 +1,8 @@
 module OhlohScm::Adapters
 	require 'logger'
 	class AbstractAdapter
+    include POSIX::Spawn
+
 		def self.logger
 			@@logger ||= Logger.new(STDERR)
 		end
@@ -25,6 +27,23 @@ module OhlohScm::Adapters
 		def run(cmd)
 			AbstractAdapter::run(cmd)
 		end
+
+    def popen(cmd, filename)
+      logger.debug { cmd }
+      file = File.open(filename, 'w')
+      pid, input, out, err = popen4(cmd)
+      while true
+        Timeout.timeout(60 * 15) do
+          buffer = out.readpartial(50000)
+          file.write(buffer)
+        end
+      end
+    rescue EOFError
+    ensure
+      file.close
+      pid, status = Process::waitpid(pid) if pid
+      raise RuntimeError.new("#{cmd} failed: #{out}\n#{err}") if status && status.exitstatus != 0
+    end
 
 		# As above, but does not raise an exception when an error occurs.
 		# Returns three values: stdout, stderr, and process exit code
