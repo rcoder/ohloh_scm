@@ -22,7 +22,7 @@ module OhlohScm::Adapters
 			unless self.exist? && self.has_branch?
 				run "mkdir -p '#{self.url}'"
 				run "rm -rf '#{self.url}'"
-				run "git clone -q -n '#{source_scm.url}' '#{self.url}' >/dev/null 2>&1"
+				run "git clone -q -n '#{source_scm.url}' '#{self.url}'"
 				create_tracking_branch(source_scm.branch_name) # ensure the correct branch exist locally
 				checkout # switch to the correct branch
 			else
