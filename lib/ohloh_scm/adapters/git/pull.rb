@@ -27,7 +27,7 @@ module OhlohScm::Adapters
 				checkout # switch to the correct branch
 			else
 				checkout # should already be on correct branch, but some old repositories were stricken by a bug
-				run "cd '#{self.url}' && git fetch --update-head-ok '#{source_scm.url}' #{self.branch_name}:#{self.branch_name}"
+				run "cd '#{self.url}' && git fetch --tags --update-head-ok '#{source_scm.url}' #{self.branch_name}:#{self.branch_name}"
 			end
 			clean_up_disk
 
