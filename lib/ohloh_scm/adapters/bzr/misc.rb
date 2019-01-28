@@ -46,7 +46,12 @@ module OhlohScm::Adapters
     def tags
       tag_strings = run("cd '#{url}' && bzr tags").split(/\n/)
       tag_strings.map do |tag_string|
-        tag_name, rev = tag_string.split(/\s+/)
+        parse_tag_names_and_revision = tag_string.split(/\s+/)
+        if parse_tag_names_and_revision.size > 1
+          tag_name, rev = parse_tag_names_and_revision[0..-2].join(' '), parse_tag_names_and_revision.last
+        else
+          tag_name, rev = parse_tag_names_and_revision.first, nil
+        end
         next if rev == '?' || tag_name == '....'
         time_string = run("cd '#{ url }' && bzr log -r #{ rev } | grep 'timestamp:' | sed 's/timestamp://'")
         [tag_name, rev, Time.parse(time_string)]
