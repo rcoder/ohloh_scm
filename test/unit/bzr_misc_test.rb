@@ -38,8 +38,10 @@ module OhlohScm::Adapters
       with_bzr_repository('bzr') do |bzr|
         time_1 = Time.parse('2009-02-04 00:25:40 +0000')
         time_2 = Time.parse('2011-12-22 18:37:33 +0000')
+        time_3 = Time.parse('2009-02-04 00:24:22 +0000')
+
         monkey_patch_run_method_to_match_tag_patterns
-        assert_equal [['v1.0.0', '5', time_1], ['v2.0.0','7', time_2]], bzr.tags
+        assert_equal [['v1.0.0', '5', time_1], ['v2.0.0', '7', time_2], ['v 3.0.0', '2', time_3]], bzr.tags
       end
     end
 
