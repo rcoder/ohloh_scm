@@ -12,7 +12,7 @@ module OhlohScm::Adapters
 
     def cat(revision, file_path)
       file_path = %Q{#{file_path}}
-      run("cd #{self.url} && git show #{ revision }:#{ file_path }").strip
+      run("cd #{self.url} && git show #{ revision }:#{ file_path.shellescape }").strip
     end
 
     def git_commit(commit)
