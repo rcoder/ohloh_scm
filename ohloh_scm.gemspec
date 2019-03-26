@@ -9,7 +9,7 @@ Gem::Specification.new do |gem|
   gem.summary       = %[Source Control Management]
   gem.description   = %[The Ohloh source control management library for interacting with Git, SVN, CVS, Hg and Bzr repositories.]
   gem.homepage      = %[https://github.com/blackducksw/ohloh_scm/]
-  gem.license       = %[GPL v2.0]
+  gem.license       = %[GPL-2.0]
 
   gem.files         = `git ls-files -z`.force_encoding('utf-8').split("\x0")
   gem.executables   = gem.files.grep(%r{^bin/}).map { |f| File.basename(f) }
