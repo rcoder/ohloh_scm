@@ -1,7 +1,10 @@
 language: ruby
+dist: xenial
 env:
   - TRAVIS_CONFIG_DIR=.travis
 before_install:
+  - sudo add-apt-repository ppa:git-core/ppa -y
+  - sudo apt-get update -q
   - cd $TRAVIS_CONFIG_DIR
   - sh .travis_ssh_setup.sh
 install:
