@@ -26,9 +26,8 @@ Gem::PackageTask.new(spec) do |pkg|
   pkg.need_zip = true
 end
 
-Rake::TestTask.new :unit_tests do |t|
+Rake::TestTask.new :test do |t|
 	t.test_files = FileList[File.dirname(__FILE__) + '/test/unit/**/*_test.rb']
 end
 
-task :default => :unit_tests
-
+task :default => :test
