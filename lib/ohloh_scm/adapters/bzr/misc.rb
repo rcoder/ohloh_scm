@@ -43,7 +43,7 @@ module OhlohScm::Adapters
 			run "cd '#{url}' && bzr export --format=dir -r #{to_rev_param(token)} '#{dest_dir}'"
 		end
 
-		def tags
+    def tags
       tag_strings = run("cd '#{url}' && bzr tags").split(/\n/)
       tag_strings.map do |tag_string|
         parse_tag_names_and_revision = tag_string.split(/\s+/)
