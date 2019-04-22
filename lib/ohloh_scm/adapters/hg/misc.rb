@@ -30,5 +30,11 @@ module OhlohScm::Adapters
         [tag_name, rev, Time.parse(time_string)]
       end
     end
+
+    protected
+
+    def branch_name_or_default
+      branch_name || :default
+    end
 	end
 end

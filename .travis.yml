@@ -1,15 +1,6 @@
-language: ruby
-env:
-  - TRAVIS_CONFIG_DIR=.travis
+language: generic
+services:
+  - docker
 before_install:
-  - cd $TRAVIS_CONFIG_DIR
-  - sh .travis_ssh_setup.sh
-install:
-  - sh .install_multiple_scms.sh
-  - sh .install_dependencies.sh
-  - gem install posix-spawn
-  - gem install nokogiri -v 1.8.1
-  - gem install test-unit -v 3.2.7
-  - sudo apt-get install expect
-before_script:
-  - cd $TRAVIS_BUILD_DIR
+  - docker pull notalex/ohloh_scm:ubuntu18
+script: docker run -P -w /home/app/ohloh_scm -v $(pwd):/home/app/ohloh_scm -ti notalex/ohloh_scm:ubuntu18 /bin/sh -c "/etc/init.d/ssh start; LANG=en_US.UTF-8 rake test 2> /dev/null"

@@ -25,7 +25,7 @@ module OhlohScm::Adapters
 			with_svn_repository('svn') do |src|
 				OhlohScm::ScratchDir.new do |dest_dir|
 
-					dest = SvnAdapter.new(:url => "svn+ssh://#{Socket.gethostname}#{File.expand_path(dest_dir)}").normalize
+					dest = SvnAdapter.new(:url => "svn+ssh://localhost#{File.expand_path(dest_dir)}").normalize
 					assert !dest.exist?
 
 					src.push(dest)
