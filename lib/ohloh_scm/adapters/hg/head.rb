@@ -3,7 +3,7 @@ module OhlohScm::Adapters
 		def head_token
 			# This only returns first 12 characters.
 			# How can we make it return the entire hash?
-      branch_opts = "--rev #{branch_name || :default}"
+      branch_opts = "--rev #{branch_name_or_default}"
 			token = run("hg id --debug -i -q #{url} #{branch_opts}").strip
 
 			# Recent versions of Hg now somtimes append a '+' char to the token.

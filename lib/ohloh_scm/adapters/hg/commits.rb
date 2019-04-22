@@ -14,6 +14,10 @@ module OhlohScm::Adapters
 			# Basically, we're trying very hard to make this act just like Git. The hg_rev_list_test checks this.
 			tokens = run("cd '#{self.url}' && #{ hg_log_with_opts } --template='{node}\\n'").split("\n").reverse
 
+      # Since hg v4, --follow-first does not play well with -r N:n. Using them together always returns all commits.
+      # To find trunk commits since a given revision, we get all trunk commits and drop older commits before given revision.
+      tokens = tokens.drop(tokens.index(after)) if tokens.any? && after && after != 0
+
 			# Hg returns everything after *and including* after.
 			# We want to exclude it.
 			if tokens.any? && tokens.first == after
@@ -96,13 +100,13 @@ module OhlohScm::Adapters
       up_to = opts[:up_to] || :tip
 
       options = if opts[:trunk_only]
-        "--follow-first -r #{ up_to }:#{ after }"
+        '--follow-first'
       else
-        query = "and (branch(#{ branch_name }) or ancestors(#{ branch_name }))" if branch_name && branch_name != 'default'
+        query = "and (branch(#{ branch_name_or_default }) or ancestors(#{ branch_name_or_default }))"
         "-r '#{ up_to }:#{ after } #{ query }'"
       end
 
-      ["hg log -f -v #{ options }", after]
+      ["hg log -v #{ options }", after]
     end
 	end
 end

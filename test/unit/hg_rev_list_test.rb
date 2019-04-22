@@ -16,9 +16,9 @@ module OhlohScm::Adapters
 				assert_equal [:A, :B],                     rev_list_helper(hg, nil, :B)
 				assert_equal [:A, :B, :G, :H, :C],         rev_list_helper(hg, nil, :C)
 				assert_equal [:A, :B, :G, :H, :C, :I, :D], rev_list_helper(hg, nil, :D)
-				assert_equal [:A, :G],                     rev_list_helper(hg, nil, :G)
-				assert_equal [:A, :G, :H],                 rev_list_helper(hg, nil, :H)
-				assert_equal [:A, :G, :H, :I],             rev_list_helper(hg, nil, :I)
+				assert_equal [:A, :B, :G],                 rev_list_helper(hg, nil, :G)
+				assert_equal [:A, :B, :G, :H],             rev_list_helper(hg, nil, :H)
+				assert_equal [:A, :B, :G, :H, :C, :I],     rev_list_helper(hg, nil, :I)
 
 				# Limited history from one commit to another
 				assert_equal [],                           rev_list_helper(hg, :A, :A)
