@@ -1,6 +1,0 @@
-language: generic
-services:
-  - docker
-before_install:
-  - docker pull notalex/ohloh_scm:ubuntu18
-script: docker run -P -w /home/app/ohloh_scm -v $(pwd):/home/app/ohloh_scm -ti notalex/ohloh_scm:ubuntu18 /bin/sh -c "/etc/init.d/ssh start; LANG=en_US.UTF-8 rake test 2> /dev/null"

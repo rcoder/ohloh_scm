@@ -1,1 +1,0 @@
-changeset = '__BEGIN_COMMIT__\nchangeset: {node}\nuser:      {author}\ndate:      {date}\n__BEGIN_COMMENT__\n{desc}\n__END_COMMENT__\n__END_COMMIT__\n'

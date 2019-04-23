@@ -1,9 +1,0 @@
-diff --git a/makefile b/makefile
-new file mode 100644
---- /dev/null
-+++ b/makefile
-@@ -0,0 +1,4 @@
-+all: helloworld
-+
-+helloworld: helloworld.c
-+	gcc -o helloworld helloworld.c

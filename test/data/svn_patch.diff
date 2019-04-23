@@ -1,9 +1,0 @@
-Index: trunk/makefile
-===================================================================
---- trunk/makefile	(nonexistent)
-+++ trunk/makefile	(revision 2)
-@@ -0,0 +1,4 @@
-+all: helloworld
-+
-+helloworld: helloworld.c
-+	gcc -o helloworld helloworld.c

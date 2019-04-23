@@ -1,7 +1,0 @@
-#! /usr/bin/env bash
-# This is for use with tests dealing with invalid encodings in svn log.
-# This script returns a sample svn xml log with some non utf-8 characters.
-
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-
-cat $DIR/../data/svn_with_invalid_encoding.log
