@@ -3,6 +3,11 @@ GEM
   specs:
     ast (2.4.0)
     byebug (11.0.1)
+    concurrent-ruby (1.1.5)
+    faker (1.9.3)
+      i18n (>= 0.7)
+    i18n (1.6.0)
+      concurrent-ruby (~> 1.0)
     jaro_winkler (1.5.2)
     minitest (5.11.3)
     parallel (1.17.0)
@@ -28,6 +33,7 @@ PLATFORMS
 
 DEPENDENCIES
   byebug
+  faker
   minitest
   rubocop (~> 0.67)
   rubocop-performance

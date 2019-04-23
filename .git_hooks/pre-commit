@@ -1,0 +1,20 @@
+#! /usr/bin/env bash
+
+echo-color() { echo "[0;30;45m $@ [0m"; }
+modified_files=$(git diff --cached --name-only | grep '.*.rb$')
+
+# Run Rubocop
+[ -z "$modified_files" ] && exit 0
+echo-color 'Running rubocop on cached ruby files:'
+bundle exec rubocop $modified_files || exit 1
+
+test_files=()
+for filepath in $modified_files; do
+  testpath=$(echo $filepath | sed 's/^lib/spec/' | sed 's/\.rb$/_spec.rb/')
+  [ -e $testpath ] && test_files+=($testpath)
+done
+
+# Run tests
+[ -z "$test_files" ] && exit 0
+echo-color 'Running related tests for cached ruby files:'
+.bin/run-tests $test_files

@@ -1,0 +1,7 @@
+language: generic
+services:
+  - docker
+before_install:
+  - docker pull notalex/oh_scm:ubuntu18
+script:
+  - docker run -P -v $(pwd):/home/app/ohloh_scm -ti notalex/oh_scm:ubuntu18 /bin/sh -c "/etc/init.d/ssh start; rubocop && LANG=en_US.UTF-8 rake test 2> /dev/null"
