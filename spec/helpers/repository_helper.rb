@@ -29,8 +29,8 @@ module RepositoryHelper
     source_path = get_fixture_folder_path(name)
     Dir.mktmpdir do |dir_path|
       setup_repository_archive(source_path, dir_path)
-      yield OhlohScm::Factory.get_scm(scm_type: scm_type, url: File.join(dir_path, name),
-                                      branch_name: branch_name)
+      yield OhlohScm::Factory.get_base(scm_type: scm_type, url: File.join(dir_path, name),
+                                       branch_name: branch_name)
     end
   end
 
