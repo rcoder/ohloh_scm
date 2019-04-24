@@ -76,6 +76,10 @@ This will prevent a git commit if the files being committed fail rubocop or thei
 ```sh
 $ git config core.hooksPath .git_hooks/
 ```
+```sh
+# Skip hooks when committing temporary code that breaks rubocop/tests.
+$ git commit -m 'temp' --no-verify
+```
 
 ## Contact OpenHub
 

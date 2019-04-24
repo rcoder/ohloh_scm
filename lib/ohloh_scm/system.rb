@@ -15,5 +15,9 @@ module OhlohScm
     def self.logger
       @logger ||= Logger.new(STDERR)
     end
+
+    def string_encoder_path
+      File.expand_path('../../.bin/string_encoder', __dir__)
+    end
   end
 end

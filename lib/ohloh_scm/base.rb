@@ -5,7 +5,7 @@ module OhlohScm
     include OhlohScm::System
     attr_reader :scm, :activity, :status
 
-    def initialize(scm_type, url, branch_name)
+    def initialize(scm_type, url, branch_name = nil)
       @scm = OhlohScm.const_get("#{scm_type.capitalize}Scm").new(base: self, url: url,
                                                                  branch_name: branch_name)
       @activity = OhlohScm.const_get("#{scm_type.capitalize}Activity").new(self)
