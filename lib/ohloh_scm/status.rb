@@ -2,6 +2,9 @@
 
 module OhlohScm
   class Status
+    extend Forwardable
+    def_delegators :@base, :scm, :activity
+
     def initialize(base)
       @base = base
     end

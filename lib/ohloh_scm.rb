@@ -3,6 +3,8 @@
 module OhlohScm
 end
 
+require 'forwardable'
+
 require_relative 'ohloh_scm/version'
 require_relative 'ohloh_scm/system'
 require_relative 'ohloh_scm/base'

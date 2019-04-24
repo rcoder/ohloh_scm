@@ -7,7 +7,7 @@ describe 'Factory' do
     url = Faker::Internet.url
     base = OhlohScm::Factory.get_scm(scm_type: :git, url: url)
 
-    base.scm.must_be_instance_of OhlohScm::GitScm
+    base.status.scm.must_be_instance_of OhlohScm::GitScm
     base.scm.url.must_equal url
     assert base.activity.method(:commits)
     assert base.status.method(:logger)
