@@ -5,7 +5,7 @@ require 'logger'
 module OhlohScm
   module System
     def run(cmd)
-      system(cmd)
+      `#{cmd}`
     end
 
     def logger
