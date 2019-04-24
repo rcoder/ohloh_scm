@@ -3,7 +3,7 @@
 module OhlohScm
   class Scm
     extend Forwardable
-    def_delegators :@base, :status, :activity
+    def_delegators :@base, :status, :activity, :run
     attr_reader :url, :branch_name
 
     def initialize(base:, url:, branch_name: nil)
