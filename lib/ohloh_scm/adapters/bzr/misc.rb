@@ -31,7 +31,7 @@ module OhlohScm::Adapters
 		end
 
     def export_tag(dest_dir, tag_name)
-      run "cd '#{path}' && bzr export -r tag:#{tag_name} #{dest_dir}"
+      run "cd '#{path}' && bzr export -r #{tag_name} #{dest_dir}"
     end
 
 		def export(dest_dir, token=head_token)
