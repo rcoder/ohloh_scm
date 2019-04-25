@@ -113,7 +113,7 @@ module OhlohScm::Adapters
 
           assert_equal(['2.0', '6'], source_scm.tags.first[0..1])
           # Avoid millisecond comparision.
-          assert_equal(Time.now.strftime('%F %R'), source_scm.tags.first[-1].strftime('%F %R'))
+          assert_equal(Time.now.utc.strftime('%F %R'), source_scm.tags.first[-1].strftime('%F %R'))
         end
       end
     end

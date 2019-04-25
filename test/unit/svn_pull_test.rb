@@ -48,7 +48,7 @@ module OhlohScm::Adapters
 
 		def test_svnadmin_create_remote
 			OhlohScm::ScratchDir.new do |dir|
-				svn = SvnAdapter.new(:url => "svn+ssh://#{Socket.gethostname}#{dir}")
+				svn = SvnAdapter.new(:url => "svn+ssh://localhost#{dir}")
 				svn.svnadmin_create_remote
 				assert svn.exist?
 				assert FileTest.exist?(File.join(dir, 'hooks', 'pre-revprop-change'))

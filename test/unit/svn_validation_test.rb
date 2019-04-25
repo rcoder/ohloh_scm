@@ -169,7 +169,7 @@ module OhlohScm::Adapters
     def test_empty_branch_name_with_file_system
       OhlohScm::ScratchDir.new do |dir|
         svn = SvnAdapter.new(:url => dir).normalize
-        assert_equal '', svn.branch_name
+        assert svn.branch_name.to_s.empty?
       end
     end
 	end

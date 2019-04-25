@@ -29,6 +29,12 @@ module OhlohScm::Adapters
                       '75532c1e1f1de55c2271f6fd29d98efbe35397c4',
 											'655f04cf6ad708ab58c7b941672dce09dd369a18'], hg.commit_tokens
 
+        assert_equal ['b14fa4692f949940bd1e28da6fb4617de2615484',
+                      '468336c6671cbc58237a259d1b7326866afc2817',
+                      '75532c1e1f1de55c2271f6fd29d98efbe35397c4',
+                      '655f04cf6ad708ab58c7b941672dce09dd369a18'],
+          hg.commit_tokens(after: '01101d8ef3cea7da9ac6e9a226d645f4418f05c9')
+
 				assert_equal ['655f04cf6ad708ab58c7b941672dce09dd369a18'],
 					hg.commit_tokens(:after => '75532c1e1f1de55c2271f6fd29d98efbe35397c4')
 
