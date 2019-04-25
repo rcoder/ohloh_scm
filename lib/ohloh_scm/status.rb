@@ -16,7 +16,5 @@ module OhlohScm
     def errors; end
 
     def cleanup; end
-
-    def logger; end
   end
 end

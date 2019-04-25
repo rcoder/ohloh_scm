@@ -11,5 +11,9 @@ module OhlohScm
       @activity = OhlohScm.const_get("#{scm_type.capitalize}Activity").new(self)
       @status = OhlohScm.const_get("#{scm_type.capitalize}Status").new(self)
     end
+
+    def logger
+      System.logger
+    end
   end
 end
