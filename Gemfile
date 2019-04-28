@@ -8,4 +8,5 @@ group :development do
   gem 'minitest'
   gem 'rubocop', '~> 0.67'
   gem 'rubocop-performance'
+  gem 'simplecov'
 end

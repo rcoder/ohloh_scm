@@ -1,3 +1,4 @@
+# :nocov:
 # frozen_string_literal: true
 
 require_relative 'parser/array_writer'

@@ -2,6 +2,10 @@
 
 $LOAD_PATH << File.expand_path('../lib', __dir__)
 
+require 'simplecov'
+SimpleCov.start { add_filter '/spec/' }
+SimpleCov.minimum_coverage 93
+
 require 'ohloh_scm'
 require 'minitest'
 require 'minitest/autorun'
