@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'tmpdir'
-
 module RepositoryHelper
   def with_git_repository(name, branch_name = nil)
     with_repository(:git, name, branch_name) { |git| yield git }
@@ -27,7 +25,7 @@ module RepositoryHelper
 
   def with_repository(scm_type, name, branch_name = nil)
     source_path = get_fixture_folder_path(name)
-    Dir.mktmpdir do |dir_path|
+    Dir.mktmpdir('oh_scm_fixture_') do |dir_path|
       setup_repository_archive(source_path, dir_path)
       yield OhlohScm::Factory.get_base(scm_type: scm_type, url: File.join(dir_path, name),
                                        branch_name: branch_name)

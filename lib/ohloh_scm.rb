@@ -3,6 +3,7 @@
 module OhlohScm
 end
 
+require 'tmpdir'
 require 'forwardable'
 
 require_relative 'ohloh_scm/version'

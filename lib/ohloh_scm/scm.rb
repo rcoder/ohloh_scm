@@ -8,8 +8,8 @@ module OhlohScm
 
     def initialize(base:, url:, branch_name: nil)
       @base = base
-      @url = url
-      @branch_name = branch_name
+      @url = url.strip if url
+      @branch_name = branch_name.strip if branch_name
     end
 
     def normalize; end

@@ -2,14 +2,15 @@
 
 $LOAD_PATH << File.expand_path('../lib', __dir__)
 
-require 'simplecov'
-SimpleCov.start { add_filter '/spec/' }
-SimpleCov.minimum_coverage 93
+if ENV['SIMPLECOV_START']
+  require 'simplecov'
+  SimpleCov.start { add_filter '/spec/' }
+  SimpleCov.minimum_coverage 94
+end
 
 require 'ohloh_scm'
 require 'minitest'
 require 'minitest/autorun'
-require 'faker'
 require 'helpers/repository_helper'
 
 FIXTURES_DIR = File.expand_path('raw_fixtures', __dir__)

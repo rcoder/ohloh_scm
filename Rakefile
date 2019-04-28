@@ -2,6 +2,7 @@
 
 require 'rake/testtask'
 
+ENV['SIMPLECOV_START'] = 'true'
 task default: :test
 
 Rake::TestTask.new do |task|
