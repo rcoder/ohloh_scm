@@ -1,11 +1,15 @@
 # frozen_string_literal: true
 
 require 'logger'
+require 'open3'
 
 module OhlohScm
   module System
     def run(cmd)
-      `#{cmd}`
+      out, err, status = Open3.capture3(cmd)
+      raise "#{cmd} failed: #{out}\n#{err}" unless status.success?
+
+      out
     end
 
     def string_encoder_path
