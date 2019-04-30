@@ -2,8 +2,9 @@
 
 module OhlohScm
   class Activity
+    include OhlohScm::System
     extend Forwardable
-    def_delegators :@base, :scm, :status, :run, :string_encoder_path
+    def_delegators :@base, :scm, :status
 
     def initialize(base)
       @base = base
