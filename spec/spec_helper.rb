@@ -5,7 +5,7 @@ $LOAD_PATH << File.expand_path('../lib', __dir__)
 if ENV['SIMPLECOV_START']
   require 'simplecov'
   SimpleCov.start { add_filter '/spec/' }
-  SimpleCov.minimum_coverage 94
+  SimpleCov.minimum_coverage 78
 end
 
 require 'ohloh_scm'
