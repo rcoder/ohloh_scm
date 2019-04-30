@@ -6,6 +6,7 @@ end
 require 'tmpdir'
 require 'forwardable'
 
+require_relative 'ohloh_scm/string_extensions'
 require_relative 'ohloh_scm/version'
 require_relative 'ohloh_scm/system'
 require_relative 'ohloh_scm/diff'
