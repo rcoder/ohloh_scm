@@ -66,9 +66,9 @@ module OhlohScm
             if line == '__BEGIN_COMMIT__'
               state = :key_values
             # Ref: https://git-scm.com/docs/git-diff-index#Documentation/git-diff-index.txt-git-diff-filesltpatterngt82308203
-            elsif line =~ /:([0-9]+) ([0-9]+) ([a-z0-9]+) ([a-z0-9]+) ([A-Z])\t"?(.+[^"])"?$/
+            elsif line =~ /:([0-9]+) ([0-9]+) ([a-z0-9]+) ([a-z0-9]+) ([A-Z])\t"?(.+)"?$/
               add_generic_diff(e, Regexp.last_match)
-            elsif line =~ /:([0-9]+) ([0-9]+) ([a-z0-9]+) ([a-z0-9]+) (R[0-9]+)\t"?(.+[^"])"?$/
+            elsif line =~ /:([0-9]+) ([0-9]+) ([a-z0-9]+) ([a-z0-9]+) (R[0-9]+)\t"?(.+)"?$/
               add_rename_edit_diff(e, Regexp.last_match)
             end
           else
@@ -94,6 +94,7 @@ module OhlohScm
       def add_generic_diff(commit, match_data)
         src_mode, dst_mode, parent_sha1, sha1, action, path = match_data[1..-1]
 
+        return if path == '.gitmodules' # contains submodule path config.
         # Submodules have a file mode of '160000'(gitlink). We ignore submodules completely.
         return if src_mode == '160000' || dst_mode == '160000'
 

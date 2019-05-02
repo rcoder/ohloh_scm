@@ -141,6 +141,19 @@ describe 'GitActivity' do
     end
   end
 
+  it 'wont track submodule commits and diffs' do
+    with_git_repository('git_with_submodules') do |git|
+      submodule_commits = %w[240375de181498b9a34d4bd328f2c87d2ade79f9
+                             b6a80291e49dc540bb78526f9b1aab1123c9fb0e]
+
+      (git.activity.commit_tokens & submodule_commits).must_be :empty?
+
+      diffs = git.activity.commits.map(&:diffs).reject(&:empty?).flatten
+      diffs.map(&:path).must_equal ['A']
+      diffs.map(&:sha1).must_equal ['f70f10e4db19068f79bc43844b49f3eece45c4e8']
+    end
+  end
+
   it 'commit_count for trunk commits' do
     with_git_repository('git_dupe_delete') do |git|
       assert_equal 4, git.activity.commit_count(trunk_only: false)
