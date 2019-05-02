@@ -12,11 +12,13 @@ require 'ohloh_scm'
 require 'minitest'
 require 'minitest/autorun'
 require 'helpers/repository_helper'
+require 'helpers/system_helper'
 
 FIXTURES_DIR = File.expand_path('raw_fixtures', __dir__)
 
 module Minitest
   class Test
     include RepositoryHelper
+    include SystemHelper
   end
 end
