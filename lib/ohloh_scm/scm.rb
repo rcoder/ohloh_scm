@@ -10,9 +10,10 @@ module OhlohScm
     def initialize(base:, url:, branch_name: nil, username: nil, password: nil)
       @base = base
       @url = url.strip if url
-      @branch_name = branch_name.strip if branch_name
-      @username = username.strip if username
-      @password = password.strip if password
+      @branch_name = branch_name&.strip
+      @branch_name = nil if branch_name&.empty?
+      @username = username&.strip
+      @password = password&.strip
     end
 
     def normalize; end
