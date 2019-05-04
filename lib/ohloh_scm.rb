@@ -3,6 +3,7 @@
 module OhlohScm
 end
 
+require 'time'
 require 'tmpdir'
 require 'forwardable'
 

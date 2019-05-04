@@ -1,4 +1,3 @@
-# :nocov:
 # frozen_string_literal: true
 
 require_relative 'parser/array_writer'
@@ -24,3 +23,5 @@ module OhlohScm
     end
   end
 end
+
+require_relative 'parser/git_parser'

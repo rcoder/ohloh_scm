@@ -4,10 +4,10 @@ module OhlohScm
   # A +Diff+ represents a change to a single file. It can represent the addition or
   # deletion of a file, or it can represent a modification of the file contents.
   #
-  # Ohloh does not track filename changes. If a file is renamed, Ohloh treats this
+  # OpenHub does not track filename changes. If a file is renamed, OpenHub treats this
   # as the deletion of one file and the creation of another.
   #
-  # Ohloh does not track directories, only the files within directories.
+  # OpenHub does not track directories, only the files within directories.
   #
   # Don't confuse our use of the word "Diff" with a patch file or the output of the
   # console tool 'diff'. This object doesn't have anything to do the actual contents
