@@ -14,12 +14,18 @@ module OhlohScm
       out
     end
 
+    def run_with_err(cmd)
+      logger.debug { cmd }
+      out, err, status = Open3.capture3(cmd)
+      [out, err, status]
+    end
+
     def string_encoder_path
       File.expand_path('../../.bin/string_encoder', __dir__)
     end
 
     def logger
-      self.class.logger
+      System.logger
     end
 
     class << self
