@@ -1,0 +1,5 @@
+changeset = '__BEGIN_COMMIT__\nchangeset: {node}\nuser:      {author}\ndate:      {date}\n__BEGIN_COMMENT__\n{desc}\n__END_COMMENT__\n__BEGIN_FILES__\n{file_mods}{file_adds}{file_dels}__END_FILES__\n__END_COMMIT__\n'
+file_mod = 'M {file_mod}\n'
+file_add = 'A {file_add}\n'
+file_del = 'D {file_del}\n'
+
