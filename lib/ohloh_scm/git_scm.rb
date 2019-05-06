@@ -15,6 +15,10 @@ module OhlohScm
       clone_or_fetch(from, callback)
     end
 
+    def vcs_path
+      "#{url}/.git"
+    end
+
     private
 
     def clone_or_fetch(remote_scm, callback)
@@ -43,7 +47,7 @@ module OhlohScm
 
     # We need very high reliability and this sequence gets the job done every time.
     def clean_and_checkout_branch
-      return unless status.git_dir_exist?
+      return unless status.scm_dir_exist?
 
       run "cd '#{url}' && git clean -f -d -x"
       return unless status.branch?(branch_name)

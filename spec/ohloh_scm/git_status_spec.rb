@@ -57,20 +57,20 @@ describe 'GitStatus' do
       assert_url_valid('http://github.com/Person/some_repo')
     end
   end
-end
 
-def get_base(opts)
-  OhlohScm::Factory.get_base({ scm_type: :git, url: 'foo' }.merge(opts))
-end
-
-def assert_url_error(*urls)
-  urls.each do |url|
-    base = OhlohScm::Factory.get_base(scm_type: :git, url: url)
-    base.status.send(:url_errors).wont_be :empty?
+  def get_base(opts)
+    OhlohScm::Factory.get_base({ scm_type: :git, url: 'foo' }.merge(opts))
   end
-end
 
-def assert_url_valid(url)
-  base = OhlohScm::Factory.get_base(scm_type: :git, url: url)
-  base.status.send(:url_errors).must_be_nil
+  def assert_url_error(*urls)
+    urls.each do |url|
+      base = OhlohScm::Factory.get_base(scm_type: :git, url: url)
+      base.status.send(:url_errors).wont_be :empty?
+    end
+  end
+
+  def assert_url_valid(url)
+    base = OhlohScm::Factory.get_base(scm_type: :git, url: url)
+    base.status.send(:url_errors).must_be_nil
+  end
 end

@@ -283,7 +283,7 @@ describe 'GitActivity' do
   describe 'commit_tokens' do
     it 'must return commit tokens within range' do
       with_git_repository('git_walk') do |git|
-        commit_tokens = CommitTokensHelper.new(git)
+        commit_tokens = CommitTokensHelper.new(git, commit_labels)
         # Full history to a commit
         commit_tokens.between(nil, :A).must_equal %i[A]
         commit_tokens.between(nil, :B).must_equal %i[A B]
@@ -307,7 +307,7 @@ describe 'GitActivity' do
 
     it 'must return trunk commit tokens within range' do
       with_git_repository('git_walk') do |git|
-        commit_tokens = CommitTokensHelper.new(git, trunk_only: true)
+        commit_tokens = CommitTokensHelper.new(git, commit_labels, trunk_only: true)
         # Full history to a commit
         commit_tokens.between(nil, :A).must_equal %i[A]
         commit_tokens.between(nil, :B).must_equal %i[A B]
@@ -323,44 +323,16 @@ describe 'GitActivity' do
         commit_tokens.between(:C, :D).must_equal %i[D]
       end
     end
-  end
-end
 
-class CommitTokensHelper
-  def initialize(base, trunk_only: false)
-    @base = base
-    @trunk_only = trunk_only
-  end
-
-  def between(from, to)
-    to_labels(@base.activity.commit_tokens(after: from_label(from), up_to: from_label(to),
-                                           trunk_only: @trunk_only))
-  end
-
-  private
-
-  def commit_labels
-    {
-      A: '886b62459ef1ffd01a908979d4d56776e0c5ecb2',
-      B: 'db77c232f01f7a649dd3a2216199a29cf98389b7',
-      C: 'f264fb40c340a415b305ac1f0b8f12502aa2788f',
-      D: '57fedf267adc31b1403f700cc568fe4ca7975a6b',
-      G: '97b80cb9743948cf302b6e21571ff40721a04c8d',
-      H: 'b8291f0e89567de3f691afc9b87a5f1908a6f3ea',
-      I: 'd067161caae2eeedbd74976aeff5c4d8f1ccc946',
-      J: 'b49aeaec003cf8afb18152cd9e292816776eecd6'
-    }
-  end
-
-  def to_label(sha1)
-    commit_labels.invert[sha1.to_s]
-  end
-
-  def to_labels(sha1s)
-    sha1s.map { |sha1| to_label(sha1) }
-  end
-
-  def from_label(label)
-    commit_labels[label]
+    def commit_labels
+      { A: '886b62459ef1ffd01a908979d4d56776e0c5ecb2',
+        B: 'db77c232f01f7a649dd3a2216199a29cf98389b7',
+        C: 'f264fb40c340a415b305ac1f0b8f12502aa2788f',
+        D: '57fedf267adc31b1403f700cc568fe4ca7975a6b',
+        G: '97b80cb9743948cf302b6e21571ff40721a04c8d',
+        H: 'b8291f0e89567de3f691afc9b87a5f1908a6f3ea',
+        I: 'd067161caae2eeedbd74976aeff5c4d8f1ccc946',
+        J: 'b49aeaec003cf8afb18152cd9e292816776eecd6' }
+    end
   end
 end

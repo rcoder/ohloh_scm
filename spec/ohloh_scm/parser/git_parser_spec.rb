@@ -3,7 +3,7 @@ require 'spec_helper'
 describe 'GitParser' do
   describe 'parse' do
     it 'must be empty for blank string' do
-      assert_equal([], OhlohScm::GitParser.parse(''))
+      OhlohScm::GitParser.parse('').must_be :empty?
     end
 
     it 'must return epoch time for log with no date' do

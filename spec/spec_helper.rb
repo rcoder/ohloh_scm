@@ -14,6 +14,7 @@ require 'minitest/autorun'
 require 'helpers/repository_helper'
 require 'helpers/system_helper'
 require 'helpers/generic_helper'
+require 'helpers/commit_tokens_helper'
 
 FIXTURES_DIR = File.expand_path('raw_fixtures', __dir__)
 
@@ -24,3 +25,5 @@ module Minitest
     include GenericHelper
   end
 end
+
+class TestCallback; def update(_, _); end; end

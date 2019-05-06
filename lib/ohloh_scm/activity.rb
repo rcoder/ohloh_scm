@@ -10,6 +10,10 @@ module OhlohScm
       @base = base
     end
 
+    def log_filename
+      File.join(Dir.tmpdir, url.gsub(/\W/, '') + '.log')
+    end
+
     def tags; end
 
     def export; end

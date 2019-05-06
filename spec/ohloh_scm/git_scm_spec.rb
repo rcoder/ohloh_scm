@@ -32,5 +32,3 @@ describe 'GitScm' do
     end
   end
 end
-
-class TestCallback; def update(_, _); end; end

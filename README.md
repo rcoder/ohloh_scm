@@ -28,7 +28,7 @@ $ docker run -P -v $(pwd):/home/app/ohloh_scm -ti notalex/oh_scm:ubuntu18 /bin/s
 
 # One may also edit the Dockerfile & build the image locally for other distros.
 $ docker build -t ohloh_scm:custom .
-$ docker run -ti ohloh_scm:custom -v $(pwd):/home/app/ohloh_scm /bin/bash
+$ docker run -P -v $(pwd):/home/app/ohloh_scm -ti ohloh_scm:custom /bin/bash
 ```
 
 ## Development Setup

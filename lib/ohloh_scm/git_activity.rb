@@ -148,10 +148,6 @@ module OhlohScm
       File.delete(log_filename) if File.exist?(log_filename)
     end
 
-    def log_filename
-      File.join(Dir.tmpdir, url.gsub(/\W/, '') + '.log')
-    end
-
     def rev_list_command(opts = {})
       up_to = opts[:up_to] || "heads/#{scm.branch_name}"
       range = opts[:after] ? "#{opts[:after]}..#{up_to}" : up_to

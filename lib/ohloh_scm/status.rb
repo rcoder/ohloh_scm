@@ -11,7 +11,15 @@ module OhlohScm
       @base = base
     end
 
-    def cleanup; end
+    def exist?
+      return unless scm_dir_exist?
+
+      !activity.head_token.to_s.empty?
+    end
+
+    def scm_dir_exist?
+      Dir.exist?(scm.vcs_path)
+    end
 
     def valid?
       validate
