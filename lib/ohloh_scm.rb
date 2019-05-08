@@ -30,4 +30,9 @@ require_relative 'ohloh_scm/hg_lib_scm'
 require_relative 'ohloh_scm/hg_lib_activity'
 require_relative 'ohloh_scm/hg_lib_status'
 
+require_relative 'ohloh_scm/bzr_scm'
+require_relative 'ohloh_scm/bzr_activity'
+require_relative 'ohloh_scm/bzr_status'
+require_relative 'ohloh_scm/parser/bzr_xml_parser'
+
 require_relative 'ohloh_scm/factory'
