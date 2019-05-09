@@ -1,0 +1,30 @@
+
+RCS file: /shared/data/ccvs/repository/intelliglue/UML/intelliglue.zuml,v
+head: 1.1
+branch:
+locks: strict
+access list:
+symbolic names:
+keyword substitution: kv
+total revisions: 1;	selected revisions: 1
+description:
+----------------------------
+revision 1.1
+date: 2005/07/25 17:11:06;  author: pizzandre;  state: Exp;
+Addin UNL file with using example-
+=============================================================================
+
+RCS file: /shared/data/ccvs/repository/intelliglue/articles/IoC_Regras.pdf,v
+head: 1.1
+branch:
+locks: strict
+access list:
+symbolic names:
+keyword substitution: b
+total revisions: 1;	selected revisions: 1
+description:
+----------------------------
+revision 1.1
+date: 2005/07/25 17:09:59;  author: pizzandre;  state: Exp;
+*** empty log message ***
+=============================================================================

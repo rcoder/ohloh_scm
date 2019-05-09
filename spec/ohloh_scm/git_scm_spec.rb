@@ -31,4 +31,27 @@ describe 'GitScm' do
       end
     end
   end
+
+  it 'must test the basic conversion to git' do
+    with_cvs_repository('cvs', 'simple') do |src_base|
+      tmpdir do |dest_dir|
+        base = OhlohScm::Factory.get_base(scm_type: :git, url: dest_dir)
+        refute base.status.exist?
+        base.scm.pull(src_base.scm, TestCallback.new)
+        assert base.status.exist?
+
+        dest_commits = base.activity.commits
+        src_base.activity.commits.each_with_index do |c, i|
+          # Because CVS does not track authors (only committers),
+          # the CVS committer becomes the Git author.
+          c.committer_date.must_equal dest_commits[i].author_date
+          c.committer_name.must_equal dest_commits[i].author_name
+
+          # Depending upon version of Git used, we may or may not have a trailing \n.
+          # We don't really care, so just compare the stripped versions.
+          c.message.strip.must_equal dest_commits[i].message.strip
+        end
+      end
+    end
+  end
 end

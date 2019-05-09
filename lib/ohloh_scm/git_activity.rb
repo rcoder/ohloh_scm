@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative 'data/git_ignore_list'
+
 # rubocop:disable Metrics/ClassLength
 module OhlohScm
   class GitActivity < Activity
@@ -115,6 +117,42 @@ module OhlohScm
       run(cmd).split.select { |branch_name| branch_name =~ /\b(.+)$/ }
     end
 
+    # Commit all changes in the working directory, using metadata from the passed commit.
+    def commit_all(commit = Commit.new)
+      init_db
+      ensure_gitignore
+      write_token(commit.token)
+
+      # Establish the author, email, message, etc. for the git-commit.
+      message_filename = build_commit_metadata(commit)
+
+      run "cd '#{url}' && git add ."
+      if anything_to_commit?
+        run "cd '#{url}' && git commit -a -F #{message_filename}"
+      else
+        logger.info { 'nothing to commit' }
+      end
+    end
+
+    # Determine the most recent revision that was safely stored in the GIT archive.
+    # Resets the token file on disk to the most recent version stored in the repository.
+    def read_token
+      return nil unless status.exist?
+
+      begin
+        cmd = "git cat-file -p `git ls-tree HEAD #{token_filename} | cut -c 13-51`"
+        token = run("cd '#{url}' && #{cmd}").strip
+      rescue RuntimeError => e
+        # If the git repository doesn't have a token file yet, it will error out.
+        # We want to just quietly return nil.
+        return nil if /pathspec '#{token_filename}' did not match any file\(s\) known to git/
+                      .match?(e.message)
+
+        raise
+      end
+      token
+    end
+
     private
 
     def cat(sha1)
@@ -178,6 +216,98 @@ module OhlohScm
 
     def no_tags?
       run("cd #{url} && git tag | head -1").empty?
+    end
+
+    # Store all of the commit metadata in the GIT environment variables
+    # where they will be picked up by the git-commit command.
+    #
+    # Commit info is required.
+    # Author info is optional, and defaults to committer info.
+    def build_commit_metadata(commit)
+      configure_git_environment_variables(commit)
+      # This is a one-off fix for DrJava, which includes some escape characters
+      # in one of its Subversion messages. This might lead to a more generalized
+      # cleanup of message text, but for now...
+      commit.message = commit.message&.gsub(/\\027/, '')
+
+      # Git requires a non-empty message
+      commit.message = '[no message]' if commit.message.nil? || commit.message =~ /\A\s*\z/
+
+      # We need to store the message in a file in case it contains crazy characters
+      #    that would corrupt a bash command line.
+      File.open(message_filename, 'w') do |f|
+        f.write commit.message
+      end
+      message_filename
+    end
+
+    def configure_git_environment_variables(commit)
+      ENV['GIT_COMMITTER_NAME'] = commit.committer_name || '[anonymous]'
+      ENV['GIT_AUTHOR_NAME'] = commit.author_name || ENV['GIT_COMMITTER_NAME']
+
+      ENV['GIT_COMMITTER_EMAIL'] = commit.committer_email || ENV['GIT_COMMITTER_NAME']
+      ENV['GIT_AUTHOR_EMAIL'] = commit.author_email || ENV['GIT_AUTHOR_NAME']
+
+      ENV['GIT_COMMITTER_DATE'] = commit.committer_date.to_s
+      ENV['GIT_AUTHOR_DATE'] = (commit.author_date || commit.committer_date).to_s
+    end
+
+    # By hiding the message file inside the .git directory, we
+    #    avoid it being found by the commit-all.
+    def message_filename
+      File.expand_path(File.join(scm.vcs_path, 'ohloh_message'))
+    end
+
+    # True if there are pending changes to commit.
+    def anything_to_commit?
+      /nothing to commit/.match?(run("cd '#{url}' && git status | tail -1")) ? false : true
+    end
+
+    # Ensures that the repository directory exists, and that the git database has been initialized.
+    def init_db
+      run "mkdir -p '#{url}'" unless FileTest.exist? url
+      run "cd '#{url}' && git init-db" unless status.scm_dir_exist?
+    end
+
+    # The .gitignore file will be created if it does not exist.
+    # If our desired filespec is not found in .gitignore, it will be appended
+    # to the end of .gitignore.
+    def ensure_gitignore
+      GIT_IGNORE_LIST.each do |ignore|
+        gitignore_filename = File.join(url, '.gitignore')
+        found = check_if_ignored(gitignore_filename, ignore)
+        next if found
+
+        File.open(gitignore_filename, File::APPEND | File::WRONLY) do |io|
+          io.puts ignore
+        end
+      end
+    end
+
+    def check_if_ignored(gitignore_filename, filespec)
+      File.open(gitignore_filename, File::CREAT | File::RDONLY) do |io|
+        io.readlines.each do |l|
+          return true && break if l.chomp == filespec
+        end
+      end
+    end
+
+    def token_filename
+      'ohloh_token'
+    end
+
+    def token_path
+      File.join(url, token_filename)
+    end
+
+    # Saves the new token in a well-known file.
+    # If the passed token is empty, this method silently does nothing.
+    def write_token(token)
+      return unless token && !token.to_s.empty?
+
+      File.open(token_path, 'w') do |f|
+        f.write token.to_s
+      end
     end
   end
 end

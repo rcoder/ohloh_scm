@@ -28,6 +28,10 @@ module OhlohScm
       System.logger
     end
 
+    def temp_folder
+      @temp_folder || '/tmp'
+    end
+
     class << self
       # Use a single logger instance.
       def logger

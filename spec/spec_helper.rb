@@ -5,7 +5,7 @@ $LOAD_PATH << File.expand_path('../lib', __dir__)
 if ENV['SIMPLECOV_START']
   require 'simplecov'
   SimpleCov.start { add_filter '/spec/' }
-  SimpleCov.minimum_coverage 96
+  SimpleCov.minimum_coverage 95
 end
 
 require 'ohloh_scm'
@@ -15,6 +15,7 @@ require 'helpers/repository_helper'
 require 'helpers/system_helper'
 require 'helpers/generic_helper'
 require 'helpers/commit_tokens_helper'
+require 'helpers/status_helper'
 
 FIXTURES_DIR = File.expand_path('raw_fixtures', __dir__)
 
@@ -23,6 +24,7 @@ module Minitest
     include RepositoryHelper
     include SystemHelper
     include GenericHelper
+    include StatusHelper
   end
 end
 

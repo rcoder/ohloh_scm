@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative 'parser/array_writer'
+require_relative 'parser/branch_number'
 
 module OhlohScm
   class Parser
@@ -25,3 +26,4 @@ module OhlohScm
 end
 
 require_relative 'parser/git_parser'
+require_relative 'parser/cvs_parser'

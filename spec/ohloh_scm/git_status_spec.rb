@@ -11,7 +11,7 @@ describe 'GitStatus' do
 
   describe 'validate_server_connection' do
     it 'must handle non existent remote source' do
-      base = OhlohScm::Factory.get_base(scm_type: :git, url: 'http://github.com/Person/f0ob@r831')
+      base = OhlohScm::Factory.get_base(scm_type: :git, url: 'https://github.com/Person/foobar')
       base.status.validate_server_connection
       base.status.errors.wont_be :empty?
     end
