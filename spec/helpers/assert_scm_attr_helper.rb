@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-module StatusHelper
+module AssertScmAttrHelper
   def get_base(scm_type, opts = {})
-    OhlohScm::Factory.get_base({ scm_type: scm_type }.merge(opts))
+    OhlohScm::Factory.get_base({ scm_type: scm_type, url: 'foobar' }.merge(opts))
   end
 
   def assert_url_error(scm_type, *urls)

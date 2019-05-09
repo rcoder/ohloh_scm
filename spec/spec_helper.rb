@@ -15,7 +15,7 @@ require 'helpers/repository_helper'
 require 'helpers/system_helper'
 require 'helpers/generic_helper'
 require 'helpers/commit_tokens_helper'
-require 'helpers/status_helper'
+require 'helpers/assert_scm_attr_helper'
 
 FIXTURES_DIR = File.expand_path('raw_fixtures', __dir__)
 
@@ -24,7 +24,7 @@ module Minitest
     include RepositoryHelper
     include SystemHelper
     include GenericHelper
-    include StatusHelper
+    include AssertScmAttrHelper
   end
 end
 

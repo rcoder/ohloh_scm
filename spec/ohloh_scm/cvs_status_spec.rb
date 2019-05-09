@@ -11,9 +11,9 @@ describe 'CvsStatus' do
   end
 
   it 'must have errors for invalid branch_name' do
-    get_base(:cvs, url: 'url', branch_name: 'x' * 81).status.send(:branch_name_errors).must_be_nil
-    get_base(:cvs, url: 'url', branch_name: 'x' * 121).status.send(:branch_name_errors).wont_be :empty?
-    get_base(:cvs, url: 'url', branch_name: 'foo@bar').status.send(:branch_name_errors).wont_be :empty?
+    get_base(:cvs, branch_name: 'x' * 81).status.send(:branch_name_errors).must_be_nil
+    get_base(:cvs, branch_name: 'x' * 121).status.send(:branch_name_errors).wont_be :empty?
+    get_base(:cvs, branch_name: 'foo@bar').status.send(:branch_name_errors).wont_be :empty?
   end
 
   it 'must test rejected urls' do
