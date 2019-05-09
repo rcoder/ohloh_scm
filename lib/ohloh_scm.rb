@@ -35,4 +35,8 @@ require_relative 'ohloh_scm/bzr_activity'
 require_relative 'ohloh_scm/bzr_status'
 require_relative 'ohloh_scm/parser/bzr_xml_parser'
 
+require_relative 'ohloh_scm/cvs_scm'
+require_relative 'ohloh_scm/cvs_activity'
+require_relative 'ohloh_scm/cvs_status'
+
 require_relative 'ohloh_scm/factory'

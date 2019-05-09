@@ -156,8 +156,8 @@ describe 'GitActivity' do
 
   it 'commit_count for trunk commits' do
     with_git_repository('git_dupe_delete') do |git|
-      assert_equal 4, git.activity.commit_count(trunk_only: false)
-      assert_equal 3, git.activity.commit_count(trunk_only: true)
+      git.activity.commit_count(trunk_only: false).must_equal 4
+      git.activity.commit_count(trunk_only: true).must_equal 3
     end
   end
 
@@ -226,14 +226,14 @@ describe 'GitActivity' do
     with_git_repository('git_with_null_merge') do |git|
       c = git.activity.verbose_commit('d3bd0bedbf4b197b2c4eb827e1ec4c35b834482f')
       # This commit's tree is identical to its parent's. Thus it should contain no diffs.
-      assert_equal [], c.diffs
+      c.diffs.must_equal []
     end
   end
 
   it 'each commit with null merge' do
     with_git_repository('git_with_null_merge') do |git|
       git.activity.each_commit do |c|
-        assert_equal [], c.diffs if c.token == 'd3bd0bedbf4b197b2c4eb827e1ec4c35b834482f'
+        c.diffs.must_equal [] if c.token == 'd3bd0bedbf4b197b2c4eb827e1ec4c35b834482f'
       end
     end
   end
@@ -247,14 +247,14 @@ describe 'GitActivity' do
   it 'safe_open_log_file must return text with valid encoding' do
     with_git_repository('git_with_invalid_encoding') do |git|
       git.activity.send(:safe_open_log_file) do |io|
-        assert_equal true, io.read.valid_encoding?
+        io.read.valid_encoding?.must_equal true
       end
     end
   end
 
   it 'commit count when there is a tag named master' do
     with_git_repository('git_with_master_tag') do |git|
-      assert_equal 3, git.activity.commit_count
+      git.activity.commit_count.must_equal 3
     end
   end
 
@@ -321,6 +321,70 @@ describe 'GitActivity' do
         commit_tokens.between(:A, :D).must_equal %i[B C D]
         commit_tokens.between(:B, :D).must_equal %i[C D]
         commit_tokens.between(:C, :D).must_equal %i[D]
+      end
+    end
+
+    it 'must commit all changes in the working directory' do
+      tmpdir do |dir|
+        base = OhlohScm::Factory.get_base(scm_type: :git, url: dir)
+
+        base.activity.send(:init_db)
+        refute base.activity.send(:anything_to_commit?)
+
+        File.open(File.join(dir, 'README'), 'w') {}
+        assert base.activity.send(:anything_to_commit?)
+
+        c = OhlohScm::Commit.new
+        c.author_name = 'John Q. Developer'
+        c.message = 'Initial checkin.'
+        base.activity.commit_all(c)
+        refute base.activity.send(:anything_to_commit?)
+
+        base.activity.commits.size.must_equal 1
+
+        base.activity.commits.first.author_name.must_equal c.author_name
+        # Depending on version of Git used, we may or may not have trailing \n.
+        # We don't really care, so just compare the stripped versions.
+        base.activity.commits.first.message.strip.must_equal c.message.strip
+
+        assert_equal ['.gitignore', 'README'], base.activity.commits.first.diffs.collect(&:path).sort
+      end
+    end
+
+    it 'must test that no token returns nil' do
+      tmpdir do |dir|
+        base = OhlohScm::Factory.get_base(scm_type: :git, url: dir)
+        refute base.activity.read_token
+        base.activity.send(:init_db)
+        refute base.activity.read_token
+      end
+    end
+
+    it 'must test write and read token' do
+      tmpdir do |dir|
+        base = OhlohScm::Factory.get_base(scm_type: :git, url: dir)
+        base.activity.send(:init_db)
+        base.activity.send(:write_token, 'FOO')
+        refute base.activity.read_token # Token not valid until committed
+        base.activity.commit_all(OhlohScm::Commit.new)
+        base.activity.read_token.must_equal 'FOO'
+      end
+    end
+
+    it 'must test that commit_all includes write token' do
+      tmpdir do |dir|
+        base = OhlohScm::Factory.get_base(scm_type: :git, url: dir)
+        base.activity.send(:init_db)
+        c = OhlohScm::Commit.new
+        c.token = 'BAR'
+        base.activity.commit_all(c)
+        c.token.must_equal base.activity.read_token
+      end
+    end
+
+    it 'must test read_token encoding' do
+      with_git_repository('git_with_invalid_encoding') do |base|
+        base.activity.read_token
       end
     end
 

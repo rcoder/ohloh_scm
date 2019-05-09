@@ -12,7 +12,10 @@ module OhlohScm
     #   local_base = OhlohScm::Factory.get_base(url: '/tmp/ruby-src')
     #   local_base.scm.pull(remote_base.scm)
     def pull(from, callback)
-      clone_or_fetch(from, callback)
+      case from
+      when CvsScm then convert_to_git(from, callback)
+      else clone_or_fetch(from, callback)
+      end
     end
 
     def vcs_path
@@ -69,6 +72,64 @@ module OhlohScm
 
       run "cd #{url} && find . -maxdepth 1 -not -name .git -not -name . \
         -print0 | xargs -0 rm -rf --"
+    end
+
+    def convert_to_git(remote_scm, callback)
+      callback.update(0, 1)
+
+      commits = remote_scm.activity.commits(after: activity.read_token)
+      check_empty_repository(commits)
+
+      if commits && !commits.empty?
+        setup_dir_and_convert_commits(commits, callback)
+      else
+        logger.info { 'Already up-to-date.' }
+      end
+    end
+
+    def setup_dir_and_convert_commits(commits, callback)
+      set_up_working_directory
+      convert(commits, callback)
+      callback.update(commits.size, commits.size)
+    end
+
+    def convert(commits, callback)
+      commits.each_with_index do |r, i|
+        callback.update(i, commits.size)
+        create_git_commit(r, i, commits.size)
+      end
+    end
+
+    def check_empty_repository(commits)
+      raise 'Empty repository' if !activity.read_token && commits.empty?
+    end
+
+    def set_up_working_directory
+      # Start by making sure we are in a known good state. Set up our working directory.
+      clean_up_disk
+      clean_and_checkout_branch
+    end
+
+    def handle_checkout_error(commit)
+      logger.error { $ERROR_INFO.inspect }
+      # If we fail to checkout, it's often because there is junk of some kind
+      # in our working directory.
+      logger.info { 'Checkout failed. Cleaning and trying again...' }
+      clean_up_disk
+      commit.scm.checkout(commit, url)
+    end
+
+    def create_git_commit(commit, index, size)
+      logger.info { "Downloading revision #{commit.token} (#{index + 1} of #{size})... " }
+      checkout(commit)
+      logger.debug { "Committing revision #{commit.token} (#{index + 1} of #{size})... " }
+      activity.commit_all(commit)
+    end
+
+    def checkout(commit)
+      commit.scm.checkout(commit, url)
+    rescue StandardError
+      handle_checkout_error(commit)
     end
   end
 end
