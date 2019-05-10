@@ -4,7 +4,7 @@ $LOAD_PATH << File.expand_path('lib', __dir__)
 require 'ohloh_scm/version'
 
 Gem::Specification.new do |gem|
-  gem.name          = 'oh_scm'
+  gem.name          = 'ohloh_scm'
   gem.version       = OhlohScm::Version::STRING
   gem.authors       = ['OpenHub Team at Synopsys']
   gem.email         = ['info@openhub.net']
