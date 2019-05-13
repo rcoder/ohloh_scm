@@ -13,6 +13,10 @@ module OhlohScm
       hg_client.cat_file(tokens.first, diff.path) if tokens.first
     end
 
+    def cleanup
+      hg_client.shutdown
+    end
+
     private
 
     def parent_tokens(commit)

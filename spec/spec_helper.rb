@@ -10,6 +10,7 @@ end
 
 require 'ohloh_scm'
 require 'minitest'
+require 'mocha/mini_test'
 require 'minitest/autorun'
 require 'helpers/repository_helper'
 require 'helpers/system_helper'

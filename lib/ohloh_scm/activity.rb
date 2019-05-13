@@ -31,5 +31,7 @@ module OhlohScm
     def commit_count; end
 
     def diffs; end
+
+    def cleanup; end
   end
 end

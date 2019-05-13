@@ -5,6 +5,7 @@ source 'https://rubygems.org'
 group :development do
   gem 'byebug'
   gem 'minitest'
+  gem 'mocha'
   gem 'rubocop', '~> 0.67'
   gem 'rubocop-performance'
   gem 'simplecov'
