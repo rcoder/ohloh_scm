@@ -37,8 +37,8 @@ module OhlohScm
     end
 
     def fetch_new_commits(remote_scm)
-      run "cd '#{url}' && git fetch --tags --update-head-ok \
-            '#{remote_scm.url}' #{branch_name}:#{branch_name}"
+      run "cd '#{url}' && git fetch --tags --update-head-ok "\
+            "'#{remote_scm.url}' #{branch_name}:#{branch_name}"
     end
 
     def clone_and_create_tracking_branch(remote_scm)
@@ -70,8 +70,8 @@ module OhlohScm
     def clean_up_disk
       return unless Dir.exist?(url)
 
-      run "cd #{url} && find . -maxdepth 1 -not -name .git -not -name . \
-        -print0 | xargs -0 rm -rf --"
+      run "cd #{url} && find . -maxdepth 1 -not -name .git -not -name . -print0"\
+            ' | xargs -0 rm -rf --'
     end
 
     def convert_to_git(remote_scm, callback)
