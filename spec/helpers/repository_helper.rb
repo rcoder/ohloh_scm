@@ -25,6 +25,10 @@ module RepositoryHelper
     with_repository(:bzr, name) { |bzr| yield bzr }
   end
 
+  def with_bzr_lib_repository(name)
+    with_repository(:bzr_lib, name) { |bzr| yield bzr }
+  end
+
   private
 
   def with_repository(scm_type, name, branch_name = nil)

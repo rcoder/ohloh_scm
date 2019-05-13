@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require_relative 'py_bridge/py_client'
 require_relative 'py_bridge/hg_lib_client'
 
 module OhlohScm
