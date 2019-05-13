@@ -29,13 +29,15 @@ module OhlohScm
     end
 
     def temp_folder
-      @temp_folder || '/tmp'
+      ENV['OHLOH_SCM_TEMP_FOLDER_PATH'] || Dir.tmpdir
     end
 
     class << self
       # Use a single logger instance.
       def logger
-        @logger ||= Logger.new(STDERR)
+        @logger ||= Logger.new(STDERR).tap do |log_obj|
+          log_obj.level = ENV['SCM_LOG_LEVEL'].to_i
+        end
       end
     end
   end
