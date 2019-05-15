@@ -310,4 +310,14 @@ describe 'HgActivity' do
       end
     end
   end
+
+  describe 'cleanup' do
+    it 'must call shutdown hg_client' do
+      activity = OhlohScm::Factory.get_core(scm_type: :hg, url: 'foobar').activity
+      hg_client = Struct.new(:foo)
+      activity.stubs(:hg_client).returns(hg_client)
+      hg_client.expects(:shutdown)
+      activity.cleanup
+    end
+  end
 end

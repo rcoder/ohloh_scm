@@ -85,8 +85,7 @@ module OhlohScm
     end
 
     def parent_tokens(commit)
-      run("cd '#{url}' && bzr log --long --show-id --limit 1 -c #{to_rev_param(commit.token)}"\
-            " | grep ^parent | cut -f2 -d' '").split("\n")
+      bzr_client.parent_tokens(commit.token)
     end
 
     def parents(commit)
@@ -100,6 +99,10 @@ module OhlohScm
     def cat_file_parent(commit, diff)
       first_parent_token = parent_tokens(commit).first
       cat(first_parent_token, diff.path) if first_parent_token
+    end
+
+    def cleanup
+      bzr_client.shutdown
     end
 
     private
@@ -157,13 +160,7 @@ module OhlohScm
     end
 
     def cat(revision, path)
-      out, err, status =
-        run_with_err("cd '#{url}' && bzr cat --name-from-revision"\
-                     " -r #{to_rev_param(revision)} '#{escape(path)}'")
-      return if err =~ / is not present in revision /
-      raise err unless status.success?
-
-      out
+      bzr_client.cat_file(revision, path)
     end
 
     # Bzr doesn't like it when the filename includes a colon
@@ -178,6 +175,16 @@ module OhlohScm
 
     def time_string(rev)
       run("cd '#{url}' && bzr log -r #{rev} | grep 'timestamp:' | sed 's/timestamp://'")
+    end
+
+    def bzr_client
+      @bzr_client ||= setup_bzr_client
+    end
+
+    def setup_bzr_client
+      bzr_client = PyBridge::BzrClient.new(url)
+      bzr_client.start
+      bzr_client
     end
   end
 end

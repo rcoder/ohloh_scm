@@ -86,12 +86,12 @@ module OhlohScm
     end
 
     def cat_file(commit, diff)
-      cat(commit.token, diff.path)
+      hg_client.cat_file(commit.token, diff.path)
     end
 
     def cat_file_parent(commit, diff)
-      p = parent_tokens(commit)
-      cat(p.first, diff.path) if p.first
+      tokens = parent_tokens(commit)
+      hg_client.cat_file(tokens.first, diff.path) if tokens.first
     end
 
     def head_token
@@ -109,6 +109,10 @@ module OhlohScm
 
     def head
       verbose_commit(head_token)
+    end
+
+    def cleanup
+      hg_client.shutdown
     end
 
     private
@@ -138,7 +142,7 @@ module OhlohScm
     end
 
     def parent_tokens(commit)
-      run("cd '#{url}' && hg parents -r #{commit.token} --template '{node}\\n'").split("\n")
+      hg_client.parent_tokens(commit.token)
     end
 
     def cat(revision, path)
@@ -168,6 +172,16 @@ module OhlohScm
                 end
 
       ["hg log -v #{options}", after]
+    end
+
+    def hg_client
+      @hg_client ||= setup_hg_client
+    end
+
+    def setup_hg_client
+      hg_client = PyBridge::HgClient.new(url)
+      hg_client.start
+      hg_client
     end
   end
 end

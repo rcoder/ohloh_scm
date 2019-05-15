@@ -17,16 +17,8 @@ module RepositoryHelper
     with_repository(:hg, name, branch_name) { |hg| yield hg }
   end
 
-  def with_hg_lib_repository(name, branch_name = nil)
-    with_repository(:hg_lib, name, branch_name) { |hg| yield hg }
-  end
-
   def with_bzr_repository(name)
     with_repository(:bzr, name) { |bzr| yield bzr }
-  end
-
-  def with_bzr_lib_repository(name)
-    with_repository(:bzr_lib, name) { |bzr| yield bzr }
   end
 
   private

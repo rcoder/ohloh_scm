@@ -2,7 +2,7 @@ from bzrlib.branch import Branch
 from bzrlib.revisionspec import RevisionSpec
 import os
 import sys
-import time 
+import time
 import traceback
 import logging
 

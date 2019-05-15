@@ -13,18 +13,20 @@ describe 'BzrActivity' do
     end
   end
 
-  it 'must test_head_and_parents' do
+  it 'must return head and parents correctly' do
     with_bzr_repository('bzr') do |bzr|
-      bzr.activity.head_token.must_equal 'test@example.com-20111222183733-y91if5npo3pe8ifs'
-      bzr.activity.head.token.must_equal 'test@example.com-20111222183733-y91if5npo3pe8ifs'
-      assert bzr.activity.head.diffs.any? # diffs should be populated
-      token = 'obnox@samba.org-20090204004942-73rnw0izen42f154'
-      bzr.activity.parents(bzr.activity.head).first.token.must_equal token
-      assert bzr.activity.parents(bzr.activity.head).first.diffs.any?
+      activity = bzr.activity
+
+      activity.head_token.must_equal 'test@example.com-20111222183733-y91if5npo3pe8ifs'
+      activity.head.token.must_equal 'test@example.com-20111222183733-y91if5npo3pe8ifs'
+      assert activity.head.diffs.any? # diffs should be populated
+
+      activity.parents(activity.head).first.token.must_equal 'obnox@samba.org-20090204004942-73rnw0izen42f154'
+      assert activity.parents(activity.head).first.diffs.any?
     end
   end
 
-  it 'must verify adding new file' do
+  it 'must return file contents' do
     with_bzr_repository('bzr') do |bzr|
       expected = <<-EXPECTED.gsub(/ {8}/, '')
         first file
@@ -54,7 +56,7 @@ describe 'BzrActivity' do
     end
   end
 
-  it 'tests cat_file_parent' do
+  it 'must get file contents by parent rev' do
     with_bzr_repository('bzr') do |bzr|
       expected = <<-EXPECTED.gsub(/ {8}/, '')
         first file
