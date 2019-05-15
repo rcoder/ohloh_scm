@@ -25,8 +25,8 @@ describe 'System' do
     it 'must allow setting logger level' do
       level = (1..5).to_a.sample
       OhlohScm::System.logger.level = level
-      base = OhlohScm::Factory.get_base(scm_type: :git, url: 'foo')
-      base.scm.send(:logger).level.must_equal level
+      core = OhlohScm::Factory.get_core(scm_type: :git, url: 'foo')
+      core.scm.send(:logger).level.must_equal level
     end
   end
 end

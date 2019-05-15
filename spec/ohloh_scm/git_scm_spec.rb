@@ -2,13 +2,13 @@ require 'spec_helper'
 
 describe 'GitScm' do
   it 'must pull git repository' do
-    with_git_repository('git') do |src_base|
+    with_git_repository('git') do |src_core|
       tmpdir do |dest_dir|
-        base = OhlohScm::Factory.get_base(scm_type: :git, url: dest_dir)
-        refute base.status.exist?
+        core = OhlohScm::Factory.get_core(scm_type: :git, url: dest_dir)
+        refute core.status.exist?
 
-        base.scm.pull(src_base.scm, TestCallback.new)
-        assert base.status.exist?
+        core.scm.pull(src_core.scm, TestCallback.new)
+        assert core.status.exist?
       end
     end
   end
@@ -16,11 +16,11 @@ describe 'GitScm' do
   it 'must pull git repository with multiple branches' do
     # This should not change current/default branch(e.g. master) to point to the branch commit being pulled
     # In this case master should not point to test branch commit
-    with_git_repository('git_with_multiple_branch', 'test') do |src_base|
+    with_git_repository('git_with_multiple_branch', 'test') do |src_core|
       tmpdir do |dest_dir|
-        base = OhlohScm::Factory.get_base(scm_type: :git, url: dest_dir, branch_name: 'test')
-        refute base.status.exist?
-        base.scm.pull(src_base.scm, TestCallback.new)
+        core = OhlohScm::Factory.get_core(scm_type: :git, url: dest_dir, branch_name: 'test')
+        refute core.status.exist?
+        core.scm.pull(src_core.scm, TestCallback.new)
 
         remote_master_branch_sha = `cd #{dest_dir} && git rev-parse origin/master`
         master_branch_sha = `cd #{dest_dir} && git rev-parse master`
@@ -33,15 +33,15 @@ describe 'GitScm' do
   end
 
   it 'must test the basic conversion to git' do
-    with_cvs_repository('cvs', 'simple') do |src_base|
+    with_cvs_repository('cvs', 'simple') do |src_core|
       tmpdir do |dest_dir|
-        base = OhlohScm::Factory.get_base(scm_type: :git, url: dest_dir)
-        refute base.status.exist?
-        base.scm.pull(src_base.scm, TestCallback.new)
-        assert base.status.exist?
+        core = OhlohScm::Factory.get_core(scm_type: :git, url: dest_dir)
+        refute core.status.exist?
+        core.scm.pull(src_core.scm, TestCallback.new)
+        assert core.status.exist?
 
-        dest_commits = base.activity.commits
-        src_base.activity.commits.each_with_index do |c, i|
+        dest_commits = core.activity.commits
+        src_core.activity.commits.each_with_index do |c, i|
           # Because CVS does not track authors (only committers),
           # the CVS committer becomes the Git author.
           c.committer_date.must_equal dest_commits[i].author_date

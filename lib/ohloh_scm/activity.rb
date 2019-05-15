@@ -4,10 +4,10 @@ module OhlohScm
   class Activity
     include OhlohScm::System
     extend Forwardable
-    def_delegators :@base, :scm, :status
+    def_delegators :@core, :scm, :status
 
-    def initialize(base)
-      @base = base
+    def initialize(core)
+      @core = core
     end
 
     def log_filename

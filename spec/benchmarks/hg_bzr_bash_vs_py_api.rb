@@ -15,8 +15,8 @@ repo_path = File.expand_path("../scm_fixtures/#{scm}_large", __dir__)
 
 puts 'Benchmarks for `cat_file`'
 
-activity = OhlohScm::Factory.get_base(scm_type: scm, url: repo_path).activity
-activity_lib = OhlohScm::Factory.get_base(scm_type: "#{scm}_lib", url: repo_path).activity
+activity = OhlohScm::Factory.get_core(scm_type: scm, url: repo_path).activity
+activity_lib = OhlohScm::Factory.get_core(scm_type: "#{scm}_lib", url: repo_path).activity
 commit = OhlohScm::Commit.new(token: '1')
 diff = OhlohScm::Diff.new(path: 'large.php')
 

@@ -1,12 +1,12 @@
 class CommitTokensHelper
-  def initialize(base, commit_labels, trunk_only: false)
-    @base = base
+  def initialize(core, commit_labels, trunk_only: false)
+    @core = core
     @trunk_only = trunk_only
     @commit_labels = commit_labels
   end
 
   def between(from, to)
-    to_labels(@base.activity.commit_tokens(after: from_label(from), up_to: from_label(to),
+    to_labels(@core.activity.commit_tokens(after: from_label(from), up_to: from_label(to),
                                            trunk_only: @trunk_only))
   end
 

@@ -3,9 +3,9 @@ require 'spec_helper'
 describe 'HgStatus' do
   describe 'validate_server_connection' do
     it 'must handle non existent remote source' do
-      base = OhlohScm::Factory.get_base(scm_type: :hg, url: 'http://www.selenic.com/repo/foobar')
-      base.status.validate_server_connection
-      base.status.errors.wont_be :empty?
+      core = OhlohScm::Factory.get_core(scm_type: :hg, url: 'http://www.selenic.com/repo/foobar')
+      core.status.validate_server_connection
+      core.status.errors.wont_be :empty?
     end
   end
 

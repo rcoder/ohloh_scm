@@ -2,15 +2,15 @@
 
 module OhlohScm
   class GitScm < Scm
-    def initialize(base:, url:, branch_name:, username:, password:)
+    def initialize(core:, url:, branch_name:, username:, password:)
       super
       @branch_name = branch_name || 'master'
     end
 
     # == Example:
-    #   remote_base = OhlohScm::Factory.get_base(url: 'https://github.com/ruby/ruby')
-    #   local_base = OhlohScm::Factory.get_base(url: '/tmp/ruby-src')
-    #   local_base.scm.pull(remote_base.scm)
+    #   remote_core = OhlohScm::Factory.get_core(url: 'https://github.com/ruby/ruby')
+    #   local_core = OhlohScm::Factory.get_core(url: '/tmp/ruby-src')
+    #   local_core.scm.pull(remote_core.scm)
     def pull(from, callback)
       case from
       when CvsScm then convert_to_git(from, callback)

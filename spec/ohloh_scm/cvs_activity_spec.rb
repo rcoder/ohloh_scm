@@ -4,19 +4,19 @@ require 'spec_helper'
 
 describe 'CvsActivity' do
   it 'must return the host' do
-    activity = get_base(:cvs, url: ':ext:anonymous:@moodle.cvs.sourceforge.net:/cvsroot/moodle',
+    activity = get_core(:cvs, url: ':ext:anonymous:@moodle.cvs.sourceforge.net:/cvsroot/moodle',
                               branch_name: 'contrib').activity
     activity.send(:host).must_equal 'moodle.cvs.sourceforge.net'
   end
 
   it 'must return the protocol' do
-    activity = get_base(:cvs, url: ':pserver:foo:@foo.com:/cvsroot/a', branch_name: 'b').activity
+    activity = get_core(:cvs, url: ':pserver:foo:@foo.com:/cvsroot/a', branch_name: 'b').activity
     activity.send(:protocol).must_equal :pserver
 
-    activity = get_base(:cvs, url: ':ext:foo:@foo.com:/cvsroot/a', branch_name: 'b').activity
+    activity = get_core(:cvs, url: ':ext:foo:@foo.com:/cvsroot/a', branch_name: 'b').activity
     activity.send(:protocol).must_equal :ext
 
-    activity = get_base(:cvs, url: ':pserver:ext:@foo.com:/cvsroot/a', branch_name: 'b').activity
+    activity = get_core(:cvs, url: ':pserver:ext:@foo.com:/cvsroot/a', branch_name: 'b').activity
     activity.send(:protocol).must_equal :pserver
   end
 
@@ -59,12 +59,12 @@ describe 'CvsActivity' do
   it 'must correctly convert commits to git' do
     with_cvs_repository('cvs', 'simple') do |cvs|
       tmpdir do |tmp_dir|
-        git_base = OhlohScm::Factory.get_base(url: tmp_dir)
-        git_base.scm.pull(cvs.scm, TestCallback.new)
+        git_core = OhlohScm::Factory.get_core(url: tmp_dir)
+        git_core.scm.pull(cvs.scm, TestCallback.new)
         utc_dates = ['2006-06-29 16:21:07 UTC', '2006-06-29 18:14:47 UTC',
                      '2006-06-29 18:45:29 UTC', '2006-06-29 18:48:54 UTC',
                      '2006-06-29 18:52:23 UTC']
-        git_base.activity.commits.map(&:author_date).map(&:to_s).must_equal utc_dates
+        git_core.activity.commits.map(&:author_date).map(&:to_s).must_equal utc_dates
       end
     end
   end

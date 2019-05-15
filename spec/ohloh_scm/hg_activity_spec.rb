@@ -304,7 +304,7 @@ describe 'HgActivity' do
         `cd #{dir} && hg init && hg add * 2> /dev/null && hg commit -u tester -m test`
 
         # Confirm that we can read the file back
-        hg = OhlohScm::Factory.get_base(scm_type: :hg, url: dir)
+        hg = OhlohScm::Factory.get_core(scm_type: :hg, url: dir)
         diff = OhlohScm::Diff.new(path: funny_name)
         hg.activity.cat_file(hg.activity.head, diff).must_equal file_content
       end

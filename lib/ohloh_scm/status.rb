@@ -4,11 +4,11 @@ module OhlohScm
   class Status
     include OhlohScm::System
     extend Forwardable
-    def_delegators :@base, :scm, :activity
+    def_delegators :@core, :scm, :activity
     attr_reader :errors
 
-    def initialize(base)
-      @base = base
+    def initialize(core)
+      @core = core
     end
 
     def exist?

@@ -267,9 +267,9 @@ describe 'GitActivity' do
   end
 
   it 'must cat file correctly' do
-    with_git_repository('git') do |base|
+    with_git_repository('git') do |core|
       diff = OhlohScm::Diff.new(sha1: '4c734ad53b272c9b3d719f214372ac497ff6c068')
-      base.activity.cat_file(nil, diff).must_equal <<-EXPECTED.gsub(/^ {8}/, '')
+      core.activity.cat_file(nil, diff).must_equal <<-EXPECTED.gsub(/^ {8}/, '')
         /* Hello, World! */
         #include <stdio.h>
         main()
@@ -326,65 +326,65 @@ describe 'GitActivity' do
 
     it 'must commit all changes in the working directory' do
       tmpdir do |dir|
-        base = OhlohScm::Factory.get_base(scm_type: :git, url: dir)
+        core = OhlohScm::Factory.get_core(scm_type: :git, url: dir)
 
-        base.activity.send(:init_db)
-        refute base.activity.send(:anything_to_commit?)
+        core.activity.send(:init_db)
+        refute core.activity.send(:anything_to_commit?)
 
         File.open(File.join(dir, 'README'), 'w') {}
-        assert base.activity.send(:anything_to_commit?)
+        assert core.activity.send(:anything_to_commit?)
 
         c = OhlohScm::Commit.new
         c.author_name = 'John Q. Developer'
         c.message = 'Initial checkin.'
-        base.activity.commit_all(c)
-        refute base.activity.send(:anything_to_commit?)
+        core.activity.commit_all(c)
+        refute core.activity.send(:anything_to_commit?)
 
-        base.activity.commits.size.must_equal 1
+        core.activity.commits.size.must_equal 1
 
-        base.activity.commits.first.author_name.must_equal c.author_name
+        core.activity.commits.first.author_name.must_equal c.author_name
         # Depending on version of Git used, we may or may not have trailing \n.
         # We don't really care, so just compare the stripped versions.
-        base.activity.commits.first.message.strip.must_equal c.message.strip
+        core.activity.commits.first.message.strip.must_equal c.message.strip
 
-        assert_equal ['.gitignore', 'README'], base.activity.commits.first.diffs.collect(&:path).sort
+        assert_equal ['.gitignore', 'README'], core.activity.commits.first.diffs.collect(&:path).sort
       end
     end
 
     it 'must test that no token returns nil' do
       tmpdir do |dir|
-        base = OhlohScm::Factory.get_base(scm_type: :git, url: dir)
-        refute base.activity.read_token
-        base.activity.send(:init_db)
-        refute base.activity.read_token
+        core = OhlohScm::Factory.get_core(scm_type: :git, url: dir)
+        refute core.activity.read_token
+        core.activity.send(:init_db)
+        refute core.activity.read_token
       end
     end
 
     it 'must test write and read token' do
       tmpdir do |dir|
-        base = OhlohScm::Factory.get_base(scm_type: :git, url: dir)
-        base.activity.send(:init_db)
-        base.activity.send(:write_token, 'FOO')
-        refute base.activity.read_token # Token not valid until committed
-        base.activity.commit_all(OhlohScm::Commit.new)
-        base.activity.read_token.must_equal 'FOO'
+        core = OhlohScm::Factory.get_core(scm_type: :git, url: dir)
+        core.activity.send(:init_db)
+        core.activity.send(:write_token, 'FOO')
+        refute core.activity.read_token # Token not valid until committed
+        core.activity.commit_all(OhlohScm::Commit.new)
+        core.activity.read_token.must_equal 'FOO'
       end
     end
 
     it 'must test that commit_all includes write token' do
       tmpdir do |dir|
-        base = OhlohScm::Factory.get_base(scm_type: :git, url: dir)
-        base.activity.send(:init_db)
+        core = OhlohScm::Factory.get_core(scm_type: :git, url: dir)
+        core.activity.send(:init_db)
         c = OhlohScm::Commit.new
         c.token = 'BAR'
-        base.activity.commit_all(c)
-        c.token.must_equal base.activity.read_token
+        core.activity.commit_all(c)
+        c.token.must_equal core.activity.read_token
       end
     end
 
     it 'must test read_token encoding' do
-      with_git_repository('git_with_invalid_encoding') do |base|
-        base.activity.read_token
+      with_git_repository('git_with_invalid_encoding') do |core|
+        core.activity.read_token
       end
     end
 

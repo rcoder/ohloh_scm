@@ -40,7 +40,7 @@ describe 'HgLibActivity' do
         `cd #{dir} && hg init && hg add * 2> /dev/null && hg commit -u tester -m test`
 
         # Confirm that we can read the file back
-        hg_lib = OhlohScm::Factory.get_base(scm_type: :hg_lib, url: dir)
+        hg_lib = OhlohScm::Factory.get_core(scm_type: :hg_lib, url: dir)
         diff = OhlohScm::Diff.new(path: funny_name)
         hg_lib.activity.cat_file(hg_lib.activity.head, diff).must_equal content
       end
@@ -49,7 +49,7 @@ describe 'HgLibActivity' do
 
   describe 'cleanup' do
     it 'must call shutdown hg_client' do
-      activity = OhlohScm::Factory.get_base(scm_type: :hg_lib, url: 'foobar').activity
+      activity = OhlohScm::Factory.get_core(scm_type: :hg_lib, url: 'foobar').activity
       hg_client = Struct.new(:foo)
       activity.stubs(:hg_client).returns(hg_client)
       hg_client.expects(:shutdown)

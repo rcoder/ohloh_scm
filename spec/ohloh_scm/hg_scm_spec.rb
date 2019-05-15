@@ -4,7 +4,7 @@ describe 'HgScm' do
   it 'must pull hg repository' do
     with_hg_repository('hg') do |src|
       tmpdir do |dir|
-        dest = OhlohScm::Factory.get_base(scm_type: :hg, url: dir)
+        dest = OhlohScm::Factory.get_core(scm_type: :hg, url: dir)
         dest.status.wont_be :exist?
 
         dest.scm.pull(src.scm, TestCallback.new)

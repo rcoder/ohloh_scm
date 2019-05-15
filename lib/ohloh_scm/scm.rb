@@ -4,12 +4,12 @@ module OhlohScm
   class Scm
     include OhlohScm::System
     extend Forwardable
-    def_delegators :@base, :status, :activity
+    def_delegators :@core, :status, :activity
     attr_reader :url, :username, :password
     attr_accessor :branch_name
 
-    def initialize(base:, url:, branch_name: nil, username: nil, password: nil)
-      @base = base
+    def initialize(core:, url:, branch_name: nil, username: nil, password: nil)
+      @core = core
       @url = url.strip if url
       @branch_name = branch_name&.strip
       @branch_name = nil if branch_name&.empty?

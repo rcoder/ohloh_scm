@@ -6,11 +6,11 @@ describe 'BzrScm' do
   it 'must pull the repository correctly' do
     with_bzr_repository('bzr') do |src|
       tmpdir do |dest_dir|
-        base = OhlohScm::Factory.get_base(scm_type: :bzr, url: dest_dir)
-        refute base.status.exist?
+        core = OhlohScm::Factory.get_core(scm_type: :bzr, url: dest_dir)
+        refute core.status.exist?
 
-        base.scm.pull(src.scm)
-        assert base.status.exist?
+        core.scm.pull(src.scm)
+        assert core.status.exist?
       end
     end
   end
