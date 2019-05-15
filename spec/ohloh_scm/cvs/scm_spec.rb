@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe 'CvsScm' do
+describe 'Cvs::Scm' do
   it 'must test symlink fixup' do
     scm = get_core(:cvs, url: ':pserver:anoncvs:@cvs.netbeans.org:/cvs').scm
     scm.normalize

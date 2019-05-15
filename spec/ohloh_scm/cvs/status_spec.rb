@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe 'CvsStatus' do
+describe 'Cvs::Status' do
   describe 'validate_server_connection' do
     it 'must handle non existent remote source' do
       url = ':pserver:anonymous:@foobar.xyz_example.org:/cvsroot'

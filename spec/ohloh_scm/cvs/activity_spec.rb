@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'CvsActivity' do
+describe 'Cvs::Activity' do
   it 'must return the host' do
     activity = get_core(:cvs, url: ':ext:anonymous:@moodle.cvs.sourceforge.net:/cvsroot/moodle',
                               branch_name: 'contrib').activity

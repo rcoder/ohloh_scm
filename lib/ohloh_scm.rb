@@ -19,22 +19,9 @@ require 'ohloh_scm/activity'
 require 'ohloh_scm/status'
 require 'ohloh_scm/py_bridge'
 
-require 'ohloh_scm/git_scm'
-require 'ohloh_scm/git_activity'
-require 'ohloh_scm/git_status'
-
-require 'ohloh_scm/parser/hg_parser'
-require 'ohloh_scm/hg_scm'
-require 'ohloh_scm/hg_activity'
-require 'ohloh_scm/hg_status'
-
-require 'ohloh_scm/parser/bzr_xml_parser'
-require 'ohloh_scm/bzr_scm'
-require 'ohloh_scm/bzr_activity'
-require 'ohloh_scm/bzr_status'
-
-require 'ohloh_scm/cvs_scm'
-require 'ohloh_scm/cvs_activity'
-require 'ohloh_scm/cvs_status'
+require 'ohloh_scm/hg'
+require 'ohloh_scm/git'
+require 'ohloh_scm/bzr'
+require 'ohloh_scm/cvs'
 
 require 'ohloh_scm/factory'

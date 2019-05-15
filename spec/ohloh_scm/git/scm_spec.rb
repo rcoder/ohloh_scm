@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe 'GitScm' do
+describe 'Git::Scm' do
   it 'must pull git repository' do
     with_git_repository('git') do |src_core|
       tmpdir do |dest_dir|

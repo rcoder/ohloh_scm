@@ -5,6 +5,7 @@ module OhlohScm
     include OhlohScm::System
     extend Forwardable
     def_delegators :@core, :scm, :status
+    def_delegators :scm, :url
 
     def initialize(core)
       @core = core

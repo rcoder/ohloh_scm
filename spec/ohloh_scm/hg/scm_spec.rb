@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe 'HgScm' do
+describe 'Hg::Scm' do
   it 'must pull hg repository' do
     with_hg_repository('hg') do |src|
       tmpdir do |dir|

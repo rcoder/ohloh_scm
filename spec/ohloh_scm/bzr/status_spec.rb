@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'BzrStatus' do
+describe 'Bzr::Status' do
   describe 'validate_server_connection' do
     it 'must handle non existent remote source' do
       core = OhlohScm::Factory.get_core(scm_type: :bzr, url: 'lp:foobar')

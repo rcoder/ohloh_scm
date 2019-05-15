@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'BzrActivity' do
+describe 'Bzr::Activity' do
   it 'must export contents of a repository' do
     with_bzr_repository('bzr') do |bzr|
       tmpdir do |dir|
@@ -410,8 +410,8 @@ describe 'BzrActivity' do
 
         commits[0].message.must_equal 'Initial.'
         commits[0].committer_name.must_equal 'Abhay Mujumdar'
-        commits[0].author_name.must_equal nil
-        commits[0].author_email.must_equal nil
+        commits[0].author_name.must_be_nil
+        commits[0].author_email.must_be_nil
 
         commits[1].message.must_equal 'Updated.'
         commits[1].committer_name.must_equal 'Abhay Mujumdar'

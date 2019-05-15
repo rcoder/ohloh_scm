@@ -9,9 +9,11 @@ module OhlohScm
     def initialize(scm_type, url, branch_name, username, password)
       scm_opts = { core: self, url: url, branch_name: branch_name,
                    username: username, password: password }
-      @scm = OhlohScm.const_get("#{scm_type.to_s.camelize}Scm").new(scm_opts)
-      @activity = OhlohScm.const_get("#{scm_type.to_s.camelize}Activity").new(self)
-      @status = OhlohScm.const_get("#{scm_type.to_s.camelize}Status").new(self)
+      scm_class_name = scm_type.to_s.camelize
+
+      @scm = OhlohScm.const_get(scm_class_name)::Scm.new(scm_opts)
+      @activity = OhlohScm.const_get(scm_class_name)::Activity.new(self)
+      @status = OhlohScm.const_get(scm_class_name)::Status.new(self)
     end
   end
 end

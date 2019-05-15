@@ -7,7 +7,7 @@ describe 'Factory' do
     url = 'https://foobar.git'
     core = OhlohScm::Factory.get_core(scm_type: :git, url: url)
 
-    core.status.scm.must_be_instance_of OhlohScm::GitScm
+    core.status.scm.must_be_instance_of OhlohScm::Git::Scm
     core.scm.url.must_equal url
     assert core.activity.method(:commits)
     assert core.status.method(:validate)

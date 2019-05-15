@@ -115,7 +115,7 @@ module OhlohScm
       end
 
       def null_sha1
-        OhlohScm::GitActivity::NULL_SHA1
+        OhlohScm::Git::Activity::NULL_SHA1
       end
 
       def parse_date(date)

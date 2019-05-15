@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'BzrScm' do
+describe 'Bzr::Scm' do
   it 'must pull the repository correctly' do
     with_bzr_repository('bzr') do |src|
       tmpdir do |dest_dir|

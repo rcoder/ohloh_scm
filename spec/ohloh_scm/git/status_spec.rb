@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe 'GitStatus' do
+describe 'Git::Status' do
   it 'branch?' do
     with_git_repository('git') do |git|
       git.activity.send(:branches).must_equal %w[develop master]

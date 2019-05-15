@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'GitActivity' do
+describe 'Git::Activity' do
   it 'must export contents of a repository' do
     with_git_repository('git') do |git|
       tmpdir do |dir|

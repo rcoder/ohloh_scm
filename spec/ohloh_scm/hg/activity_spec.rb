@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe 'HgActivity' do
+describe 'Hg::Activity' do
   it 'must fetch tags' do
     with_hg_repository('hg') do |hg|
       time = Time.parse('Fri Jul 22 18:00:18 2016 +0530')
