@@ -1,19 +1,19 @@
 require 'spec_helper'
 
-describe 'Cvs::Status' do
+describe 'Cvs::Validation' do
   describe 'validate_server_connection' do
     it 'must handle non existent remote source' do
       url = ':pserver:anonymous:@foobar.xyz_example.org:/cvsroot'
       core = OhlohScm::Factory.get_core(scm_type: :cvs, url: url, branch_name: 'foo')
-      core.status.validate_server_connection
-      core.status.errors.wont_be :empty?
+      core.validate
+      core.errors.wont_be :empty?
     end
   end
 
   it 'must have errors for invalid branch_name' do
-    get_core(:cvs, branch_name: 'x' * 81).status.send(:branch_name_errors).must_be_nil
-    get_core(:cvs, branch_name: 'x' * 121).status.send(:branch_name_errors).wont_be :empty?
-    get_core(:cvs, branch_name: 'foo@bar').status.send(:branch_name_errors).wont_be :empty?
+    get_core(:cvs, branch_name: 'x' * 81).validation.send(:branch_name_errors).must_be_nil
+    get_core(:cvs, branch_name: 'x' * 121).validation.send(:branch_name_errors).wont_be :empty?
+    get_core(:cvs, branch_name: 'foo@bar').validation.send(:branch_name_errors).wont_be :empty?
   end
 
   it 'must test rejected urls' do

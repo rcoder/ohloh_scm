@@ -10,6 +10,7 @@ describe 'Factory' do
     core.status.scm.must_be_instance_of OhlohScm::Git::Scm
     core.scm.url.must_equal url
     assert core.activity.method(:commits)
-    assert core.status.method(:validate)
+    assert core.status.method(:exist?)
+    assert core.validation.method(:validate)
   end
 end

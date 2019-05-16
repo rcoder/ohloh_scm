@@ -17,6 +17,7 @@ require 'ohloh_scm/core'
 require 'ohloh_scm/scm'
 require 'ohloh_scm/activity'
 require 'ohloh_scm/status'
+require 'ohloh_scm/validation'
 require 'ohloh_scm/py_bridge'
 
 require 'ohloh_scm/hg'
