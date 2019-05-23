@@ -26,3 +26,5 @@ require 'ohloh_scm/bzr'
 require 'ohloh_scm/cvs'
 
 require 'ohloh_scm/factory'
+
+`#{File.expand_path('../.bin/check_scm_version', __dir__)}`

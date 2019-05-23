@@ -59,6 +59,9 @@ sudo apt-get install -y openssh-server expect locales
 sudo locale-gen en_US.UTF-8
 ```
 
+OhlohScm is currently tested on the following versions:
+Git 2.17.1, SVN 1.9.7, CVSNT 2.5.04, Mercurial 4.5.3 and Bazaar 2.8.0
+
 OhlohScm has been tested with other linux distros and MacOSx. The installation instructions will differ.
 Let us know if you need help installing OhlohScm on other distros.
 
