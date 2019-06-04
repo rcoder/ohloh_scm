@@ -1,24 +1,10 @@
 # frozen_string_literal: true
 
 module RepositoryHelper
-  def with_git_repository(name, branch_name = nil)
-    with_repository(:git, name, branch_name) { |git| yield git }
-  end
-
-  def with_git_svn_repository(name)
-    with_repository(:git_svn, name) { |svn| yield svn }
-  end
-
-  def with_cvs_repository(name, module_name = '')
-    with_repository(:cvs, name, module_name) { |cvs| yield cvs }
-  end
-
-  def with_hg_repository(name, branch_name = nil)
-    with_repository(:hg, name, branch_name) { |hg| yield hg }
-  end
-
-  def with_bzr_repository(name)
-    with_repository(:bzr, name) { |bzr| yield bzr }
+  %w[git svn git_svn cvs hg bzr].each do |scm_type|
+    define_method("with_#{scm_type}_repository") do |name, branch_name = nil, &block|
+      with_repository(scm_type, name, branch_name) { |core| block.call(core) }
+    end
   end
 
   private
@@ -27,7 +13,8 @@ module RepositoryHelper
     source_path = get_fixture_folder_path(name)
     Dir.mktmpdir('oh_scm_fixture_') do |dir_path|
       setup_repository_archive(source_path, dir_path)
-      yield OhlohScm::Factory.get_core(scm_type: scm_type, url: File.join(dir_path, name),
+      path_prefix = scm_type == 'svn' ? 'file://' : ''
+      yield OhlohScm::Factory.get_core(scm_type: scm_type, url: "#{path_prefix}#{File.join(dir_path, name)}",
                                        branch_name: branch_name)
     end
   end

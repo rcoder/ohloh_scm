@@ -4,6 +4,7 @@ require 'timeout'
 
 module OhlohScm
   class Validation
+    include OhlohScm::System
     extend Forwardable
     def_delegators :@core, :scm, :activity, :status
     attr_reader :errors

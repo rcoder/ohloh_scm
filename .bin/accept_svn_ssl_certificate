@@ -1,0 +1,9 @@
+#!/usr/bin/expect -f
+
+set timeout 10
+
+eval spawn [lrange $argv 0 end]
+
+expect {
+  "(R)eject, accept (t)emporarily or accept (p)ermanently? " { send "p\r"; }
+}

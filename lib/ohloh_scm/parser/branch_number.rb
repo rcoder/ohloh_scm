@@ -31,6 +31,8 @@ module OhlohScm
       @num
     end
 
+    protected
+
     # Returns true if <branch_number> is an ancestor of this object.
     # Also returns true if <branch_number> is the same as this object.
     # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
@@ -51,12 +53,7 @@ module OhlohScm
     end
     # rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity
 
-    # private
-
-    # FIXME: Remove if not used.
-    def to_s
-      @num.join('.')
-    end
+    private
 
     def descendant?(branch_number)
       return true if branch_number[0] > @num[0] ||

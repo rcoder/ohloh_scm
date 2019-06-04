@@ -9,7 +9,7 @@ describe 'Bzr::Scm' do
         core = OhlohScm::Factory.get_core(scm_type: :bzr, url: dest_dir)
         refute core.status.exist?
 
-        core.scm.pull(src.scm)
+        core.scm.pull(src.scm, TestCallback.new)
         assert core.status.exist?
       end
     end
