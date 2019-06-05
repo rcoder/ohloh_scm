@@ -3,13 +3,17 @@
 module OhlohScm
   module Bzr
     class Scm < OhlohScm::Scm
-      def pull(from)
+      def pull(from, callback)
+        callback.update(0, 1)
+
         if status.exist?
           run "cd '#{url}' && bzr revert && bzr pull --overwrite '#{from.url}'"
         else
           run "rm -rf '#{url}'"
           run "bzr branch '#{from.url}' '#{url}'"
         end
+
+        callback.update(1, 1)
       end
 
       def vcs_path

@@ -39,7 +39,6 @@ module OhlohScm
       # rubocop:enable Metrics/PerceivedComplexity
 
       def normalize
-        super
         # Some CVS forges publish an URL which is actually a symlink, which causes CVSNT to crash.
         # For some forges, we can work around this by using an alternate directory.
         case guess_forge

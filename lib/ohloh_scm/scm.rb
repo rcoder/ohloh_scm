@@ -19,7 +19,7 @@ module OhlohScm
 
     def normalize; end
 
-    def pull; end
+    def pull(_, _); end
 
     def vcs_path; end
   end

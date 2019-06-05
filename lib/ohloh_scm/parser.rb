@@ -27,3 +27,4 @@ end
 
 require_relative 'parser/git_parser'
 require_relative 'parser/cvs_parser'
+require_relative 'parser/svn_parser'

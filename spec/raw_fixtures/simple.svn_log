@@ -1,0 +1,37 @@
+------------------------------------------------------------------------
+r5 | jason | 2006-07-14 16:07:15 -0700 (Fri, 14 Jul 2006) | 1 line
+Changed paths:
+   D /COPYING
+   A /trunk/COPYING (from /COPYING:4)
+
+moving COPYING
+------------------------------------------------------------------------
+r4 | jason | 2006-07-14 15:17:08 -0700 (Fri, 14 Jul 2006) | 1 line
+Changed paths:
+   A /COPYING
+
+added bs COPYING to catch global licenses
+------------------------------------------------------------------------
+r3 | robin | 2006-06-11 11:34:17 -0700 (Sun, 11 Jun 2006) | 1 line
+Changed paths:
+   A /trunk/README
+   M /trunk/helloworld.c
+
+added some documentation and licensing info
+------------------------------------------------------------------------
+r2 | robin | 2006-06-11 11:32:13 -0700 (Sun, 11 Jun 2006) | 1 line
+Changed paths:
+   A /trunk/makefile
+
+added makefile
+------------------------------------------------------------------------
+r1 | robin | 2006-06-11 11:28:00 -0700 (Sun, 11 Jun 2006) | 2 lines
+Changed paths:
+   A /branches
+   A /tags
+   A /trunk
+   A /trunk/helloworld.c
+
+Initial Checkin
+
+------------------------------------------------------------------------

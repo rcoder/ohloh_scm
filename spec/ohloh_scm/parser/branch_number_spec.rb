@@ -10,62 +10,62 @@ describe 'BranchNumber' do
   it 'must test simple inherits_from' do
     b = OhlohScm::BranchNumber.new('1.3')
 
-    assert b.inherits_from?(OhlohScm::BranchNumber.new('1.2'))
-    assert b.inherits_from?(OhlohScm::BranchNumber.new('1.1'))
-    assert b.inherits_from?(OhlohScm::BranchNumber.new('1.3'))
+    assert b.send(:inherits_from?, OhlohScm::BranchNumber.new('1.2'))
+    assert b.send(:inherits_from?, OhlohScm::BranchNumber.new('1.1'))
+    assert b.send(:inherits_from?, OhlohScm::BranchNumber.new('1.3'))
 
-    refute b.inherits_from?(OhlohScm::BranchNumber.new('1.4'))
-    refute b.inherits_from?(OhlohScm::BranchNumber.new('1.1.2.1'))
-    refute b.inherits_from?(OhlohScm::BranchNumber.new('1.2.2.1'))
-    refute b.inherits_from?(OhlohScm::BranchNumber.new('1.3.2.1'))
+    refute b.send(:inherits_from?, OhlohScm::BranchNumber.new('1.4'))
+    refute b.send(:inherits_from?, OhlohScm::BranchNumber.new('1.1.2.1'))
+    refute b.send(:inherits_from?, OhlohScm::BranchNumber.new('1.2.2.1'))
+    refute b.send(:inherits_from?, OhlohScm::BranchNumber.new('1.3.2.1'))
   end
 
   it 'must test complex inherits_from' do
     b = OhlohScm::BranchNumber.new('1.3.6.3.2.3')
 
-    assert b.inherits_from?(OhlohScm::BranchNumber.new('1.2'))
-    assert b.inherits_from?(OhlohScm::BranchNumber.new('1.1'))
-    assert b.inherits_from?(OhlohScm::BranchNumber.new('1.3'))
-    assert b.inherits_from?(OhlohScm::BranchNumber.new('1.3.6.1'))
-    assert b.inherits_from?(OhlohScm::BranchNumber.new('1.3.6.2'))
-    assert b.inherits_from?(OhlohScm::BranchNumber.new('1.3.6.3'))
-    assert b.inherits_from?(OhlohScm::BranchNumber.new('1.3.6.3.2.1'))
-    assert b.inherits_from?(OhlohScm::BranchNumber.new('1.3.6.3.2.2'))
-    assert b.inherits_from?(OhlohScm::BranchNumber.new('1.3.6.3.2.3'))
+    assert b.send(:inherits_from?, OhlohScm::BranchNumber.new('1.2'))
+    assert b.send(:inherits_from?, OhlohScm::BranchNumber.new('1.1'))
+    assert b.send(:inherits_from?, OhlohScm::BranchNumber.new('1.3'))
+    assert b.send(:inherits_from?, OhlohScm::BranchNumber.new('1.3.6.1'))
+    assert b.send(:inherits_from?, OhlohScm::BranchNumber.new('1.3.6.2'))
+    assert b.send(:inherits_from?, OhlohScm::BranchNumber.new('1.3.6.3'))
+    assert b.send(:inherits_from?, OhlohScm::BranchNumber.new('1.3.6.3.2.1'))
+    assert b.send(:inherits_from?, OhlohScm::BranchNumber.new('1.3.6.3.2.2'))
+    assert b.send(:inherits_from?, OhlohScm::BranchNumber.new('1.3.6.3.2.3'))
 
-    refute b.inherits_from?(OhlohScm::BranchNumber.new('1.4'))
-    refute b.inherits_from?(OhlohScm::BranchNumber.new('1.1.2.1'))
-    refute b.inherits_from?(OhlohScm::BranchNumber.new('1.2.2.1'))
-    refute b.inherits_from?(OhlohScm::BranchNumber.new('1.3.2.1'))
-    refute b.inherits_from?(OhlohScm::BranchNumber.new('1.3.4.1'))
-    refute b.inherits_from?(OhlohScm::BranchNumber.new('1.3.6.1.2.1'))
-    refute b.inherits_from?(OhlohScm::BranchNumber.new('1.3.6.4'))
-    refute b.inherits_from?(OhlohScm::BranchNumber.new('1.3.6.3.4.1'))
-    refute b.inherits_from?(OhlohScm::BranchNumber.new('1.3.6.3.2.2.2.1'))
-    refute b.inherits_from?(OhlohScm::BranchNumber.new('1.3.6.3.2.4'))
+    refute b.send(:inherits_from?, OhlohScm::BranchNumber.new('1.4'))
+    refute b.send(:inherits_from?, OhlohScm::BranchNumber.new('1.1.2.1'))
+    refute b.send(:inherits_from?, OhlohScm::BranchNumber.new('1.2.2.1'))
+    refute b.send(:inherits_from?, OhlohScm::BranchNumber.new('1.3.2.1'))
+    refute b.send(:inherits_from?, OhlohScm::BranchNumber.new('1.3.4.1'))
+    refute b.send(:inherits_from?, OhlohScm::BranchNumber.new('1.3.6.1.2.1'))
+    refute b.send(:inherits_from?, OhlohScm::BranchNumber.new('1.3.6.4'))
+    refute b.send(:inherits_from?, OhlohScm::BranchNumber.new('1.3.6.3.4.1'))
+    refute b.send(:inherits_from?, OhlohScm::BranchNumber.new('1.3.6.3.2.2.2.1'))
+    refute b.send(:inherits_from?, OhlohScm::BranchNumber.new('1.3.6.3.2.4'))
   end
 
   it 'must  test primary revision number change' do
     b = OhlohScm::BranchNumber.new('2.3')
 
-    assert b.inherits_from?(OhlohScm::BranchNumber.new('2.2'))
-    assert b.inherits_from?(OhlohScm::BranchNumber.new('2.1'))
-    assert b.inherits_from?(OhlohScm::BranchNumber.new('1.1'))
-    assert b.inherits_from?(OhlohScm::BranchNumber.new('1.9999'))
+    assert b.send(:inherits_from?, OhlohScm::BranchNumber.new('2.2'))
+    assert b.send(:inherits_from?, OhlohScm::BranchNumber.new('2.1'))
+    assert b.send(:inherits_from?, OhlohScm::BranchNumber.new('1.1'))
+    assert b.send(:inherits_from?, OhlohScm::BranchNumber.new('1.9999'))
 
-    refute b.inherits_from?(OhlohScm::BranchNumber.new('2.4'))
-    refute b.inherits_from?(OhlohScm::BranchNumber.new('3.1'))
+    refute b.send(:inherits_from?, OhlohScm::BranchNumber.new('2.4'))
+    refute b.send(:inherits_from?, OhlohScm::BranchNumber.new('3.1'))
   end
 
   it 'must test complex primary revision number change' do
     b = OhlohScm::BranchNumber.new('2.3.2.1')
 
-    assert b.inherits_from?(OhlohScm::BranchNumber.new('2.3'))
-    assert b.inherits_from?(OhlohScm::BranchNumber.new('2.2'))
-    assert b.inherits_from?(OhlohScm::BranchNumber.new('1.1'))
-    assert b.inherits_from?(OhlohScm::BranchNumber.new('1.9999'))
+    assert b.send(:inherits_from?, OhlohScm::BranchNumber.new('2.3'))
+    assert b.send(:inherits_from?, OhlohScm::BranchNumber.new('2.2'))
+    assert b.send(:inherits_from?, OhlohScm::BranchNumber.new('1.1'))
+    assert b.send(:inherits_from?, OhlohScm::BranchNumber.new('1.9999'))
 
-    refute b.inherits_from?(OhlohScm::BranchNumber.new('3.1'))
+    refute b.send(:inherits_from?, OhlohScm::BranchNumber.new('3.1'))
   end
 
   it 'must test simple on_same_line' do
