@@ -41,7 +41,7 @@ module OhlohScm
 
         if scm.url[0..root_path.length - 1] != root_path
           [:failed, "The URL did not match the Subversion root #{root_path}. Is the URL correct?"]
-        elsif scm.recalc_branch_name && activity.ls_stdout.nil?
+        elsif scm.recalc_branch_name && activity.ls.nil?
           [:failed, "The server did not respond to a 'svn ls' command. Is the URL correct?"]
         end
       end

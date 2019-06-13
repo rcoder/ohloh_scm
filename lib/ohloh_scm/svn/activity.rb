@@ -15,11 +15,11 @@ module OhlohScm
         "#{username} #{password}"
       end
 
-      def ls_stdout(path = nil, revision = 'HEAD')
+      def ls(path = nil, revision = 'HEAD')
         stdout = run "svn ls --trust-server-cert --non-interactive -r #{revision} "\
           "#{username_and_password_opts} "\
           "'#{uri_encode(File.join(root.to_s, scm.branch_name.to_s, path.to_s))}@#{revision}'"
-        stdout.strip
+        collect_files(stdout)
       rescue StandardError => e
         logger.error(e.message) && nil
       end
@@ -62,6 +62,13 @@ module OhlohScm
       end
 
       private
+
+      def collect_files(stdout)
+        stdout.split("\n").map do |line|
+          # CVSROOT/ is found in cvs repos converted to svn.
+          line.chomp unless line.chomp.empty? || line == 'CVSROOT/'
+        end.compact.sort
+      end
 
       def info(path = nil, revision = 'HEAD')
         @info ||= {}

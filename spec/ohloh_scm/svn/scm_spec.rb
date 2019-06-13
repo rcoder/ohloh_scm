@@ -36,8 +36,40 @@ describe 'Svn::Scm' do
 
       svn_scm = get_core(:svn, url: svn_core.scm.url + '/trunk', branch_name: nil).scm
       OhlohScm::Svn::Activity.any_instance.stubs(:root).returns(svn_core.scm.url)
-      OhlohScm::Svn::Scm.any_instance.stubs(:branch_name).returns(nil)
-      svn_scm.normalize.branch_name.must_be_nil
+      svn_scm.normalize.branch_name.must_equal '/trunk'
+    end
+  end
+
+  describe 'restrict_url_to_trunk' do
+    it 'must return url when url ends with trunk' do
+      svn_scm = get_core(:svn, url: 'svn:foobar/trunk').scm
+      svn_scm.restrict_url_to_trunk.must_equal svn_scm.url
+    end
+
+    it 'must append trunk to url and set branch_name when trunk folder is present' do
+      with_svn_repository('svn') do |svn_core|
+        scm = svn_core.scm
+        scm.url.must_equal svn_core.activity.root
+        scm.branch_name.must_be_nil
+
+        scm.restrict_url_to_trunk
+
+        scm.url.must_equal svn_core.activity.root + '/trunk'
+        scm.branch_name.must_equal '/trunk'
+      end
+    end
+
+    it 'must update url and branch_name when repo has a single subfolder' do
+      with_svn_repository('svn_subdir') do |svn_core|
+        scm = svn_core.scm
+        scm.url.must_equal svn_core.activity.root
+        scm.branch_name.must_be_nil
+
+        scm.restrict_url_to_trunk
+
+        scm.url.must_equal svn_core.activity.root + '/subdir/trunk'
+        scm.branch_name.must_equal '/subdir/trunk'
+      end
     end
   end
 end
