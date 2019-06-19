@@ -8,13 +8,13 @@ module OhlohScm
       open_repository
     end
 
-    private
-
     def shutdown
       send_command('QUIT')
       [@stdin, @stdout, @stderr].reject(&:closed?).each(&:close)
       Process.waitpid(@pid, Process::WNOHANG)
     end
+
+    private
 
     def send_command(cmd)
       # send the command
