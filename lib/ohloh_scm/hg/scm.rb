@@ -25,17 +25,26 @@ module OhlohScm
 
         status.exist? ? revert_and_pull(remote_scm) : clone_repository(remote_scm)
 
+        clean_up_disk
+
         callback.update(1, 1)
       end
 
       def clone_repository(remote_scm)
         run "rm -rf '#{url}'"
-        run "hg clone -U '#{remote_scm.url}' '#{url}'"
+        run "hg clone '#{remote_scm.url}' '#{url}'"
       end
 
       def revert_and_pull(remote_scm)
         branch_opts = "-r #{remote_scm.branch_name}" if branch_name
         run "cd '#{url}' && hg revert --all && hg pull #{branch_opts} -u -y '#{remote_scm.url}'"
+      end
+
+      def clean_up_disk
+        return unless FileTest.exist?(url)
+
+        run "cd #{url} && find . -maxdepth 1 -not -name .hg -not -name . -print0"\
+              ' | xargs -0 rm -rf --'
       end
     end
   end
