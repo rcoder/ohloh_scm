@@ -1,0 +1,13 @@
+require: rubocop-performance
+
+AllCops:
+  TargetRubyVersion: 2.5
+
+Metrics/LineLength:
+  Max: 99
+
+Documentation:
+  Enabled: false
+
+Style/RegexpLiteral:
+  Enabled: false

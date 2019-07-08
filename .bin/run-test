@@ -1,0 +1,3 @@
+#! /usr/bin/env bash
+
+bundle exec ruby -Ispec $1 --name /.*$2.*/

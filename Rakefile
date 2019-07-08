@@ -1,33 +1,11 @@
-require 'rake'
-require 'rake/clean'
+# frozen_string_literal: true
+
 require 'rake/testtask'
 
-require 'rubygems'
-require 'rubygems/package_task'
+ENV['SIMPLECOV_START'] = 'true'
+task default: :test
 
-spec = Gem::Specification.new do |s|
-  s.name = 'ohloh_scm'
-  s.version = '0.0.1'
-  s.author = 'Robin Luckey'
-  s.email = 'robin@ohloh.net'
-  s.homepage = 'http://labs.ohloh.net'
-  s.platform = Gem::Platform::RUBY
-  s.summary = 'Ohloh Source Control Management Library'
-  s.files = FileList['README', 'COPYING', '{bin,lib,test}/**/*']
-  s.require_path = 'lib'
-  s.executables = 'ohlog'
-  s.has_rdoc = true
-  s.extra_rdoc_files = ['README']
-  s.test_files = FileList["test/**/*"]
+Rake::TestTask.new do |task|
+  task.libs << 'spec'
+  task.pattern = 'spec/**/*_spec.rb'
 end
-
-Gem::PackageTask.new(spec) do |pkg|
-  pkg.need_tar = true
-  pkg.need_zip = true
-end
-
-Rake::TestTask.new :test do |t|
-	t.test_files = FileList[File.dirname(__FILE__) + '/test/unit/**/*_test.rb']
-end
-
-task :default => :test

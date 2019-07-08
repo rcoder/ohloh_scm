@@ -1,5 +1,2 @@
-*.swp
-*.pyc
-pkg/
-*.cache
 .byebug*
+coverage

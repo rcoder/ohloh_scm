@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<ohloh_log>
+    <commit token="5">
+        <committer name="jason" date="2006-07-14T23:07:15Z" />
+        <message>moving COPYING</message>
+        <diffs>
+            <diff action="D" path="/COPYING" />
+            <diff action="A" path="/trunk/COPYING" />
+        </diffs>
+    </commit>
+    <commit token="4">
+        <committer name="jason" date="2006-07-14T22:17:08Z" />
+        <message>added bs COPYING to catch global licenses</message>
+        <diffs>
+            <diff action="A" path="/COPYING" />
+        </diffs>
+    </commit>
+    <commit token="3">
+        <committer name="robin" date="2006-06-11T18:34:17Z" />
+        <message>added some documentation and licensing info</message>
+        <diffs>
+            <diff action="A" path="/trunk/README" />
+            <diff action="M" path="/trunk/helloworld.c" />
+        </diffs>
+    </commit>
+    <commit token="2">
+        <committer name="robin" date="2006-06-11T18:32:13Z" />
+        <message>added makefile</message>
+        <diffs>
+            <diff action="A" path="/trunk/makefile" />
+        </diffs>
+    </commit>
+    <commit token="1">
+        <committer name="robin" date="2006-06-11T18:28:00Z" />
+        <message>Initial Checkin
+</message>
+        <diffs>
+            <diff action="A" path="/branches" />
+            <diff action="A" path="/tags" />
+            <diff action="A" path="/trunk" />
+            <diff action="A" path="/trunk/helloworld.c" />
+        </diffs>
+    </commit>
+</ohloh_log>

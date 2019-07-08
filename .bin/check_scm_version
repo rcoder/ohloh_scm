@@ -1,0 +1,28 @@
+#! /usr/bin/env ruby
+$LOAD_PATH.push File.expand_path('../../lib', __FILE__)
+
+require 'open3'
+require_relative '../lib/ohloh_scm/version'
+
+SCM_CLI_LIST = %w[git svn cvsnt hg bzr].freeze
+
+def match_scm_cli(scm_type)
+  scm_version = get_scm_version(scm_type)
+  major_version = Object.const_get('OhlohScm::Version::' + scm_type.upcase)
+  return if scm_version.nil? || major_version.to_i == scm_version.to_i
+  STDERR.puts "warning: Ohloh SCM is compatible with #{scm_type} v#{major_version.to_i}.x.x. "\
+              "The installed #{scm_type} version is #{scm_version}."
+end
+
+def get_scm_version(scm_type)
+  out, _err, _status = Open3.capture3("#{scm_type} --version --quiet")
+  out, _err, _status = Open3.capture3("#{scm_type} --version") if out.empty?
+  out.match(/(\d+\.)(\d+\.)(\d+)/).to_s
+rescue => exception
+  STDERR.puts exception
+  nil
+end
+
+SCM_CLI_LIST.each do |scm_type|
+  match_scm_cli(scm_type)
+end
