@@ -24,7 +24,7 @@ $ git checkout -b v3
 
 # To run all tests, we need to start the ssh server and set UTF-8 locale for encoding tests.
 $ cmd='/etc/init.d/ssh start; LANG=en_US.UTF-8 rake test 2> /dev/null'
-$ docker run -P -v $(pwd):/home/app/ohloh_scm -ti notalex/oh_scm:ubuntu18 /bin/sh -c "$cmd"
+$ docker run -P -v $(pwd):/home/app/ohloh_scm -ti ohdeployer/ohloh_scm:ubuntu18 /bin/sh -c "$cmd"
 # This mounts the current folder into the docker container;
 #   hence any edits made in ohloh_scm on the host machine would reflect in the container.
 
