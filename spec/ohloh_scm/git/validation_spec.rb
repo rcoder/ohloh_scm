@@ -1,12 +1,6 @@
 require 'spec_helper'
 
 describe 'Git::Validation' do
-  it 'must handle non existent remote source' do
-    core = OhlohScm::Factory.get_core(scm_type: :git, url: 'https://github.com/Person/foobar')
-    core.validate
-    core.errors.wont_be :empty?
-  end
-
   it 'wont have errors for valid url' do
     core = OhlohScm::Factory.get_core(scm_type: :git, url: 'https://github.com/ruby/ruby')
     core.validation.send(:validate_attributes)

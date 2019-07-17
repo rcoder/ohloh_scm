@@ -20,9 +20,7 @@ module OhlohScm
 
     private
 
-    def validate_server_connection
-      return unless valid?
-    end
+    def validate_server_connection; end
 
     # rubocop:disable Metrics/AbcSize
     def validate_attributes
