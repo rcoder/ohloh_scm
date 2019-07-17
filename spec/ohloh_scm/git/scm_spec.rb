@@ -5,9 +5,10 @@ describe 'Git::Scm' do
     with_git_repository('git') do |src_core|
       tmpdir do |dest_dir|
         core = OhlohScm::Factory.get_core(scm_type: :git, url: dest_dir)
-        refute core.status.exist?
+        refute core.status.scm_dir_exist?
 
         core.scm.pull(src_core.scm, TestCallback.new)
+        assert core.status.scm_dir_exist?
         assert core.status.exist?
       end
     end
@@ -19,7 +20,7 @@ describe 'Git::Scm' do
     with_git_repository('git_with_multiple_branch', 'test') do |src_core|
       tmpdir do |dest_dir|
         core = OhlohScm::Factory.get_core(scm_type: :git, url: dest_dir, branch_name: 'test')
-        refute core.status.exist?
+        refute core.status.scm_dir_exist?
         core.scm.pull(src_core.scm, TestCallback.new)
 
         remote_master_branch_sha = `cd #{dest_dir} && git rev-parse origin/master`
@@ -36,8 +37,9 @@ describe 'Git::Scm' do
     with_cvs_repository('cvs', 'simple') do |src_core|
       tmpdir do |dest_dir|
         core = OhlohScm::Factory.get_core(scm_type: :git, url: dest_dir)
-        refute core.status.exist?
+        refute core.status.scm_dir_exist?
         core.scm.pull(src_core.scm, TestCallback.new)
+        assert core.status.scm_dir_exist?
         assert core.status.exist?
 
         dest_commits = core.activity.commits

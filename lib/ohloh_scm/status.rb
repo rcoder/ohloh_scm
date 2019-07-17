@@ -12,9 +12,10 @@ module OhlohScm
     end
 
     def exist?
-      return unless scm_dir_exist?
-
       !activity.head_token.to_s.empty?
+    rescue RuntimeError
+      logger.debug { $ERROR_INFO.inspect }
+      false
     end
 
     def scm_dir_exist?
