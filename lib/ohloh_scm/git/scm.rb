@@ -43,8 +43,10 @@ module OhlohScm
       end
 
       def clone_and_create_tracking_branch(remote_scm)
-        run "rm -rf '#{url}'"
-        run "git clone -q -n '#{remote_scm.url}' '#{url}'"
+        unless status.scm_dir_exist?
+          run "rm -rf '#{url}'"
+          run "git clone -q -n '#{remote_scm.url}' '#{url}'"
+        end
         create_tracking_branch(remote_scm.branch_name) # ensure the correct branch exists locally
         clean_and_checkout_branch # switch to the correct branch
       end
