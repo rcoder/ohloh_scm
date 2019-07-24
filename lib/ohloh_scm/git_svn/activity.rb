@@ -3,7 +3,7 @@
 module OhlohScm
   module GitSvn
     class Activity < OhlohScm::Activity
-      def_delegators :scm, :url
+      def_delegators :scm, :url, :temp_dir
 
       def commit_count(opts = {})
         cmd = "#{after_revision(opts)} | grep -E -e '^r[0-9]+.*lines$' | wc -l"
@@ -49,7 +49,8 @@ module OhlohScm
       end
 
       def log_filename
-        File.join('/tmp', url.gsub(/\W/, '') + '.log')
+        tmp_dir = temp_dir || '/tmp'
+        File.join(tmp_dir, url.gsub(/\W/, '') + '.log')
       end
 
       def after_revision(opts)

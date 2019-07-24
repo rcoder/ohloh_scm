@@ -5,14 +5,15 @@ module OhlohScm
     include OhlohScm::System
     extend Forwardable
     def_delegators :@core, :scm, :status
-    def_delegators :scm, :url
+    def_delegators :scm, :url, :temp_dir
 
     def initialize(core)
       @core = core
     end
 
     def log_filename
-      File.join(Dir.tmpdir, url.gsub(/\W/, '') + '.log')
+      tmp_dir = temp_dir || Dir.tmpdir
+      File.join(tmp_dir, url.gsub(/\W/, '') + '.log')
     end
 
     def tags; end
