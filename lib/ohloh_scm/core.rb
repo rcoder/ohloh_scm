@@ -18,5 +18,9 @@ module OhlohScm
       @status = OhlohScm.const_get(scm_class_name)::Status.new(self)
       @validation = OhlohScm.const_get(scm_class_name)::Validation.new(self)
     end
+
+    def temp_dir=(tmp_dir)
+      @scm.temp_dir = tmp_dir
+    end
   end
 end
