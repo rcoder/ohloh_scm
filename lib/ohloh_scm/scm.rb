@@ -6,7 +6,7 @@ module OhlohScm
     extend Forwardable
     def_delegators :@core, :status, :activity
     attr_reader :url, :username, :password
-    attr_accessor :branch_name, :temp_dir
+    attr_accessor :branch_name
 
     def initialize(core:, url:, branch_name: nil, username: nil, password: nil)
       @core = core
