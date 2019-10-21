@@ -2,7 +2,7 @@
 
 module OhlohScm
   module Git
-    class Scm < OhlohScm::Scm # rubocop:disable Metrics/ClassLength
+    class Scm < OhlohScm::Scm
       def initialize(core:, url:, branch_name:, username:, password:)
         super
         @branch_name = branch_name || 'master'
@@ -54,16 +54,12 @@ module OhlohScm
       # We need very high reliability and this sequence gets the job done every time.
       def clean_and_checkout_branch
         return unless status.scm_dir_exist?
-        return unless status.branch?(branch_name)
 
         run "cd '#{url}' && git clean -f -d -x"
-        clean_git_lock_file
-        run "cd '#{url}' && git reset --hard HEAD"
-        run "cd '#{url}' && git checkout #{branch_name} --"
-      end
+        return unless status.branch?(branch_name)
 
-      def clean_git_lock_file
-        run "rm #{url}/.git/index.lock" if File.exist?("#{url}/.git/index.lock")
+        run "cd '#{url}' && git checkout #{branch_name} --"
+        run "cd '#{url}' && git reset --hard heads/#{branch_name} --"
       end
 
       def create_tracking_branch(branch_name)
