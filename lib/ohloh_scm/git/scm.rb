@@ -27,7 +27,7 @@ module OhlohScm
 
       def clone_or_fetch(remote_scm, callback)
         callback.update(0, 1)
-        if status.branch?(branch_name)
+        if status.exist? && status.branch?(branch_name)
           clean_and_checkout_branch # must be on correct branch, but we want to be careful.
           fetch_new_commits(remote_scm)
         else
@@ -43,7 +43,7 @@ module OhlohScm
       end
 
       def clone_and_create_tracking_branch(remote_scm)
-        unless status.scm_dir_exist?
+        unless status.exist?
           run "rm -rf '#{url}'"
           run "git clone -q -n '#{remote_scm.url}' '#{url}'"
         end
