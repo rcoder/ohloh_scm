@@ -2,7 +2,7 @@
 
 module OhlohScm
   module Git
-    class Scm < OhlohScm::Scm # rubocop:disable Metrics/ClassLength
+    class Scm < OhlohScm::Scm
       def initialize(core:, url:, branch_name:, username:, password:)
         super
         @branch_name = branch_name || 'master'
@@ -27,7 +27,7 @@ module OhlohScm
 
       def clone_or_fetch(remote_scm, callback)
         callback.update(0, 1)
-        if status.branch?(branch_name)
+        if status.exist? && status.branch?(branch_name)
           clean_and_checkout_branch # must be on correct branch, but we want to be careful.
           fetch_new_commits(remote_scm)
         else
@@ -43,7 +43,7 @@ module OhlohScm
       end
 
       def clone_and_create_tracking_branch(remote_scm)
-        unless status.scm_dir_exist?
+        unless status.exist?
           run "rm -rf '#{url}'"
           run "git clone -q -n '#{remote_scm.url}' '#{url}'"
         end
@@ -54,16 +54,12 @@ module OhlohScm
       # We need very high reliability and this sequence gets the job done every time.
       def clean_and_checkout_branch
         return unless status.scm_dir_exist?
-        return unless status.branch?(branch_name)
 
         run "cd '#{url}' && git clean -f -d -x"
-        clean_git_lock_file
-        run "cd '#{url}' && git reset --hard HEAD"
-        run "cd '#{url}' && git checkout #{branch_name} --"
-      end
+        return unless status.branch?(branch_name)
 
-      def clean_git_lock_file
-        run "rm #{url}/.git/index.lock" if File.exist?("#{url}/.git/index.lock")
+        run "cd '#{url}' && git checkout #{branch_name} --"
+        run "cd '#{url}' && git reset --hard heads/#{branch_name} --"
       end
 
       def create_tracking_branch(branch_name)
