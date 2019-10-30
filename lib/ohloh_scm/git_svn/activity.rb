@@ -40,6 +40,10 @@ module OhlohScm
         cat("#{git_commit(commit)}^", diff.path)
       end
 
+      def git_commit(commit)
+        run("cd #{url} && git svn find-rev r#{commit.token}").strip
+      end
+
       private
 
       def open_log_file(opts = {})
@@ -70,10 +74,6 @@ module OhlohScm
       def cat(revision, file_path)
         file_path = file_path.to_s
         run("cd #{url} && git show #{revision}:#{file_path.shellescape}").strip
-      end
-
-      def git_commit(commit)
-        run("cd #{url} && git svn find-rev r#{commit.token}").strip
       end
 
       def git_svn_log_cmd
