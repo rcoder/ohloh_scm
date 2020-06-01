@@ -23,7 +23,7 @@ module OhlohScm
       # rubocop:enable Metrics/MethodLength
 
       def export_tag(dest_dir, tag_name)
-        run "cd '#{path}' && bzr export -r #{tag_name} #{dest_dir}"
+        run "cd '#{url}' && bzr export -r #{tag_name} #{dest_dir}"
       end
 
       def export(dest_dir, token = head_token)
