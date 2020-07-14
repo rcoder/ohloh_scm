@@ -1,17 +1,18 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require_relative '../test_helper'
 
-module Scm::Adapters
-	class BzrValidationTest < Scm::Test
+module OhlohScm::Adapters
+	class BzrValidationTest < OhlohScm::Test
 		def test_rejected_urls
 			[	nil, "", "foo", "http:/", "http:://", "http://", "http://a",
 				"www.selenic.com/repo/hello", # missing a protool prefix
 				"http://www.selenic.com/repo/hello%20world", # no encoded strings allowed
 				"http://www.selenic.com/repo/hello world", # no spaces allowed
 				"git://www.selenic.com/repo/hello", # git protocol not allowed
-				"svn://www.selenic.com/repo/hello" # svn protocol not allowed
+				"svn://www.selenic.com/repo/hello", # svn protocol not allowed
+				"lp://foobar", # lp requires no "//" after colon
 			].each do |url|
 				bzr = BzrAdapter.new(:url => url, :public_urls_only => true)
-				assert bzr.validate_url.any?
+				assert bzr.validate_url.to_a.any?, "Didn't expect #{ url } to validate"
 			end
 		end
 
@@ -19,6 +20,9 @@ module Scm::Adapters
 			[ "http://www.selenic.com/repo/hello",
 				"http://www.selenic.com:80/repo/hello",
 				"https://www.selenic.com/repo/hello",
+				"bzr://www.selenic.com/repo/hello",
+				"lp:foobar",
+				"lp:~foobar/bar",
 			].each do |url|
 				bzr = BzrAdapter.new(:url => url, :public_urls_only => true)
 				assert !bzr.validate_url
@@ -46,6 +50,9 @@ module Scm::Adapters
 
 			bzr = BzrAdapter.new(:url => "/home/test/bzr")
 			assert_equal nil, bzr.guess_forge
+
+			bzr = BzrAdapter.new( :url => 'bzr://www.selenic.com/repo/hello')
+			assert_equal 'www.selenic.com', bzr.guess_forge
 
 			bzr = BzrAdapter.new( :url => 'http://www.selenic.com/repo/hello')
 			assert_equal 'www.selenic.com', bzr.guess_forge
