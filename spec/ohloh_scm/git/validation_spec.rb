@@ -7,6 +7,10 @@ describe 'Git::Validation' do
     core.errors.must_be :empty?
   end
 
+  it 'must have errors for no branch_name' do
+    get_core(:git, branch_name: '').validation.send(:branch_name_errors).wont_be :empty?
+  end
+
   it 'must have errors for invalid branch_name' do
     get_core(:git, branch_name: 'x' * 81).validation.send(:branch_name_errors).wont_be :empty?
     get_core(:git, branch_name: 'foo@bar').validation.send(:branch_name_errors).wont_be :empty?
