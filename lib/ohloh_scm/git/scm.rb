@@ -43,7 +43,7 @@ module OhlohScm
       end
 
       def clone_and_create_tracking_branch(remote_scm)
-        unless status.exist?
+        unless status.scm_dir_exist? || status.exist?
           run "rm -rf '#{url}'"
           run "git clone -q -n '#{remote_scm.url}' '#{url}'"
         end
