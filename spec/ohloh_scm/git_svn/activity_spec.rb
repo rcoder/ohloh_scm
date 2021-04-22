@@ -60,7 +60,7 @@ describe 'GitSvn::Activity' do
 
     it 'cat_file_with_invalid_filename' do
       with_git_svn_repository('git_svn') do |git_svn|
-        -> { git_svn.activity.cat_file(commit_1, OhlohScm::Diff.new(path: 'invalid')) }.must_raise(RuntimeError)
+        assert git_svn.activity.cat_file(commit_1, OhlohScm::Diff.new(path: 'invalid')).must_be_empty
       end
     end
 
