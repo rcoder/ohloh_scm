@@ -73,7 +73,8 @@ module OhlohScm
 
       def cat(revision, file_path)
         file_path = file_path.to_s
-        run("cd #{url} && git show #{revision}:#{file_path.shellescape}").strip
+        run("cd #{url} && git show #{revision}:#{file_path.shellescape} | #{string_encoder_path}")
+          .strip
       end
 
       def git_svn_log_cmd
