@@ -66,7 +66,7 @@ module OhlohScm
         return if branch_name.to_s.empty?
         return if activity.branches.include?(branch_name)
 
-        run "cd '#{url}' && git branch -f #{branch_name} origin/#{branch_name}"
+        run "cd '#{url}' && git remote update && git branch -f #{branch_name} origin/#{branch_name}"
       end
 
       # Deletes everything but the *.git* folder in the working directory.

@@ -33,6 +33,27 @@ describe 'Git::Scm' do
     end
   end
 
+  it 'must update branches in local copy' do
+    test_branch_name = 'test' # consider that 'test' is the current *main* branch.
+
+    with_git_repository('git_with_multiple_branch', test_branch_name) do |src_core|
+      tmpdir do |dest_dir|
+        core = OhlohScm::Factory.get_core(scm_type: :git, url: dest_dir, branch_name: test_branch_name)
+        core.scm.pull(src_core.scm, TestCallback.new)
+
+        # Emulate a scenario where the local copy doesn't have the current *main* branch.
+        `cd #{dest_dir} && git checkout master && git branch -D test`
+
+        local_branch_cmd = "cd #{dest_dir} && git branch | grep '\*' | sed 's/^\* //'"
+        `#{ local_branch_cmd }`.chomp.must_equal 'master'
+
+        # On doing a refetch, our local copy will now have the updated *main* branch.
+        core.scm.pull(src_core.scm, TestCallback.new)
+        `#{ local_branch_cmd }`.chomp.must_equal test_branch_name
+      end
+    end
+  end
+
   it 'must test the basic conversion to git' do
     with_cvs_repository('cvs', 'simple') do |src_core|
       tmpdir do |dest_dir|

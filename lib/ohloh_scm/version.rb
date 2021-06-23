@@ -2,7 +2,7 @@
 
 module OhlohScm
   module Version
-    STRING = '3.0.13'
+    STRING = '3.0.14'
     GIT = '2.17.1'
     SVN = '1.9.7'
     CVSNT = '2.5.04'
