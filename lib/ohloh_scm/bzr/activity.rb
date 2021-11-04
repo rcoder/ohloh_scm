@@ -75,8 +75,7 @@ module OhlohScm
       end
 
       def head_token
-        run("cd '#{url}' && bzr log --limit 1 --show-id #{url} 2> /dev/null"\
-              " | grep ^revision-id | cut -f2 -d' '").strip
+        run("bzr log --limit 1 --show-id #{url} 2> /dev/null | grep ^revision-id | cut -f2 -d' '").strip
       end
 
       def head
