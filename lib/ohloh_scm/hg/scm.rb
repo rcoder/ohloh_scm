@@ -42,6 +42,7 @@ module OhlohScm
 
       def clean_up_disk
         return unless FileTest.exist?(url)
+        sleep 1
 
         run "cd #{url} && find . -maxdepth 1 -not -name .hg -not -name . -print0"\
               ' | xargs -0 rm -rf --'
