@@ -14,7 +14,6 @@ RUN apt-get install -y build-essential software-properties-common locales ragel 
 
 RUN apt-get install -y python2.7 python2-dev python-pip \
   && ln -s /usr/bin/python2.7 /usr/local/bin/python
-RUN pip2 install bzr "mercurial==4.5.3"
 
 RUN locale-gen en_US.UTF-8
 
@@ -32,6 +31,7 @@ RUN ssh-keygen -q -t rsa -N '' -f /root/.ssh/id_rsa \
   && cp /root/.ssh/id_rsa.pub /root/.ssh/authorized_keys \
   && echo 'StrictHostKeyChecking no' >> /root/.ssh/config
 
+RUN pip2 install bzr "mercurial==4.9.1"
 RUN mkdir -p ~/.bazaar/plugins \
   && cd ~/.bazaar/plugins \
   && bzr branch lp:bzr-xmloutput ~/.bazaar/plugins/xmloutput
