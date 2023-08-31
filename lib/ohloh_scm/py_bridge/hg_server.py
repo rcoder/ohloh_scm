@@ -10,13 +10,20 @@ class HglibPipeServer:
     self.repository = hg.repository(self.ui, repository_url)
 
   def get_file_content(self, filename, revision):
-    c = self.repository.changectx(revision)
+    c = self.changectx(revision)
     fc = c[filename]
     contents = fc.data()
     return contents
 
+  def changectx(self, revision):
+    if hasattr(self.repository, 'changectx'):
+      return self.repository.changectx(revision)
+    else:
+      rev_no = self.repository.revs(revision).first()
+      return self.repository[rev_no]
+
   def get_parent_tokens(self, revision):
-    c = self.repository.changectx(revision)
+    c = self.changectx(revision)
     parents = [p.hex() for p in c.parents() if p.hex() != '0000000000000000000000000000000000000000']
     return parents
 
